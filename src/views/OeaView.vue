@@ -6,23 +6,24 @@
 
 <script setup>
 import { useRoute } from 'vue-router';
-import { storeToRefs } from 'pinia'
+import { storeToRefs } from 'pinia';
 
-import { useSound } from '@vueuse/sound'
+import { useSound } from '@vueuse/sound';
 
 import { useQuestsStore } from '@/stores/quests.js';
 import { pointInPolygon, toPolygon } from '@/utils/utils.js';
+import confetti from '@/composables/useConfetti'
 
 import okSound from '@/assets/sounds/ok.mp3';
 import koSound from '@/assets/sounds/ko.mp3';
-
 
 const route = useRoute();
 const questsStore = useQuestsStore();
 const { currentQuest } = storeToRefs(questsStore);
 
-const {play: playOk} = useSound(okSound);
-const {play: playKo} = useSound(koSound);
+const { play: playOk } = useSound(okSound);
+const { play: playKo } = useSound(koSound);
+//const confetti = new Confetti();
 
 questsStore.setCurrentQuestIndex(parseInt(route?.params?.imageIndex || 1) - 1);
 
@@ -38,9 +39,13 @@ const onImageClick = (event) => {
     const isInside = pointInPolygon(scaledPolygon, point);
 
     if (isInside) {
-        questsStore.nextQuest();
         playOk();
-    }else{
+        confetti.start();
+        questsStore.nextQuest();
+        setTimeout(() => {
+            confetti.stop();
+        }, 1500);
+    } else {
         playKo();
     }
 };
