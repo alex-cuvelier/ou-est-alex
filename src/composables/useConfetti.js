@@ -11,29 +11,29 @@ export default {
             particles: [
                 {
                     type: 'image',
-                    url: '/images/particules/bravo-1.png'
+                    url: '/images/particules/bravo-1.png',
                 },
                 {
                     type: 'image',
-                    url: '/images/particules/bravo-2.png'
+                    url: '/images/particules/bravo-2.png',
                 },
                 {
                     type: 'image',
-                    url: '/images/particules/bravo-3.png'
+                    url: '/images/particules/bravo-3.png',
                 },
                 {
                     type: 'image',
-                    url: '/images/particules/bravo-4.png'
+                    url: '/images/particules/bravo-4.png',
                 },
                 {
                     type: 'image',
-                    url: '/images/particules/bravo-5.png'
+                    url: '/images/particules/bravo-5.png',
                 },
                 {
                     type: 'image',
-                    url: '/images/particules/bravo-6.png'
+                    url: '/images/particules/bravo-6.png',
                 },
-            ]
+            ],
         }),
     stop: () => instance.stop(),
 };

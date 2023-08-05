@@ -1,51 +1,48 @@
 <template>
-  <header>
-    Où est Alex ?
-    <div>
-      <button class="btn-icon" @click="questsStore.previousQuest">
-        <font-awesome-icon icon="arrow-left" size="sm" />
-      </button>
-      {{ currentQuestIndex + 1 }} / {{ questsCount }}
-      <button class="btn-icon" @click="questsStore.nextQuest">
-        <font-awesome-icon icon="arrow-right" size="sm" />
-      </button>
-    </div>
-  </header>
-  <RouterView />
+    <header>
+        Où est Alex ?
+        <div>
+            <button class="btn-icon" @click="questsStore.previousQuest">
+                <font-awesome-icon icon="arrow-left" size="sm" />
+            </button>
+            {{ currentQuestIndex + 1 }} / {{ questsCount }}
+            <button class="btn-icon" @click="questsStore.nextQuest">
+                <font-awesome-icon icon="arrow-right" size="sm" />
+            </button>
+        </div>
+    </header>
+    <RouterView />
 </template>
 
-
 <script setup>
-  import { useQuestsStore } from '@/stores/quests.js';
-  import { storeToRefs } from 'pinia';
+import { useQuestsStore } from '@/stores/quests.js';
+import { storeToRefs } from 'pinia';
 
-  const questsStore = useQuestsStore();
-  const { currentQuestIndex, questsCount } = storeToRefs(questsStore);
+const questsStore = useQuestsStore();
+const { currentQuestIndex, questsCount } = storeToRefs(questsStore);
 </script>
 
 <style lang="scss" scoped>
-  #app{
+#app {
     display: flex;
     flex-direction: column;
-    
-    header{
-      padding: 1rem;
-      display: flex;
-      justify-content: space-between;
-      position: relative;
-      z-index: 1;
-      background-color: #fff;
 
-      .btn-icon{
-        background: none;
-        border: none;
-      }
+    header {
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        z-index: 1;
+        background-color: #fff;
 
+        .btn-icon {
+            background: none;
+            border: none;
+        }
     }
 
-    main{
-      flex: 1;
+    main {
+        flex: 1;
     }
-
-  }
+}
 </style>

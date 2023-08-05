@@ -4,15 +4,14 @@ import { defineStore } from 'pinia';
 import quests from '@/quests.json';
 
 export const useQuestsStore = defineStore('quests', () => {
-
     const currentQuestIndex = ref(0);
 
     const currentQuest = computed(() => quests[currentQuestIndex.value]);
-    
+
     const questsCount = computed(() => quests.length);
 
     const nextQuest = () => {
-        if (currentQuestIndex.value >= quests.length -1) {
+        if (currentQuestIndex.value >= quests.length - 1) {
             currentQuestIndex.value = 0;
             return;
         }
@@ -35,7 +34,7 @@ export const useQuestsStore = defineStore('quests', () => {
         }
 
         currentQuestIndex.value = index;
-    }
+    };
 
-    return { currentQuestIndex, currentQuest, questsCount,  nextQuest, previousQuest, setCurrentQuestIndex };
+    return { currentQuestIndex, currentQuest, questsCount, nextQuest, previousQuest, setCurrentQuestIndex };
 });
