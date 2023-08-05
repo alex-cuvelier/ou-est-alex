@@ -12,8 +12,8 @@ export const useQuestsStore = defineStore('quests', () => {
     const questsCount = computed(() => quests.length);
 
     const nextQuest = () => {
-        if (currentQuestIndex.value === quests.length) {
-            currentQuestIndex.value = 1;
+        if (currentQuestIndex.value >= quests.length -1) {
+            currentQuestIndex.value = 0;
             return;
         }
 
