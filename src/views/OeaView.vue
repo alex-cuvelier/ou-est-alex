@@ -124,14 +124,22 @@ const onmousemove = function (e) {
 const onwheel = function (e) {
     e.preventDefault();
 
-    var xs = (e.clientX - pointX.value) / scale.value,
-        ys = (e.clientY - pointY.value) / scale.value,
-        delta = e.wheelDelta ? e.wheelDelta : -e.deltaY;
+    const img = e.target;
+    const rec = img.getBoundingClientRect();
+    const x = (e.clientX - rec.x) / scale.value;
+    const y = (e.clientY - rec.y) / scale.value;
+
+    const delta = (e.wheelDelta ? e.wheelDelta : -e.deltaY);
+
+    if(scale.value == 1 && delta < 0) {
+        resetTransform();
+        return;
+    }
 
     if (delta > 0) {
-        scale.value = (scale.value * 1.2).toFixed(2);
+        scale.value = (scale.value + 0.4);
     } else {
-        scale.value = (scale.value / 1.2).toFixed(2);
+        scale.value = (scale.value - 0.4);
     }
 
     if (scale.value < 1) {
@@ -140,8 +148,10 @@ const onwheel = function (e) {
         scale.value = 10;
     }
 
-    pointX.value = e.clientX - xs * scale.value;
-    pointY.value = e.clientY - ys * scale.value;
+    const m = (delta > 0) ? 0.2 : -0.2;
+    pointX.value += (-x * m * 2) + (img.offsetWidth * m);
+    pointY.value += (-y * m * 2) + (img.offsetHeight * m);
+
 };
 
 //change url on quest change
