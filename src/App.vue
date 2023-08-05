@@ -1,6 +1,6 @@
 <template>
     <header>
-        Où est Alex ?
+        <a href="/">Où est Alex ?</a>
         <div>
             <button class="btn-icon" @click="questsStore.previousQuest">
                 <font-awesome-icon icon="arrow-left" size="sm" />
@@ -21,28 +21,3 @@ import { storeToRefs } from 'pinia';
 const questsStore = useQuestsStore();
 const { currentQuestIndex, questsCount } = storeToRefs(questsStore);
 </script>
-
-<style lang="scss" scoped>
-#app {
-    display: flex;
-    flex-direction: column;
-
-    header {
-        padding: 1rem;
-        display: flex;
-        justify-content: space-between;
-        position: relative;
-        z-index: 1;
-        background-color: #fff;
-
-        .btn-icon {
-            background: none;
-            border: none;
-        }
-    }
-
-    main {
-        flex: 1;
-    }
-}
-</style>

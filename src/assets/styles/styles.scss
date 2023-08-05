@@ -1,0 +1,53 @@
+@import 'base.scss';
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+
+    header {
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        z-index: 1;
+        background-color: #fff;
+        border-bottom: 1px solid #ccc;
+
+        a{
+            text-decoration: none;
+            &:visited {
+                color: inherit;
+            }
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+        }
+    }
+
+    main {
+        flex: 1;
+        background-color: #000;
+        .oea-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform-origin: 0px 0px;
+            cursor: crosshair;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        font-size: 2.5rem;
+
+        .btn-icon {
+            svg {
+                font-size: 2.5rem;
+            }
+        }
+    }
+}

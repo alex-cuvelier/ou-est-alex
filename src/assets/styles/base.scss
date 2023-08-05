@@ -6,8 +6,20 @@
     font-weight: normal;
 }
 
+html {
+    height: -webkit-fill-available;
+}
+
+/* Avoid Chrome to see Safari hack */
+@supports (-webkit-touch-callout: none) {
+    body {
+      /* The hack for Safari */
+      min-height: -webkit-fill-available;
+    }
+  }
+
 body {
-    min-height: 100vh;
+    min-height: 100svh;
     line-height: 1.6;
     font-family:
         Inter,

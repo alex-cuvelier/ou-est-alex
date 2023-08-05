@@ -14,7 +14,7 @@
 
 <script setup>
 import { ref, watch, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
 import { useSound } from '@vueuse/sound';
@@ -27,8 +27,10 @@ import okSound from '@/assets/sounds/oui.mp3';
 import koSound from '@/assets/sounds/non.mp3';
 
 const route = useRoute();
+const router = useRouter();
+
 const questsStore = useQuestsStore();
-const { currentQuest } = storeToRefs(questsStore);
+const { currentQuest, currentQuestIndex } = storeToRefs(questsStore);
 
 const { play: playOk } = useSound(okSound);
 const { play: playKo } = useSound(koSound);
@@ -134,23 +136,27 @@ const onwheel = function (e) {
 
     if (scale.value < 1) {
         scale.value = 1;
+    } else if (scale.value > 10) {
+        scale.value = 10;
     }
 
     pointX.value = e.clientX - xs * scale.value;
     pointY.value = e.clientY - ys * scale.value;
 };
 
-watch(currentQuest, () => {
+watch(currentQuestIndex, (value) => {
+    router.push({
+        name: 'homeIndex',
+        params: {
+            imageIndex: value + 1,
+        },
+    });
     resetTransform();
 });
-</script>
 
-<style lang="scss" scoped>
-.oea-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transform-origin: 0px 0px;
-    cursor: crosshair;
-}
-</style>
+watch(scale, (value) => {
+    if (value == 1) {
+        resetTransform();
+    }
+});
+</script>
