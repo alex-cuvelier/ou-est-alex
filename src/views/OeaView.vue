@@ -137,17 +137,15 @@ const onwheel = function (e) {
     }
 
     if (delta > 0) {
-        scale.value = (scale.value + 0.4);
+        if(scale.value > 10){
+            return
+        }
+        scale.value = parseFloat((scale.value + 0.4).toFixed(1));
     } else {
-        scale.value = (scale.value - 0.4);
-    }
-
-    if (scale.value < 1) {
-        scale.value = 1;
-        return;
-    } else if (scale.value > 10) {
-        scale.value = 10;
-        return;
+        if(scale.value <= 1){
+            return
+        }
+        scale.value = parseFloat((scale.value - 0.4).toFixed(1));
     }
 
     const m = (delta > 0) ? 0.2 : -0.2;
@@ -169,6 +167,7 @@ watch(currentQuestIndex, (value) => {
 
 //reset transform on scale reset
 watch(scale, (value) => {
+    console.log(value);
     if (value == 1) {
         resetTransform();
     }
