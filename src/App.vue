@@ -32,6 +32,9 @@
       padding: 1rem;
       display: flex;
       justify-content: space-between;
+      position: relative;
+      z-index: 1;
+      background-color: #fff;
 
       .btn-icon{
         background: none;
