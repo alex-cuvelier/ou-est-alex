@@ -13,6 +13,18 @@ export function pointInPolygon(polygon, point) {
     return result;
 }
 
+export function getPolygonCenter(polygon) {
+    console.log(polygon);
+    let x = 0;
+    let y = 0;
+    for (let i = 0; i < polygon.length; i++) {
+        x += polygon[i][0];
+        y += polygon[i][1];
+    }
+    
+    return [x / polygon.length, y / polygon.length];
+}
+
 export function toPolygon(coordsStr) {
     return coordsStr
         .split(',')

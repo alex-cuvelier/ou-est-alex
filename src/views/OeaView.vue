@@ -1,4 +1,19 @@
 <template>
+    <header>
+        <a href="/">Où est Alex ?</a>
+        <button class="btn-icon ask-clue">
+            <font-awesome-icon icon="question-circle" size="sm" />
+        </button>
+        <div>
+            <button class="btn-icon" @click="questsStore.previousQuest">
+                <font-awesome-icon icon="arrow-left" size="sm" />
+            </button>
+            {{ currentQuestIndex + 1 }} / {{ questsCount }}
+            <button class="btn-icon" @click="questsStore.nextQuest">
+                <font-awesome-icon icon="arrow-right" size="sm" />
+            </button>
+        </div>
+    </header>
     <main>
         <img
             class="oea-img"
@@ -30,7 +45,7 @@ const route = useRoute();
 const router = useRouter();
 
 const questsStore = useQuestsStore();
-const { currentQuest, currentQuestIndex } = storeToRefs(questsStore);
+const { currentQuest, currentQuestIndex, questsCount } = storeToRefs(questsStore);
 
 const { play: playOk } = useSound(okSound);
 const { play: playKo } = useSound(koSound);
