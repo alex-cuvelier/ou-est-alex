@@ -144,6 +144,7 @@ const onwheel = function (e) {
     pointY.value = e.clientY - ys * scale.value;
 };
 
+//change url on quest change
 watch(currentQuestIndex, (value) => {
     router.push({
         name: 'homeIndex',
@@ -154,6 +155,7 @@ watch(currentQuestIndex, (value) => {
     resetTransform();
 });
 
+//reset transform on scale reset
 watch(scale, (value) => {
     if (value == 1) {
         resetTransform();
