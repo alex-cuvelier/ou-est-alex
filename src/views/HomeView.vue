@@ -5,14 +5,24 @@
 </template>
 
 <script setup>
-import { pointInPolygon, toPolygon } from '@/utils/utils.js';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia'
+
+import { useSound } from '@vueuse/sound'
+
 import { useQuestsStore } from '@/stores/quests.js';
+import { pointInPolygon, toPolygon } from '@/utils/utils.js';
+
+import okSound from '@/assets/sounds/ok.mp3';
+import koSound from '@/assets/sounds/ko.mp3';
+
 
 const route = useRoute();
 const questsStore = useQuestsStore();
 const { currentQuest } = storeToRefs(questsStore);
+
+const {play: playOk} = useSound(okSound);
+const {play: playKo} = useSound(koSound);
 
 questsStore.setCurrentQuestIndex(parseInt(route?.params?.imageIndex || 1) - 1);
 
@@ -29,6 +39,9 @@ const onImageClick = (event) => {
 
     if (isInside) {
         questsStore.nextQuest();
+        playOk();
+    }else{
+        playKo();
     }
 };
 </script>
@@ -40,4 +53,3 @@ const onImageClick = (event) => {
     object-fit: cover;
 }
 </style>
-```
