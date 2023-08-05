@@ -23,8 +23,8 @@ import { useQuestsStore } from '@/stores/quests.js';
 import { pointInPolygon, toPolygon } from '@/utils/utils.js';
 import confetti from '@/composables/useConfetti';
 
-import okSound from '@/assets/sounds/ok.mp3';
-import koSound from '@/assets/sounds/ko.mp3';
+import okSound from '@/assets/sounds/oui.mp3';
+import koSound from '@/assets/sounds/non.mp3';
 
 const route = useRoute();
 const questsStore = useQuestsStore();
@@ -105,8 +105,18 @@ const onmousemove = function (e) {
         return;
     }
 
-    pointX.value = e.clientX - start.x;
-    pointY.value = e.clientY - start.y;
+    let newXValue = e.clientX - start.x;
+    let newYValue = e.clientY - start.y;
+    const xDifference = pointX.value + newXValue;
+    const yDifference = pointY.value + newYValue;
+
+    const threshold = 10 * scale.value;
+    if (xDifference < threshold && yDifference > -threshold && yDifference < threshold && yDifference > -threshold) {
+        return;
+    }
+
+    pointX.value = newXValue;
+    pointY.value = newYValue;
 };
 
 const onwheel = function (e) {
@@ -141,7 +151,6 @@ watch(currentQuest, () => {
     height: 100%;
     object-fit: cover;
     transform-origin: 0px 0px;
-    transform: scale(1) translate(0px, 0px);
-    cursor: grab;
+    cursor: crosshair;
 }
 </style>
