@@ -1,7 +1,6 @@
 import { ref, computed, watch } from 'vue';
 
 export default function useImageZoom(clikcCallback) {
-
     const scale = ref(1),
         pointX = ref(0),
         pointY = ref(0);
@@ -97,14 +96,14 @@ export default function useImageZoom(clikcCallback) {
     });
 
     return {
-        scale, 
-        pointX, 
-        pointY, 
-        transformStyle, 
-        resetTransform, 
-        onMouseDown, 
-        onMouseUp, 
-        onMouseMove, 
-        onWheel, 
+        scale,
+        pointX,
+        pointY,
+        transformStyle,
+        resetTransform,
+        onMouseDown,
+        onMouseUp,
+        onMouseMove,
+        onWheel,
     };
 }
