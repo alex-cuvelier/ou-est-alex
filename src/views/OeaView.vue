@@ -34,15 +34,11 @@ import { ref, watch, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
-import { useSound } from '@vueuse/sound';
-
 import { useQuestsStore } from '@/stores/quests.js';
 import { pointInPolygon, toPolygon, getPolygonCenter, getRandomPointInCircle } from '@/utils/utils.js';
 import confetti from '@/composables/useConfetti';
 
-import okSound from '@/assets/sounds/oui.mp3';
-import koSound from '@/assets/sounds/non.mp3';
-import noobSound from '@/assets/sounds/noob.mp3';
+import { playOk, playKo, playNoob } from '@/composables/useSounds.js';
 
 const route = useRoute();
 const router = useRouter();
@@ -50,9 +46,7 @@ const router = useRouter();
 const questsStore = useQuestsStore();
 const { currentQuest, currentQuestIndex, questsCount } = storeToRefs(questsStore);
 
-const { play: playOk } = useSound(okSound);
-const { play: playKo } = useSound(koSound);
-const { play: playNoob } = useSound(noobSound);
+
 
 questsStore.setCurrentQuestIndex(parseInt(route?.params?.imageIndex || 1) - 1);
 
@@ -237,7 +231,8 @@ watch(currentQuestIndex, (value) => {
         },
     });
     resetTransform();
-    clueSize.value = Math.min(document.querySelector('main').getBoundingClientRect().width, document.querySelector('main').getBoundingClientRect().height);
+    const mainDimensions = document.querySelector('main').getBoundingClientRect();
+    clueSize.value = Math.min(mainDimensions.width, mainDimensions.height);
     updateWrapperStyle();
 });
 
