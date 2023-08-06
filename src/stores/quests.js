@@ -4,18 +4,30 @@ import { defineStore } from 'pinia';
 import quests from '@/quests.json';
 
 export const useQuestsStore = defineStore('quests', () => {
-    const filteredQuests = quests.filter((quest) => !quest.hard).map((quest, index) => ({ ...quest, id: index }));
+    const filteredQuests = 
+        quests.filter(quest => !quest.hard)
+        .map((quest, index) => ({
+            id: index,
+            type: 'quest',
+            ...quest
+        }));
 
     const currentQuestIndex = ref(0);
+
+    const questsStats = ref([]);
 
     const currentQuest = computed(() => filteredQuests[currentQuestIndex.value]);
 
     const questsCount = computed(() => filteredQuests.length);
 
-    const nextQuest = () => {
+    const nextQuest = (questStat) => {
         if (currentQuestIndex.value >= filteredQuests.length - 1) {
             currentQuestIndex.value = 0;
             return;
+        }
+
+        if (questStat) {
+            questsStats.value.push(questStat);
         }
 
         currentQuestIndex.value++;
@@ -38,5 +50,5 @@ export const useQuestsStore = defineStore('quests', () => {
         currentQuestIndex.value = index;
     };
 
-    return { currentQuestIndex, currentQuest, questsCount, nextQuest, previousQuest, setCurrentQuestIndex };
+    return { currentQuestIndex, currentQuest, questsCount, questsStats, nextQuest, previousQuest, setCurrentQuestIndex };
 });

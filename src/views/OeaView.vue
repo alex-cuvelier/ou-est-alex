@@ -8,15 +8,20 @@
             <button class="oea-btn" @click="questsStore.previousQuest">
                 <font-awesome-icon icon="arrow-left" size="sm" />
             </button>
-            {{ currentQuestIndex + 1 }} / {{ questsCount }}
-            <button class="oea-btn" @click="questsStore.nextQuest">
+            <span v-if="currentQuestIndex + 1 < questsCount">
+                {{ currentQuestIndex + 1 }} / {{ questsCount - 1 }}
+            </span>
+            <span v-else>
+                Fin
+            </span>
+            <button class="oea-btn" @click="nextQuest">
                 <font-awesome-icon icon="arrow-right" size="sm" />
             </button>
         </div>
     </header>
-    <!-- <div class="oea-stats"></div> -->
     <main>
         <div
+            v-if="currentQuest?.type == 'quest'"
             ref="image-wrapper"
             class="oea-image-wrapper"
             :class="{ displayClue: displayClue }"
@@ -28,7 +33,39 @@
         >
             <img ref="image" class="oea-img" :src="currentQuest.url" />
         </div>
+        <div v-else class="oea-end-stats">
+                <div class="oea-end-stat">
+                    <span class="oea-end-stat-title">Trouvés</span>
+                    <span class="oea-end-stat-value">{{ endStats.found }} / {{ questsCount - 1 }}</span>
+                </div>
+                <div class="oea-end-stat">
+                    <span class="oea-end-stat-title">Erreurs</span>
+                    <span class="oea-end-stat-value">{{ endStats.noCount }}</span>
+                </div>
+                <div class="oea-end-stat">
+                    <span class="oea-end-stat-title">Indices</span>
+                    <span class="oea-end-stat-value">{{ endStats.clueCount }}</span>
+                </div>
+                <div class="oea-end-stat">
+                    <span class="oea-end-stat-title">Temps</span>
+                    <span class="oea-end-stat-value">{{ formatDuration(intervalToDuration({ start: 0, end: endStats.time * 1000 }), { locale: fr }) }}</span>
+                </div>
+        </div>
     </main>
+    <div v-if="currentQuest?.type == 'quest'" class="oea-quest-stats">
+        <div class="oea-quest-stat">
+            <span class="oea-quest-stat-title">Timer</span>
+            <span class="oea-quest-stat-value">{{ timer }}</span>
+        </div>
+        <div class="oea-quest-stat">
+            <span class="oea-quest-stat-title">Indice</span>
+            <span class="oea-quest-stat-value">{{ questStats.clueCount }}</span>
+        </div>
+        <div class="oea-quest-stat">
+            <span class="oea-quest-stat-title">Non</span>
+            <span class="oea-quest-stat-value">{{ questStats.noCount }}</span>
+        </div>
+    </div>
 </template>
 
 <script setup>
@@ -43,11 +80,20 @@ import useImageZoom from '@/composables/useImageZoom.js';
 
 import { playOk, playKo, playNoob } from '@/composables/useSounds.js';
 
+import { intervalToDuration, formatDuration } from 'date-fns';
+import { fr } from 'date-fns/locale';
+
 const route = useRoute();
 const router = useRouter();
 
 const questsStore = useQuestsStore();
-const { currentQuest, currentQuestIndex, questsCount } = storeToRefs(questsStore);
+const { currentQuest, currentQuestIndex, questsCount, questsStats } = storeToRefs(questsStore);
+
+const questStats = ref({});
+const timer = ref(0);
+setInterval(() => {
+    timer.value++;
+}, 1000);
 
 questsStore.setCurrentQuestIndex(parseInt(route?.params?.imageIndex || 1) - 1);
 
@@ -67,16 +113,37 @@ function checkAlexFound(event) {
         onAlexFound();
     } else {
         playKo();
+        questStats.value.noCount++;
     }
 }
 
 function onAlexFound() {
     playOk();
     confetti.start();
-    questsStore.nextQuest();
+    questStats.value.found = true;
+    nextQuest();
     setTimeout(() => {
         confetti.stop();
     }, 1500);
+}
+
+function nextQuest() {
+    questStats.value.end = new Date();
+    questsStore.nextQuest({
+        ...questStats.value,
+    });
+}
+
+function resetQuestStats() {
+    questStats.value = {
+        id: currentQuestIndex.value + 1,
+        start: new Date(),
+        end: null,
+        clueCount: 0,
+        noCount: 0,
+        found: false,
+    };
+    timer.value = 0;
 }
 
 //IMAGE WRAPPER DIMENSIONS
@@ -115,6 +182,7 @@ function updateWrapperStyle() {
 function showClue() {
     playNoob();
     displayClue.value = true;
+    questStats.value.clueCount++;
     setTimeout(() => {
         displayClue.value = false;
         if (clueSize.value > 50) {
@@ -124,6 +192,22 @@ function showClue() {
     }, 100);
 }
 
+const endStats = computed(() => {
+    return questsStats.value.reduce(
+        (acc, stat) => {
+            acc.found += stat.found ? 1 : 0;
+            acc.noCount += stat.noCount;
+            acc.clueCount += stat.clueCount;
+            acc.time += intervalToDuration({
+                start: stat.start,
+                end: stat.end,
+            }).seconds;
+            return acc;
+        },
+        { found: 0, noCount: 0, clueCount: 0, time: 0 },
+    );
+});
+
 //ZOOM
 
 function resetClueSize() {
@@ -132,7 +216,12 @@ function resetClueSize() {
 }
 
 onMounted(() => {
+    if (currentQuest.value.type == 'end' && questsStats.value.length == 0) {
+        location.href = '/';
+    }
+
     resetClueSize();
+    resetQuestStats();
     updateWrapperStyle();
 });
 
@@ -146,7 +235,10 @@ watch(currentQuestIndex, (value) => {
     });
     resetTransform();
     resetClueSize();
-    updateWrapperStyle();
+    resetQuestStats();
+    if (currentQuest.value.type == 'quest') {
+        updateWrapperStyle();
+    }
 });
 </script>
 
