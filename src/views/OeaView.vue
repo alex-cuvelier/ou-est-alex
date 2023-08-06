@@ -14,6 +14,7 @@
             </button>
         </div>
     </header>
+    <!-- <div class="oea-stats"></div> -->
     <main>
         <div
             ref="image-wrapper"
@@ -38,6 +39,7 @@ import { storeToRefs } from 'pinia';
 import { useQuestsStore } from '@/stores/quests.js';
 import { pointInPolygon, toPolygon, getPolygonCenter, getRandomPointInCircle } from '@/utils/utils.js';
 import confetti from '@/composables/useConfetti';
+import useImageZoom from '@/composables/useImageZoom.js';
 
 import { playOk, playKo, playNoob } from '@/composables/useSounds.js';
 
@@ -53,8 +55,9 @@ const clueSize = ref(0);
 const clueSizeWithUnit = computed(() => clueSize.value + 'px');
 const displayClue = ref(false);
 
-function checkAlexFound(event) {
+const { transformStyle, resetTransform, onMouseDown, onMouseUp, onMouseMove, onWheel } = useImageZoom(checkAlexFound);
 
+function checkAlexFound(event) {
     const xRatio = event.target.naturalWidth / event.target.width;
     const yRatio = event.target.naturalHeight / event.target.height;
     const polygon = toPolygon(currentQuest.value.coords, xRatio, yRatio);
@@ -65,16 +68,16 @@ function checkAlexFound(event) {
     } else {
         playKo();
     }
-};
+}
 
-function onAlexFound (){
+function onAlexFound() {
     playOk();
     confetti.start();
     questsStore.nextQuest();
     setTimeout(() => {
         confetti.stop();
     }, 1500);
-};
+}
 
 //IMAGE WRAPPER DIMENSIONS
 const wrapperStyle = ref({ height: '100%', width: '100%' });
@@ -109,7 +112,7 @@ function updateWrapperStyle() {
     };
 }
 
-function showClue(){
+function showClue() {
     playNoob();
     displayClue.value = true;
     setTimeout(() => {
@@ -119,100 +122,14 @@ function showClue(){
         }
         updateWrapperStyle();
     }, 100);
-};
-
-//ZOOM
-const scale = ref(1),
-    pointX = ref(0),
-    pointY = ref(0);
-let panning = false,
-    start = { x: 0, y: 0 },
-    pointSaved = { x: 0, y: 0 };
-
-const transformStyle = computed(() => {
-    return {
-        transform: `translate(${pointX.value}px, ${pointY.value}px) scale(${scale.value})`,
-    };
-});
-
-function resetTransform() {
-    scale.value = 1;
-    pointX.value = 0;
-    pointY.value = 0;
 }
 
-function onMouseDown(e) {
-    e.preventDefault();
-    start = { x: e.clientX - pointX.value, y: e.clientY - pointY.value };
-    panning = true;
-    pointSaved = { x: pointX.value, y: pointY.value };
-};
+//ZOOM
 
-function onMouseUp(e) {
-    panning = false;
-
-    //Check if is a click or a drag
-    if (pointSaved.x == pointX.value && pointSaved.y == pointY.value) {
-        checkAlexFound(e);
-    }
-};
-
-function onMouseMove (e) {
-    e.preventDefault();
-    if (!panning) {
-        return;
-    }
-
-    let newXValue = e.clientX - start.x;
-    let newYValue = e.clientY - start.y;
-    const xDifference = pointX.value + newXValue;
-    const yDifference = pointY.value + newYValue;
-
-    const threshold = 10 * scale.value;
-    if (xDifference < threshold && yDifference > -threshold && yDifference < threshold && yDifference > -threshold) {
-        return;
-    }
-
-    pointX.value = newXValue;
-    pointY.value = newYValue;
-};
-
-function onWheel (event) {
-    event.preventDefault();
-
-    const img = event.target;
-    const rec = img.getBoundingClientRect();
-    const x = (event.clientX - rec.x) / scale.value;
-    const y = (event.clientY - rec.y) / scale.value;
-
-    const delta = event.wheelDelta ? event.wheelDelta : -event.deltaY;
-
-    if (scale.value == 1 && delta < 0) {
-        resetTransform();
-        return;
-    }
-
-    if (delta > 0) {
-        if (scale.value > 10) {
-            return;
-        }
-        scale.value = parseFloat((scale.value + 0.4).toFixed(1));
-    } else {
-        if (scale.value <= 1) {
-            return;
-        }
-        scale.value = parseFloat((scale.value - 0.4).toFixed(1));
-    }
-
-    const m = delta > 0 ? 0.2 : -0.2;
-    pointX.value += -x * m * 2 + img.offsetWidth * m;
-    pointY.value += -y * m * 2 + img.offsetHeight * m;
-};
-
-function resetClueSize () {
+function resetClueSize() {
     const mainDimensions = document.querySelector('main').getBoundingClientRect();
     clueSize.value = Math.min(mainDimensions.width, mainDimensions.height);
-};
+}
 
 onMounted(() => {
     resetClueSize();
@@ -231,22 +148,14 @@ watch(currentQuestIndex, (value) => {
     resetClueSize();
     updateWrapperStyle();
 });
-
-//reset transform on scale reset
-watch(scale, (value) => {
-    if (value == 1) {
-        resetTransform();
-    }
-});
 </script>
 
 <style lang="scss">
 /* Clue circles */
 .oea-image-wrapper {
-
-    &.displayClue{
+    &.displayClue {
         &::after,
-        &::before  {
+        &::before {
             display: block;
         }
     }
