@@ -42,6 +42,7 @@ import confetti from '@/composables/useConfetti';
 
 import okSound from '@/assets/sounds/oui.mp3';
 import koSound from '@/assets/sounds/non.mp3';
+import noobSound from '@/assets/sounds/noob.mp3';
 
 const route = useRoute();
 const router = useRouter();
@@ -51,6 +52,7 @@ const { currentQuest, currentQuestIndex, questsCount } = storeToRefs(questsStore
 
 const { play: playOk } = useSound(okSound);
 const { play: playKo } = useSound(koSound);
+const { play: playNoob } = useSound(noobSound);
 
 questsStore.setCurrentQuestIndex(parseInt(route?.params?.imageIndex || 1) - 1);
 
@@ -122,6 +124,7 @@ function updateWrapperStyle() {
 }
 
 const showClue = () => {
+    playNoob();
     clueDisplay.value = 'block';
     setTimeout(() => {
         clueDisplay.value = 'none';
