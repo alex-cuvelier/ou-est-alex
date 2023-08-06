@@ -89,6 +89,8 @@ const alexFound = () => {
 const wrapperStyle = ref({ height: '100%', width: '100%' });
 
 function updateWrapperStyle() {
+
+    /* Compute wrapper dimmensions */
     const main = document.querySelector('main');
     const mainDimensions = main.getBoundingClientRect();
     const aspectRatio = currentQuest.value.width / currentQuest.value.height;
@@ -103,13 +105,13 @@ function updateWrapperStyle() {
         newWidth = mainDimensions.height * aspectRatio;
     }
 
+    /* Compute clue circle position*/
     const xRatio = currentQuest.value.width / newWidth;
     const yRatio = currentQuest.value.height / newHeight;
     const polygon = toPolygon(currentQuest.value.coords);
     const scaledPolygon = polygon.map((coord) => [coord[0] / xRatio, coord[1] / yRatio]);
     const polygonCenter = getPolygonCenter(scaledPolygon);
-
-    const clueCenter = getRandomPointInCircle(polygonCenter.x, polygonCenter.y, clueSize.value / 2);
+    const clueCenter = getRandomPointInCircle(polygonCenter.x, polygonCenter.y, clueSize.value / 2 - 20);
 
     wrapperStyle.value = {
         height: newHeight + 'px',
@@ -124,10 +126,10 @@ const showClue = () => {
     setTimeout(() => {
         clueDisplay.value = 'none';
         if(clueSize.value > 50){
-            clueSize.value = clueSize.value - 50;
+            clueSize.value = clueSize.value * 0.8;
         }
         updateWrapperStyle();
-    }, 1000);
+    }, 100);
 };
 
 //ZOOM
@@ -248,6 +250,7 @@ watch(scale, (value) => {
 </script>
 
 <style lang="scss">
+/* Clue circles */
 .oea-image-wrapper::after {
     content: '';
     position: absolute;
