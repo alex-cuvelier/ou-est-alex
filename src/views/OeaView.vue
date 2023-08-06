@@ -1,23 +1,21 @@
 <template>
     <header>
         <a href="/">Où est Alex ?</a>
-        <button class="oea-btn ask-clue" @click="showClue" :disabled="displayClue">
-            <font-awesome-icon icon="question-circle" size="lg" />
-        </button>
-        <div>
-            <button class="oea-btn" @click="questsStore.previousQuest">
+        <span>
+            <button class="oea-btn ask-clue" @click="showClue" :disabled="displayClue">
+                <font-awesome-icon icon="question-circle" size="lg" />
+            </button>
+        </span>
+        <div v-if="currentQuestIndex + 1 < questsCount">
+            <button class="oea-btn" :disabled="currentQuestIndex == 0" @click="questsStore.previousQuest">
                 <font-awesome-icon icon="arrow-left" size="sm" />
             </button>
-            <span v-if="currentQuestIndex + 1 < questsCount">
-                {{ currentQuestIndex + 1 }} / {{ questsCount - 1 }}
-            </span>
-            <span v-else>
-                Fin
-            </span>
+            <span> {{ currentQuestIndex + 1 }} / {{ questsCount - 1 }} </span>
             <button class="oea-btn" @click="nextQuest">
                 <font-awesome-icon icon="arrow-right" size="sm" />
             </button>
         </div>
+        <span v-else> Fin </span>
     </header>
     <main>
         <div
@@ -34,22 +32,33 @@
             <img ref="image" class="oea-img" :src="currentQuest.url" />
         </div>
         <div v-else class="oea-end-stats">
-                <div class="oea-end-stat">
-                    <span class="oea-end-stat-title">Trouvés</span>
-                    <span class="oea-end-stat-value">{{ endStats.found }} / {{ questsCount - 1 }}</span>
-                </div>
-                <div class="oea-end-stat">
-                    <span class="oea-end-stat-title">Erreurs</span>
-                    <span class="oea-end-stat-value">{{ endStats.noCount }}</span>
-                </div>
-                <div class="oea-end-stat">
-                    <span class="oea-end-stat-title">Indices</span>
-                    <span class="oea-end-stat-value">{{ endStats.clueCount }}</span>
-                </div>
-                <div class="oea-end-stat">
-                    <span class="oea-end-stat-title">Temps</span>
-                    <span class="oea-end-stat-value">{{ formatDuration(intervalToDuration({ start: 0, end: endStats.time * 1000 }), { locale: fr }) }}</span>
-                </div>
+            <div class="oea-end-stat">
+                <span class="oea-end-stat-title">Trouvés</span>
+                <span class="oea-end-stat-value">{{ endStats.found }} / {{ questsCount - 1 }}</span>
+            </div>
+            <div class="oea-end-stat">
+                <span class="oea-end-stat-title">Erreurs</span>
+                <span class="oea-end-stat-value">{{ endStats.noCount }}</span>
+            </div>
+            <div class="oea-end-stat">
+                <span class="oea-end-stat-title">Indices</span>
+                <span class="oea-end-stat-value">{{ endStats.clueCount }}</span>
+            </div>
+            <div class="oea-end-stat">
+                <span class="oea-end-stat-title">Temps</span>
+                <span class="oea-end-stat-value">{{
+                    formatDuration(
+                        intervalToDuration({
+                            start: 0,
+                            end: endStats.time * 1000,
+                        }),
+                        { locale: fr },
+                    )
+                }}</span>
+            </div>
+            <div class="oea-end-button-container">
+                <button class="oea-btn" @click="questsStore.resetQuests">Recommencer</button>
+            </div>
         </div>
     </main>
     <div v-if="currentQuest?.type == 'quest'" class="oea-quest-stats">
