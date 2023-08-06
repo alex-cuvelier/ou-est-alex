@@ -33,6 +33,10 @@
             cursor: pointer;
             border-radius: 10%;
             color: #000;
+            &:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
 
             @media (max-device-width: 768px) {
                 font-size: 2.5rem;
