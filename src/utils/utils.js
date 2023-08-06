@@ -14,15 +14,14 @@ export function pointInPolygon(polygon, point) {
 }
 
 export function getPolygonCenter(polygon) {
-    console.log(polygon);
     let x = 0;
     let y = 0;
     for (let i = 0; i < polygon.length; i++) {
         x += polygon[i][0];
         y += polygon[i][1];
     }
-    
-    return {x: x / polygon.length, y: y / polygon.length};
+
+    return { x: x / polygon.length, y: y / polygon.length };
 }
 
 export function toPolygon(coordsStr) {

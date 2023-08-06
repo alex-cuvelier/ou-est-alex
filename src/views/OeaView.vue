@@ -2,7 +2,7 @@
     <header>
         <a href="/">Où est Alex ?</a>
         <button class="oea-btn ask-clue" @click="showClue" :disabled="clueDisplay != 'none'">
-            <font-awesome-icon icon="question-circle" size="lg"/>
+            <font-awesome-icon icon="question-circle" size="lg" />
         </button>
         <div>
             <button class="oea-btn" @click="questsStore.previousQuest">
@@ -91,7 +91,6 @@ const alexFound = () => {
 const wrapperStyle = ref({ height: '100%', width: '100%' });
 
 function updateWrapperStyle() {
-
     /* Compute wrapper dimmensions */
     const main = document.querySelector('main');
     const mainDimensions = main.getBoundingClientRect();
@@ -128,7 +127,7 @@ const showClue = () => {
     clueDisplay.value = 'block';
     setTimeout(() => {
         clueDisplay.value = 'none';
-        if(clueSize.value > 50){
+        if (clueSize.value > 50) {
             clueSize.value = clueSize.value * 0.8;
         }
         updateWrapperStyle();
@@ -244,36 +243,39 @@ watch(currentQuestIndex, (value) => {
 
 //reset transform on scale reset
 watch(scale, (value) => {
-    console.log(value);
     if (value == 1) {
         resetTransform();
     }
 });
-
 </script>
 
 <style lang="scss">
 /* Clue circles */
-.oea-image-wrapper::after {
-    content: '';
-    position: absolute;
-    top: var(--clueCenterY);
-    left: var(--clueCenterX);
-    width: v-bind(clueSizeWithUnit);
-    height: v-bind(clueSizeWithUnit);
-    border: 2px solid black;
-    border-radius: 50%;
-    display: v-bind(clueDisplay);
-}
-.oea-image-wrapper::before {
-    content: '';
-    position: absolute;
-    top: calc(var(--clueCenterY) + 1px);
-    left: calc(var(--clueCenterX) + 1px);
-    width: calc(v-bind(clueSizeWithUnit) - 2px);
-    height: calc(v-bind(clueSizeWithUnit) - 2px);
-    border: 2px solid white;
-    border-radius: 50%;
-    display: v-bind(clueDisplay);
+.oea-image-wrapper {
+    &::after,
+    &::before {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        display: v-bind(clueDisplay);
+        border-radius: 50%;
+        display: v-bind(clueDisplay);
+    }
+
+    &::after {
+        top: var(--clueCenterY);
+        left: var(--clueCenterX);
+        width: v-bind(clueSizeWithUnit);
+        height: v-bind(clueSizeWithUnit);
+        border: 2px solid black;
+    }
+
+    &::before {
+        top: calc(var(--clueCenterY) + 1px);
+        left: calc(var(--clueCenterX) + 1px);
+        width: calc(v-bind(clueSizeWithUnit) - 2px);
+        height: calc(v-bind(clueSizeWithUnit) - 2px);
+        border: 2px solid white;
+    }
 }
 </style>

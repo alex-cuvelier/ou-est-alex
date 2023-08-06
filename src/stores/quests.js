@@ -4,11 +4,9 @@ import { defineStore } from 'pinia';
 import quests from '@/quests.json';
 
 export const useQuestsStore = defineStore('quests', () => {
-    
-    const filteredQuests =  quests.filter((quest) => !quest.hard);
-    
-    const currentQuestIndex = ref(0);
+    const filteredQuests = quests.filter((quest) => !quest.hard);
 
+    const currentQuestIndex = ref(0);
 
     const currentQuest = computed(() => filteredQuests[currentQuestIndex.value]);
 
