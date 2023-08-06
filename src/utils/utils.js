@@ -1,9 +1,9 @@
-export function pointInPolygon(polygon, point) {
+export function pointInPolygon(polygon, x, y) {
     let result = false;
     for (let i = 0, j = polygon.length - 1; i < polygon.length; i++) {
         if (
-            polygon[i][1] > point[1] !== polygon[j][1] > point[1] &&
-            point[0] < ((polygon[j][0] - polygon[i][0]) * (point[1] - polygon[i][1])) / (polygon[j][1] - polygon[i][1]) + polygon[i][0]
+            polygon[i][1] > y !== polygon[j][1] > y &&
+            x < ((polygon[j][0] - polygon[i][0]) * (y - polygon[i][1])) / (polygon[j][1] - polygon[i][1]) + polygon[i][0]
         ) {
             result = !result;
         }
@@ -24,7 +24,7 @@ export function getPolygonCenter(polygon) {
     return { x: x / polygon.length, y: y / polygon.length };
 }
 
-export function toPolygon(coordsStr) {
+export function toPolygon(coordsStr, xRatio, yRatio) {
     return coordsStr
         .split(',')
         .map((coord, index, coords) => {
@@ -32,7 +32,8 @@ export function toPolygon(coordsStr) {
                 return [parseInt(coord), parseInt(coords[index + 1])];
             }
         })
-        .filter((coord) => coord !== undefined);
+        .filter((coord) => coord !== undefined)
+        .map((coord) => [coord[0] / xRatio, coord[1] / yRatio]);
 }
 
 export function getContainedSize(img) {

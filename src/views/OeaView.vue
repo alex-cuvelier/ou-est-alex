@@ -46,8 +46,6 @@ const router = useRouter();
 const questsStore = useQuestsStore();
 const { currentQuest, currentQuestIndex, questsCount } = storeToRefs(questsStore);
 
-
-
 questsStore.setCurrentQuestIndex(parseInt(route?.params?.imageIndex || 1) - 1);
 
 const clueSize = ref(0);
@@ -55,15 +53,11 @@ const clueSizeWithUnit = computed(() => clueSize.value + 'px');
 const clueDisplay = ref('none');
 
 const checkAlexFound = (event) => {
-    const { offsetX, offsetY } = event;
-    const point = [offsetX, offsetY];
-    const naturalHeight = event.target.naturalHeight;
-    const naturalWidth = event.target.naturalWidth;
-    const xRatio = naturalWidth / event.target.width;
-    const yRatio = naturalHeight / event.target.height;
-    const polygon = toPolygon(currentQuest.value.coords);
-    const scaledPolygon = polygon.map((coord) => [coord[0] / xRatio, coord[1] / yRatio]);
-    const isInside = pointInPolygon(scaledPolygon, point);
+
+    const xRatio = event.target.naturalWidth / event.target.width;
+    const yRatio = event.target.naturalHeight / event.target.height;
+    const polygon = toPolygon(currentQuest.value.coords, xRatio, yRatio);
+    const isInside = pointInPolygon(polygon, event.offsetX, event.offsetY);
 
     if (isInside) {
         alexFound();
@@ -103,9 +97,8 @@ function updateWrapperStyle() {
     /* Compute clue circle position*/
     const xRatio = currentQuest.value.width / newWidth;
     const yRatio = currentQuest.value.height / newHeight;
-    const polygon = toPolygon(currentQuest.value.coords);
-    const scaledPolygon = polygon.map((coord) => [coord[0] / xRatio, coord[1] / yRatio]);
-    const polygonCenter = getPolygonCenter(scaledPolygon);
+    const polygon = toPolygon(currentQuest.value.coords, xRatio, yRatio);
+    const polygonCenter = getPolygonCenter(polygon);
     const clueCenter = getRandomPointInCircle(polygonCenter.x, polygonCenter.y, clueSize.value / 2 - 20);
 
     wrapperStyle.value = {
