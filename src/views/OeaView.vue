@@ -1,34 +1,35 @@
 <template>
     <header>
         <a href="/">Où est Alex ?</a>
-        <button class="btn-icon ask-clue">
+        <button class="oea-btn ask-clue">
             <font-awesome-icon icon="question-circle" size="sm" />
         </button>
         <div>
-            <button class="btn-icon" @click="questsStore.previousQuest">
+            <button class="oea-btn" @click="questsStore.previousQuest">
                 <font-awesome-icon icon="arrow-left" size="sm" />
             </button>
             {{ currentQuestIndex + 1 }} / {{ questsCount }}
-            <button class="btn-icon" @click="questsStore.nextQuest">
+            <button class="oea-btn" @click="questsStore.nextQuest">
                 <font-awesome-icon icon="arrow-right" size="sm" />
             </button>
         </div>
     </header>
     <main>
-        <img
-            class="oea-img"
-            :src="currentQuest.url"
-            :style="imageStyle"
-            @mousedown="onmousedown"
-            @mouseup="onmouseup"
-            @mousemove="onmousemove"
-            @wheel="onwheel"
-        />
+        <div ref="image-wrapper" class="oea-image-wrapper" :style="{...wrapperStyle, ...imageStyle}" @mousedown="onmousedown"
+                @mouseup="onmouseup"
+                @mousemove="onmousemove"
+                @wheel="onwheel">
+            <img
+                ref="image"
+                class="oea-img"
+                :src="currentQuest.url"
+            />
+        </div>
     </main>
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
@@ -93,11 +94,39 @@ const imageStyle = computed(() => {
     };
 });
 
+const wrapperStyle = ref({ height: '100%', width: '100%' });
+
+function udpateWrapperStyle(){
+    const main = document.querySelector('main');
+    console.log('update wrapper style')
+    if(!main){
+        console.error('main not found');
+        return {height: '100%', width: '100%'};
+    } 
+
+    const mainDimensions = main.getBoundingClientRect();
+    console.log('main : ', mainDimensions.width, mainDimensions.height);
+    
+    const aspectRatio = currentQuest.value.width / currentQuest.value.height;
+    const containerAspectRatio = mainDimensions.width / mainDimensions.height;
+    
+    let newWidth, newHeight;
+
+    if (aspectRatio > containerAspectRatio) {
+        newWidth = mainDimensions.width;
+        newHeight = mainDimensions.width / aspectRatio;
+    } else {
+        newHeight = mainDimensions.height;
+        newWidth = mainDimensions.height * aspectRatio;
+    }
+
+    wrapperStyle.value = {height: newHeight + 'px', width: newWidth + 'px'};
+}
+
 function resetTransform() {
     scale.value = 1;
     pointX.value = 0;
     pointY.value = 0;
-    //setTransform();
 }
 
 const onmousedown = function (e) {
@@ -178,6 +207,11 @@ watch(currentQuestIndex, (value) => {
         },
     });
     resetTransform();
+    udpateWrapperStyle();
+});
+
+onMounted(() => {
+    udpateWrapperStyle();
 });
 
 //reset transform on scale reset
