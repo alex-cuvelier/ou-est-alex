@@ -1,8 +1,8 @@
 <template>
     <header>
         <a href="/">Où est Alex ?</a>
-        <button class="oea-btn ask-clue">
-            <font-awesome-icon icon="question-circle" size="sm" />
+        <button class="oea-btn ask-clue" @click="showClue" :disabled="clueDisplay != 'none'">
+            <font-awesome-icon icon="question-circle" size="lg"/>
         </button>
         <div>
             <button class="oea-btn" @click="questsStore.previousQuest">
@@ -15,15 +15,16 @@
         </div>
     </header>
     <main>
-        <div ref="image-wrapper" class="oea-image-wrapper" :style="{...wrapperStyle, ...imageStyle}" @mousedown="onmousedown"
-                @mouseup="onmouseup"
-                @mousemove="onmousemove"
-                @wheel="onwheel">
-            <img
-                ref="image"
-                class="oea-img"
-                :src="currentQuest.url"
-            />
+        <div
+            ref="image-wrapper"
+            class="oea-image-wrapper"
+            :style="{ ...wrapperStyle, ...transformStyle }"
+            @mousedown="onmousedown"
+            @mouseup="onmouseup"
+            @mousemove="onmousemove"
+            @wheel="onwheel"
+        >
+            <img ref="image" class="oea-img" :src="currentQuest.url" />
         </div>
     </main>
 </template>
@@ -36,7 +37,7 @@ import { storeToRefs } from 'pinia';
 import { useSound } from '@vueuse/sound';
 
 import { useQuestsStore } from '@/stores/quests.js';
-import { pointInPolygon, toPolygon } from '@/utils/utils.js';
+import { pointInPolygon, toPolygon, getPolygonCenter, getRandomPointInCircle } from '@/utils/utils.js';
 import confetti from '@/composables/useConfetti';
 
 import okSound from '@/assets/sounds/oui.mp3';
@@ -52,6 +53,10 @@ const { play: playOk } = useSound(okSound);
 const { play: playKo } = useSound(koSound);
 
 questsStore.setCurrentQuestIndex(parseInt(route?.params?.imageIndex || 1) - 1);
+
+const clueSize = ref(0);
+const clueSizeWithUnit = computed(() => clueSize.value + 'px');
+const clueDisplay = ref('none');
 
 const checkAlexFound = (event) => {
     const { offsetX, offsetY } = event;
@@ -80,38 +85,16 @@ const alexFound = () => {
     }, 1500);
 };
 
-//ZOOM
-const scale = ref(1),
-    pointX = ref(0),
-    pointY = ref(0);
-let panning = false,
-    start = { x: 0, y: 0 },
-    pointSaved = { x: 0, y: 0 };
-
-const imageStyle = computed(() => {
-    return {
-        transform: `translate(${pointX.value}px, ${pointY.value}px) scale(${scale.value})`,
-    };
-});
-
+//IMAGE WRAPPER DIMENSIONS
 const wrapperStyle = ref({ height: '100%', width: '100%' });
 
-function udpateWrapperStyle(){
+function updateWrapperStyle() {
     const main = document.querySelector('main');
-    console.log('update wrapper style')
-    if(!main){
-        console.error('main not found');
-        return {height: '100%', width: '100%'};
-    } 
-
     const mainDimensions = main.getBoundingClientRect();
-    console.log('main : ', mainDimensions.width, mainDimensions.height);
-    
     const aspectRatio = currentQuest.value.width / currentQuest.value.height;
     const containerAspectRatio = mainDimensions.width / mainDimensions.height;
-    
-    let newWidth, newHeight;
 
+    let newWidth, newHeight;
     if (aspectRatio > containerAspectRatio) {
         newWidth = mainDimensions.width;
         newHeight = mainDimensions.width / aspectRatio;
@@ -120,8 +103,46 @@ function udpateWrapperStyle(){
         newWidth = mainDimensions.height * aspectRatio;
     }
 
-    wrapperStyle.value = {height: newHeight + 'px', width: newWidth + 'px'};
+    const xRatio = currentQuest.value.width / newWidth;
+    const yRatio = currentQuest.value.height / newHeight;
+    const polygon = toPolygon(currentQuest.value.coords);
+    const scaledPolygon = polygon.map((coord) => [coord[0] / xRatio, coord[1] / yRatio]);
+    const polygonCenter = getPolygonCenter(scaledPolygon);
+
+    const clueCenter = getRandomPointInCircle(polygonCenter.x, polygonCenter.y, clueSize.value / 2);
+
+    wrapperStyle.value = {
+        height: newHeight + 'px',
+        width: newWidth + 'px',
+        '--clueCenterY': clueCenter.y - clueSize.value / 2 + 'px',
+        '--clueCenterX': clueCenter.x - clueSize.value / 2 + 'px',
+    };
 }
+
+const showClue = () => {
+    clueDisplay.value = 'block';
+    setTimeout(() => {
+        clueDisplay.value = 'none';
+        if(clueSize.value > 50){
+            clueSize.value = clueSize.value - 50;
+        }
+        updateWrapperStyle();
+    }, 1000);
+};
+
+//ZOOM
+const scale = ref(1),
+    pointX = ref(0),
+    pointY = ref(0);
+let panning = false,
+    start = { x: 0, y: 0 },
+    pointSaved = { x: 0, y: 0 };
+
+const transformStyle = computed(() => {
+    return {
+        transform: `translate(${pointX.value}px, ${pointY.value}px) scale(${scale.value})`,
+    };
+});
 
 function resetTransform() {
     scale.value = 1;
@@ -173,30 +194,35 @@ const onwheel = function (e) {
     const x = (e.clientX - rec.x) / scale.value;
     const y = (e.clientY - rec.y) / scale.value;
 
-    const delta = (e.wheelDelta ? e.wheelDelta : -e.deltaY);
+    const delta = e.wheelDelta ? e.wheelDelta : -e.deltaY;
 
-    if(scale.value == 1 && delta < 0) {
+    if (scale.value == 1 && delta < 0) {
         resetTransform();
         return;
     }
 
     if (delta > 0) {
-        if(scale.value > 10){
-            return
+        if (scale.value > 10) {
+            return;
         }
         scale.value = parseFloat((scale.value + 0.4).toFixed(1));
     } else {
-        if(scale.value <= 1){
-            return
+        if (scale.value <= 1) {
+            return;
         }
         scale.value = parseFloat((scale.value - 0.4).toFixed(1));
     }
 
-    const m = (delta > 0) ? 0.2 : -0.2;
-    pointX.value += (-x * m * 2) + (img.offsetWidth * m);
-    pointY.value += (-y * m * 2) + (img.offsetHeight * m);
-
+    const m = delta > 0 ? 0.2 : -0.2;
+    pointX.value += -x * m * 2 + img.offsetWidth * m;
+    pointY.value += -y * m * 2 + img.offsetHeight * m;
 };
+
+onMounted(() => {
+    const mainDimensions = document.querySelector('main').getBoundingClientRect();
+    clueSize.value = Math.min(mainDimensions.width, mainDimensions.height);
+    updateWrapperStyle();
+});
 
 //change url on quest change
 watch(currentQuestIndex, (value) => {
@@ -207,11 +233,8 @@ watch(currentQuestIndex, (value) => {
         },
     });
     resetTransform();
-    udpateWrapperStyle();
-});
-
-onMounted(() => {
-    udpateWrapperStyle();
+    clueSize.value = Math.min(document.querySelector('main').getBoundingClientRect().width, document.querySelector('main').getBoundingClientRect().height);
+    updateWrapperStyle();
 });
 
 //reset transform on scale reset
@@ -221,4 +244,30 @@ watch(scale, (value) => {
         resetTransform();
     }
 });
+
 </script>
+
+<style lang="scss">
+.oea-image-wrapper::after {
+    content: '';
+    position: absolute;
+    top: var(--clueCenterY);
+    left: var(--clueCenterX);
+    width: v-bind(clueSizeWithUnit);
+    height: v-bind(clueSizeWithUnit);
+    border: 2px solid black;
+    border-radius: 50%;
+    display: v-bind(clueDisplay);
+}
+.oea-image-wrapper::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--clueCenterY) + 1px);
+    left: calc(var(--clueCenterX) + 1px);
+    width: calc(v-bind(clueSizeWithUnit) - 2px);
+    height: calc(v-bind(clueSizeWithUnit) - 2px);
+    border: 2px solid white;
+    border-radius: 50%;
+    display: v-bind(clueDisplay);
+}
+</style>

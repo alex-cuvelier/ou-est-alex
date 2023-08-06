@@ -22,7 +22,7 @@ export function getPolygonCenter(polygon) {
         y += polygon[i][1];
     }
     
-    return [x / polygon.length, y / polygon.length];
+    return {x: x / polygon.length, y: y / polygon.length};
 }
 
 export function toPolygon(coordsStr) {
@@ -45,4 +45,14 @@ export function getContainedSize(img) {
         height = img.width / ratio;
     }
     return [width, height];
+}
+
+export function getRandomPointInCircle(centerX, centerY, radius) {
+    const theta = Math.random() * (2 * Math.PI);
+    const r = Math.sqrt(Math.random()) * radius;
+
+    const x = centerX + r * Math.cos(theta);
+    const y = centerY + r * Math.sin(theta);
+
+    return { x, y };
 }
