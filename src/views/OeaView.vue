@@ -60,23 +60,20 @@
             </div>
         </div>
     </main>
-    <div v-if="currentQuest?.type == 'quest'" class="oea-quest-stats">
-        <div class="oea-quest-stat">
-            <span class="oea-quest-stat-title">Timer</span>
-            <span class="oea-quest-stat-value">{{ timer }}</span>
-        </div>
-        <div class="oea-quest-stat">
-            <span class="oea-quest-stat-title">Indice</span>
-            <span class="oea-quest-stat-value">{{ questStats.clueCount }}</span>
-        </div>
-        <div class="oea-quest-stat">
-            <span class="oea-quest-stat-title">Non</span>
-            <span class="oea-quest-stat-value">{{ questStats.noCount }}</span>
-        </div>
-    </div>
+    <oea-current-quest-stats 
+        v-if="currentQuest?.type == 'quest'" 
+        class="oea-quest-stats"
+        :timer="timer"
+        :clueCount="questStats.clueCount"
+        :noCount="questStats.noCount"
+        >
+    </oea-current-quest-stats>
 </template>
 
 <script setup>
+
+import OeaCurrentQuestStats from '@/components/OeaCurrentQuestStats.vue';
+
 import { ref, watch, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
