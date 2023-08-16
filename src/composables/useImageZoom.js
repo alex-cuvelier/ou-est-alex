@@ -30,6 +30,10 @@ export default function useImageZoom(clikcCallback) {
     function onMouseUp(e) {
         panning = false;
 
+        if(!e.target.classList.contains('oea-img')){
+            return;
+        }
+        
         //Check if is a click or a drag
         if (pointSaved.x == pointX.value && pointSaved.y == pointY.value) {
             clikcCallback(e);
