@@ -22,7 +22,7 @@
             v-if="currentQuest?.type == 'quest'"
             ref="image-wrapper"
             class="oea-image-wrapper"
-            :class="{ displayClue: displayClue }"
+            :class="{ displayClue }"
             :style="{ ...wrapperStyle, ...transformStyle }"
             @mousedown.left="onMouseDown"
             @mousemove="onMouseMove"
@@ -30,39 +30,10 @@
         >
             <img ref="image" class="oea-img" :src="currentQuest.url" />
         </div>
-        <div v-else class="oea-end-stats">
-            <div class="oea-end-stat">
-                <span class="oea-end-stat-title">Trouvés</span>
-                <span class="oea-end-stat-value">{{ endStats.found }} / {{ questsCount - 1 }}</span>
-            </div>
-            <div class="oea-end-stat">
-                <span class="oea-end-stat-title">Erreurs</span>
-                <span class="oea-end-stat-value">{{ endStats.noCount }}</span>
-            </div>
-            <div class="oea-end-stat">
-                <span class="oea-end-stat-title">Indices</span>
-                <span class="oea-end-stat-value">{{ endStats.clueCount }}</span>
-            </div>
-            <div class="oea-end-stat">
-                <span class="oea-end-stat-title">Temps</span>
-                <span class="oea-end-stat-value">{{
-                    formatDuration(
-                        intervalToDuration({
-                            start: 0,
-                            end: endStats.time * 1000,
-                        }),
-                        { locale: fr },
-                    )
-                }}</span>
-            </div>
-            <div class="oea-end-button-container">
-                <button class="oea-btn" @click="questsStore.resetQuests">Recommencer</button>
-            </div>
-        </div>
+        <oea-end-stats v-else ></oea-end-stats>
     </main>
     <oea-current-quest-stats 
         v-if="currentQuest?.type == 'quest'" 
-        class="oea-quest-stats"
         :timer="timer"
         :clueCount="questStats.clueCount"
         :noCount="questStats.noCount"
@@ -73,6 +44,7 @@
 <script setup>
 
 import OeaCurrentQuestStats from '@/components/OeaCurrentQuestStats.vue';
+import OeaEndStats from '@/components/OeaEndStats.vue';
 
 import { ref, watch, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -85,8 +57,6 @@ import useImageZoom from '@/composables/useImageZoom.js';
 
 import { playOk, playKo, playNoob } from '@/composables/useSounds.js';
 
-import { intervalToDuration, formatDuration } from 'date-fns';
-import { fr } from 'date-fns/locale';
 
 const route = useRoute();
 const router = useRouter();
@@ -197,24 +167,9 @@ function showClue() {
     }, 100);
 }
 
-const endStats = computed(() => {
-    return questsStats.value.reduce(
-        (acc, stat) => {
-            acc.found += stat.found ? 1 : 0;
-            acc.noCount += stat.noCount;
-            acc.clueCount += stat.clueCount;
-            acc.time += intervalToDuration({
-                start: stat.start,
-                end: stat.end,
-            }).seconds;
-            return acc;
-        },
-        { found: 0, noCount: 0, clueCount: 0, time: 0 },
-    );
-});
 
 function preloadNextImage(){
-    if(nextQuest.value.type != 'quest'){
+    if(nextQuest?.value?.type != 'quest'){
         return;
     }
 
@@ -257,6 +212,10 @@ watch(currentQuestIndex, (value) => {
 });
 
 watch(currentQuestIndex, preloadNextImage, {immediate: true});
+
+// watch( () => route.params.imageIndex, (value) => {
+//     console.log('route.params', value);
+// });
 </script>
 
 <style lang="scss">

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="oea-quest-stats">
         <div class="oea-quest-stat">
             <span class="oea-quest-stat-title">Timer</span>
             <span class="oea-quest-stat-value">{{ timer }}</span>
