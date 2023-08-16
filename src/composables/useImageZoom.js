@@ -58,6 +58,9 @@ export default function useImageZoom(clikcCallback) {
 
     function onWheel(event) {
         event.preventDefault();
+        if(event.ctrlKey){
+            return;
+        }
 
         const img = event.target;
         const rec = img.getBoundingClientRect();

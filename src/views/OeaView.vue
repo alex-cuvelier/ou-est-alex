@@ -24,8 +24,7 @@
             class="oea-image-wrapper"
             :class="{ displayClue: displayClue }"
             :style="{ ...wrapperStyle, ...transformStyle }"
-            @mousedown="onMouseDown"
-            @mouseup="onMouseUp"
+            @mousedown.left="onMouseDown"
             @mousemove="onMouseMove"
             @wheel="onWheel"
         >
@@ -240,6 +239,8 @@ onMounted(() => {
     resetClueSize();
     resetQuestStats();
     updateWrapperStyle();
+
+    document.addEventListener('mouseup', onMouseUp);
 });
 
 //change url on quest change
