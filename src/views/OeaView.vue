@@ -7,11 +7,11 @@
             </button>
         </span>
         <div v-if="currentQuestIndex + 1 < questsCount">
-            <button class="oea-btn" :disabled="currentQuestIndex == 0" @click="questsStore.previousQuest">
+            <button class="oea-btn" :disabled="currentQuestIndex == 0" @click="questsStore.goToPreviousQuest">
                 <font-awesome-icon icon="arrow-left" size="sm" />
             </button>
             <span> {{ currentQuestIndex + 1 }} / {{ questsCount - 1 }} </span>
-            <button class="oea-btn" @click="nextQuest">
+            <button class="oea-btn" @click="goToNextQuest">
                 <font-awesome-icon icon="arrow-right" size="sm" />
             </button>
         </div>
@@ -96,7 +96,7 @@ const route = useRoute();
 const router = useRouter();
 
 const questsStore = useQuestsStore();
-const { currentQuest, currentQuestIndex, questsCount, questsStats } = storeToRefs(questsStore);
+const { currentQuest, nextQuest, currentQuestIndex, questsCount, questsStats } = storeToRefs(questsStore);
 
 const questStats = ref({});
 const timer = ref(0);
@@ -130,15 +130,15 @@ function onAlexFound() {
     playOk();
     confetti.start();
     questStats.value.found = true;
-    nextQuest();
+    goToNextQuest();
     setTimeout(() => {
         confetti.stop();
     }, 1500);
 }
 
-function nextQuest() {
+function goToNextQuest() {
     questStats.value.end = new Date();
-    questsStore.nextQuest({
+    questsStore.goToNextQuest({
         ...questStats.value,
     });
 }
@@ -217,8 +217,16 @@ const endStats = computed(() => {
     );
 });
 
-//ZOOM
+function preloadNextImage(){
+    if(nextQuest.value.type != 'quest'){
+        return;
+    }
 
+    const nextImage = new Image();
+    nextImage.src = nextQuest.value.url;
+}
+
+//ZOOM
 function resetClueSize() {
     const mainDimensions = document.querySelector('main').getBoundingClientRect();
     clueSize.value = Math.min(mainDimensions.width, mainDimensions.height);
@@ -249,6 +257,8 @@ watch(currentQuestIndex, (value) => {
         updateWrapperStyle();
     }
 });
+
+watch(currentQuestIndex, preloadNextImage, {immediate: true});
 </script>
 
 <style lang="scss">
