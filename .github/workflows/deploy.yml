@@ -29,7 +29,11 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+    - name: Add server to known_hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H 79.137.35.132 >> ~/.ssh/known_hosts
+
     - name: Deploy to Server
       run: |
         rsync -avz --delete dist/ debian@79.137.35.132:/var/www/ouestalex.fr/html
-        ssh debian@79.137.35.132 "sudo systemctl reload nginx"
