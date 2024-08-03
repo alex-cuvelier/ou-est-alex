@@ -1,6 +1,6 @@
 <template>
     <header>
-        <a href="/">Où est Alex ?</a>
+        <a href="/">Où est Alex test?</a>
         <template v-if="currentQuestIndex + 1 < questsCount">
             <button class="oea-btn ask-clue" @click="showClue" :title="$t('header.ask-clue')" :disabled="displayClue">
             <img class="icon icon-lg" src="@/assets/icons/circle-question-solid.svg" />
