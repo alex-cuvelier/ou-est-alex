@@ -1,12 +1,11 @@
 <template>
     <header>
         <a href="/">Où est Alex ?</a>
-        <span>
+        <template v-if="currentQuestIndex + 1 < questsCount">
             <button class="oea-btn ask-clue" @click="showClue" :title="$t('header.ask-clue')" :disabled="displayClue">
-                <img class="icon icon-lg" src="@/assets/icons/circle-question-solid.svg" />
-            </button>
-        </span>
-        <div v-if="currentQuestIndex + 1 < questsCount">
+            <img class="icon icon-lg" src="@/assets/icons/circle-question-solid.svg" />
+        </button>
+        <div class="right-buttons">
             <button class="oea-btn" :disabled="currentQuestIndex == 0" @click="questsStore.goToPreviousQuest">
                 <img class="icon" src="@/assets/icons/arrow-left-solid.svg" />
             </button>
@@ -15,6 +14,7 @@
                 <img class="icon" src="@/assets/icons/arrow-right-solid.svg" />
             </button>
         </div>
+        </template>
         <span v-else> Fin </span>
     </header>
     <main>
