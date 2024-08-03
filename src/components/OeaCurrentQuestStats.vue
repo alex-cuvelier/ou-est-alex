@@ -16,9 +16,9 @@
 </template>
 
 <script setup>
-    defineProps({
-        timer: Number,
-        clueCount: Number,
-        noCount: Number
-    })
+defineProps({
+    timer: Number,
+    clueCount: Number,
+    noCount: Number,
+});
 </script>

@@ -35,12 +35,7 @@
         </div>
         <oea-end-stats v-else></oea-end-stats>
     </main>
-    <oea-current-quest-stats 
-        v-if="currentQuest?.type == 'quest'" 
-        :timer="timer"
-        :clueCount="questStats.clueCount"
-        :noCount="questStats.noCount"
-        >
+    <oea-current-quest-stats v-if="currentQuest?.type == 'quest'" :timer="timer" :clueCount="questStats.clueCount" :noCount="questStats.noCount">
     </oea-current-quest-stats>
 </template>
 
@@ -212,7 +207,6 @@ watch(currentQuestIndex, (value) => {
 });
 
 watch(currentQuestIndex, preloadNextImage, { immediate: true });
-
 </script>
 
 <style lang="scss">

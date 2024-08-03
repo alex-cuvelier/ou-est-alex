@@ -1,38 +1,37 @@
 <template>
-   <div class="oea-end-stats">
-            <div class="oea-end-stat">
-                <span class="oea-end-stat-title">Trouvés</span>
-                <span class="oea-end-stat-value">{{ endStats.found }} / {{ questsCount - 1 }}</span>
-            </div>
-            <div class="oea-end-stat">
-                <span class="oea-end-stat-title">Erreurs</span>
-                <span class="oea-end-stat-value">{{ endStats.noCount }}</span>
-            </div>
-            <div class="oea-end-stat">
-                <span class="oea-end-stat-title">Indices</span>
-                <span class="oea-end-stat-value">{{ endStats.clueCount }}</span>
-            </div>
-            <div class="oea-end-stat">
-                <span class="oea-end-stat-title">Temps</span>
-                <span class="oea-end-stat-value">{{
-                    formatDuration(
-                        intervalToDuration({
-                            start: 0,
-                            end: endStats.time * 1000,
-                        }),
-                        { locale: fr },
-                    )
-                }}</span>
-            </div>
-            <div class="oea-end-button-container">
-                <button class="oea-btn" @click="questsStore.resetQuests">Recommencer</button>
-            </div>
+    <div class="oea-end-stats">
+        <div class="oea-end-stat">
+            <span class="oea-end-stat-title">Trouvés</span>
+            <span class="oea-end-stat-value">{{ endStats.found }} / {{ questsCount - 1 }}</span>
         </div>
+        <div class="oea-end-stat">
+            <span class="oea-end-stat-title">Erreurs</span>
+            <span class="oea-end-stat-value">{{ endStats.noCount }}</span>
+        </div>
+        <div class="oea-end-stat">
+            <span class="oea-end-stat-title">Indices</span>
+            <span class="oea-end-stat-value">{{ endStats.clueCount }}</span>
+        </div>
+        <div class="oea-end-stat">
+            <span class="oea-end-stat-title">Temps</span>
+            <span class="oea-end-stat-value">{{
+                formatDuration(
+                    intervalToDuration({
+                        start: 0,
+                        end: endStats.time * 1000,
+                    }),
+                    { locale: fr },
+                )
+            }}</span>
+        </div>
+        <div class="oea-end-button-container">
+            <button class="oea-btn" @click="questsStore.resetQuests">Recommencer</button>
+        </div>
+    </div>
 </template>
 
 <script setup>
-
-import {computed } from 'vue';
+import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { intervalToDuration, formatDuration } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -55,5 +54,4 @@ const endStats = computed(() => {
         { found: 0, noCount: 0, clueCount: 0, time: 0 },
     );
 });
-
 </script>

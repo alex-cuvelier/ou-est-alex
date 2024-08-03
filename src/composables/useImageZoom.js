@@ -2,7 +2,6 @@ import { ref, computed, watch } from 'vue';
 
 // Define the default export function for the image zoom feature
 export default function useImageZoom(clickCallback) {
-
     // Reactive variables to track the scale and position of the image
     const scale = ref(1),
         pointX = ref(0),
@@ -44,7 +43,7 @@ export default function useImageZoom(clickCallback) {
         if (!e.target.classList.contains('oea-img')) {
             return;
         }
-        
+
         // Check if it's a click or a drag event
         if (pointSaved.x == pointX.value && pointSaved.y == pointY.value) {
             clickCallback(e);
@@ -116,7 +115,6 @@ export default function useImageZoom(clickCallback) {
 
     // Handle touch events
     function onTouchStart(e) {
-        
         if (e.touches.length === 1) {
             // Single touch: start panning
             start = { x: e.touches[0].clientX - pointX.value, y: e.touches[0].clientY - pointY.value };
