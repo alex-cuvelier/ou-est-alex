@@ -35,7 +35,7 @@ import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { intervalToDuration, formatDuration } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { useQuestsStore } from '@/stores/quests.js';
+import { useQuestsStore } from '@/stores/questsStore.js';
 const questsStore = useQuestsStore();
 const { questsCount, questsStats } = storeToRefs(questsStore);
 

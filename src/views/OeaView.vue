@@ -47,7 +47,7 @@ import { ref, watch, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
-import { useQuestsStore } from '@/stores/quests.js';
+import { useQuestsStore } from '@/stores/questsStore.js';
 import { pointInPolygon, toPolygon, getPolygonCenter, getRandomPointInCircle } from '@/utils/utils.js';
 import confetti from '@/composables/useConfetti';
 import useImageZoom from '@/composables/useImageZoom.js';

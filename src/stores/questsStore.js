@@ -4,9 +4,10 @@ import { defineStore } from 'pinia';
 import quests from '@/quests.json';
 
 export const useQuestsStore = defineStore('quests', () => {
+    
     const filteredQuests = quests
         .sort((a, b) => a.difficultyLevel - b.difficultyLevel)
-        .filter((quest) => quest.difficultyLevel < 4)
+        .filter((quest) => quest.difficultyLevel < 4 || quest.type === 'end')
         .map((quest, index) => ({
             id: index,
             type: 'quest',
