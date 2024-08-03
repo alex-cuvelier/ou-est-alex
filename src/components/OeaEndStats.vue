@@ -14,15 +14,7 @@
         </div>
         <div class="oea-end-stat">
             <span class="oea-end-stat-title">Temps</span>
-            <span class="oea-end-stat-value">{{
-                formatDuration(
-                    intervalToDuration({
-                        start: 0,
-                        end: endStats.time * 1000,
-                    }),
-                    { locale: fr },
-                )
-            }}</span>
+            <span class="oea-end-stat-value">{{ formatMillisecondsToTime(endStats.time) }}</span>
         </div>
         <div class="oea-end-button-container">
             <button class="oea-btn" @click="questsStore.resetQuests">Recommencer</button>
@@ -33,8 +25,7 @@
 <script setup>
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import { intervalToDuration, formatDuration } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { formatMillisecondsToTime } from '@/utils/utils.js';
 import { useQuestsStore } from '@/stores/questsStore.js';
 const questsStore = useQuestsStore();
 const { questsCount, questsStats } = storeToRefs(questsStore);
@@ -45,10 +36,7 @@ const endStats = computed(() => {
             acc.found += stat.found ? 1 : 0;
             acc.noCount += stat.noCount;
             acc.clueCount += stat.clueCount;
-            acc.time += intervalToDuration({
-                start: stat.start,
-                end: stat.end,
-            }).seconds;
+            acc.time += stat.end - stat.start;
             return acc;
         },
         { found: 0, noCount: 0, clueCount: 0, time: 0 },

@@ -3,16 +3,16 @@
         <a href="/">Où est Alex ?</a>
         <span>
             <button class="oea-btn ask-clue" @click="showClue" :disabled="displayClue">
-                <font-awesome-icon icon="question-circle" size="lg" />
+                <img src="@/assets/icons/circle-question-solid.svg" class="icon icon-lg" />
             </button>
         </span>
         <div v-if="currentQuestIndex + 1 < questsCount">
             <button class="oea-btn" :disabled="currentQuestIndex == 0" @click="questsStore.goToPreviousQuest">
-                <font-awesome-icon icon="arrow-left" size="sm" />
+                <img src="@/assets/icons/arrow-left-solid.svg" class="icon" />
             </button>
             <span> {{ currentQuestIndex + 1 }} / {{ questsCount - 1 }} </span>
             <button class="oea-btn" @click="goToNextQuest">
-                <font-awesome-icon icon="arrow-right" size="sm" />
+                <img src="@/assets/icons/arrow-right-solid.svg" class="icon" />
             </button>
         </div>
         <span v-else> Fin </span>
@@ -35,7 +35,7 @@
         </div>
         <oea-end-stats v-else></oea-end-stats>
     </main>
-    <oea-current-quest-stats v-if="currentQuest?.type == 'quest'" :timer="timer" :clueCount="questStats.clueCount" :noCount="questStats.noCount">
+    <oea-current-quest-stats v-if="currentQuest?.type == 'quest'" :difficultyLevel="currentQuest.difficultyLevel" :timer="timer" :clueCount="questStats.clueCount" :noCount="questStats.noCount">
     </oea-current-quest-stats>
 </template>
 

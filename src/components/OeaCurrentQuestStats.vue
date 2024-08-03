@@ -1,6 +1,10 @@
 <template>
     <div class="oea-quest-stats">
         <div class="oea-quest-stat">
+            <span class="oea-quest-stat-title">Difficulté</span>
+            <span class="oea-quest-stat-value">{{ difficultyLevel + 1 }}</span>
+        </div>
+        <div class="oea-quest-stat">
             <span class="oea-quest-stat-title">Timer</span>
             <span class="oea-quest-stat-value">{{ timer }}</span>
         </div>
@@ -17,6 +21,7 @@
 
 <script setup>
 defineProps({
+    difficultyLevel: Number,
     timer: Number,
     clueCount: Number,
     noCount: Number,

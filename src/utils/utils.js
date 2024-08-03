@@ -56,3 +56,22 @@ export function getRandomPointInCircle(centerX, centerY, radius) {
 
     return { x, y };
 }
+
+export function formatMillisecondsToTime(milliseconds) {
+    // Ensure the input is a number
+    if (typeof milliseconds !== 'number' || isNaN(milliseconds)) {
+      return 'Invalid input';
+    }
+  
+    // Calculate hours, minutes, and seconds
+    const hrs = Math.floor(milliseconds / 3600000);
+    const mins = Math.floor((milliseconds % 3600000) / 60000);
+    const secs = Math.floor((milliseconds % 60000) / 1000);
+  
+    // Pad with leading zeros if necessary
+    const formattedHrs = String(hrs).padStart(2, '0');
+    const formattedMins = String(mins).padStart(2, '0');
+    const formattedSecs = String(secs).padStart(2, '0');
+  
+    return `${formattedHrs}:${formattedMins}:${formattedSecs}`;
+  }
