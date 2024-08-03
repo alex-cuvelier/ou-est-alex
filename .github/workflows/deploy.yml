@@ -1,0 +1,35 @@
+name: Deploy to Debian Server
+
+on:
+  push:
+    branches:
+      - main  # Change this to your deployment branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'  # Specify your Node.js version
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build the Vue app
+      run: npm run build
+
+    - name: Set up SSH key
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Deploy to Server
+      run: |
+        rsync -avz --delete dist/ debian@79.137.35.132:/var/www/ouestalex.fr/html
+        ssh debian@79.137.35.132 "sudo systemctl reload nginx"
