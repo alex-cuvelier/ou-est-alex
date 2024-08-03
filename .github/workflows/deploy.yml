@@ -3,7 +3,7 @@ name: Deploy to Debian Server
 on:
   push:
     branches:
-      - main  # Change this to your deployment branch
+      - main  # Adjust this if your deployment branch is different
 
 jobs:
   build-and-deploy:
@@ -16,7 +16,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18'  # Specify your Node.js version
+        node-version: '18'
 
     - name: Install dependencies
       run: npm install
@@ -27,6 +27,9 @@ jobs:
     - name: Install rsync
       run: sudo apt-get update && sudo apt-get install -y rsync
 
+    - name: Verify rsync installation
+      run: rsync --version
+      
     - name: Set up SSH key
       uses: webfactory/ssh-agent@v0.5.3
       with:
