@@ -1,23 +1,23 @@
 <template>
     <div class="oea-end-stats">
         <div class="oea-end-stat">
-            <span class="oea-end-stat-title">Trouvés</span>
+            <span class="oea-end-stat-title">{{ $t('end.found') }}</span>
             <span class="oea-end-stat-value">{{ endStats.found }} / {{ questsCount - 1 }}</span>
         </div>
         <div class="oea-end-stat">
-            <span class="oea-end-stat-title">Erreurs</span>
+            <span class="oea-end-stat-title">{{ $t('end.errors') }}</span>
             <span class="oea-end-stat-value">{{ endStats.noCount }}</span>
         </div>
         <div class="oea-end-stat">
-            <span class="oea-end-stat-title">Indices</span>
+            <span class="oea-end-stat-title">{{ $t('end.clues') }}</span>
             <span class="oea-end-stat-value">{{ endStats.clueCount }}</span>
         </div>
         <div class="oea-end-stat">
-            <span class="oea-end-stat-title">Temps</span>
+            <span class="oea-end-stat-title">{{ $t('end.time') }}</span>
             <span class="oea-end-stat-value">{{ formatMillisecondsToTime(endStats.time) }}</span>
         </div>
         <div class="oea-end-button-container">
-            <button class="oea-btn" @click="questsStore.resetQuests">Recommencer</button>
+            <button class="oea-btn" @click="questsStore.resetQuests">{{ $t('end.restart') }}</button>
         </div>
     </div>
 </template>

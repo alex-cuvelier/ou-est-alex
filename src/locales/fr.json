@@ -1,0 +1,19 @@
+{
+  "header": {
+    "ask-clue": "Demander un indice"
+  },
+  "footer": {
+    "difficultyLevel": "Difficulté",
+    "timer": "Timer",
+    "clue": "Indice",
+    "no": "Non"
+  },
+  "end": {
+    "found": "Trouvés",
+    "errors": "Erreurs",
+    "clues": "Indices",
+    "time": "Temps",
+    "restart": "Recommencer"
+  }
+}
+  
