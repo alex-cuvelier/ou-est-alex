@@ -20,17 +20,20 @@
     <main>
         <div
             v-if="currentQuest?.type == 'quest'"
-            ref="image-wrapper"
+            ref="imageWrapper"
             class="oea-image-wrapper"
             :class="{ displayClue }"
             :style="{ ...wrapperStyle, ...transformStyle }"
             @mousedown.left="onMouseDown"
             @mousemove="onMouseMove"
             @wheel="onWheel"
+            @touchstart="onTouchStart"
+            @touchmove="onTouchMove"
+            @touchend="onTouchEnd"
         >
             <img ref="image" class="oea-img" :src="currentQuest.url" />
         </div>
-        <oea-end-stats v-else ></oea-end-stats>
+        <oea-end-stats v-else></oea-end-stats>
     </main>
     <oea-current-quest-stats 
         v-if="currentQuest?.type == 'quest'" 
@@ -42,7 +45,6 @@
 </template>
 
 <script setup>
-
 import OeaCurrentQuestStats from '@/components/OeaCurrentQuestStats.vue';
 import OeaEndStats from '@/components/OeaEndStats.vue';
 
@@ -56,7 +58,6 @@ import confetti from '@/composables/useConfetti';
 import useImageZoom from '@/composables/useImageZoom.js';
 
 import { playOk, playKo, playNoob } from '@/composables/useSounds.js';
-
 
 const route = useRoute();
 const router = useRouter();
@@ -76,7 +77,7 @@ const clueSize = ref(0);
 const clueSizeWithUnit = computed(() => clueSize.value + 'px');
 const displayClue = ref(false);
 
-const { transformStyle, resetTransform, onMouseDown, onMouseUp, onMouseMove, onWheel } = useImageZoom(checkAlexFound);
+const { transformStyle, resetTransform, onMouseDown, onMouseUp, onMouseMove, onWheel, onTouchStart, onTouchMove, onTouchEnd } = useImageZoom(checkAlexFound);
 
 function checkAlexFound(event) {
     const xRatio = event.target.naturalWidth / event.target.width;
@@ -167,9 +168,8 @@ function showClue() {
     }, 100);
 }
 
-
-function preloadNextImage(){
-    if(nextQuest?.value?.type != 'quest'){
+function preloadNextImage() {
+    if (nextQuest?.value?.type != 'quest') {
         return;
     }
 
@@ -211,7 +211,7 @@ watch(currentQuestIndex, (value) => {
     }
 });
 
-watch(currentQuestIndex, preloadNextImage, {immediate: true});
+watch(currentQuestIndex, preloadNextImage, { immediate: true });
 
 // watch( () => route.params.imageIndex, (value) => {
 //     console.log('route.params', value);
