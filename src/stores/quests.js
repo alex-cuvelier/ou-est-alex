@@ -5,7 +5,8 @@ import quests from '@/quests.json';
 
 export const useQuestsStore = defineStore('quests', () => {
     const filteredQuests = quests
-        .filter((quest) => !quest.hard)
+        .sort((a, b) => a.difficultyLevel - b.difficultyLevel)
+        .filter((quest) => quest.difficultyLevel < 4)
         .map((quest, index) => ({
             id: index,
             type: 'quest',
@@ -18,7 +19,7 @@ export const useQuestsStore = defineStore('quests', () => {
 
     const currentQuest = computed(() => filteredQuests[currentQuestIndex.value]);
 
-    const nextQuest = computed(() => filteredQuests[currentQuestIndex.value + 1 % filteredQuests.length]);
+    const nextQuest = computed(() => filteredQuests[currentQuestIndex.value + (1 % filteredQuests.length)]);
 
     const questsCount = computed(() => filteredQuests.length);
 
@@ -57,5 +58,5 @@ export const useQuestsStore = defineStore('quests', () => {
         currentQuestIndex.value = 0;
     }
 
-    return { currentQuestIndex, currentQuest, nextQuest,  questsCount, questsStats, goToNextQuest, goToPreviousQuest, setCurrentQuestIndex, resetQuests };
+    return { currentQuestIndex, currentQuest, nextQuest, questsCount, questsStats, goToNextQuest, goToPreviousQuest, setCurrentQuestIndex, resetQuests };
 });

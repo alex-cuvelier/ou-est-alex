@@ -213,9 +213,6 @@ watch(currentQuestIndex, (value) => {
 
 watch(currentQuestIndex, preloadNextImage, { immediate: true });
 
-// watch( () => route.params.imageIndex, (value) => {
-//     console.log('route.params', value);
-// });
 </script>
 
 <style lang="scss">

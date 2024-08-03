@@ -38,7 +38,6 @@ export default function useImageZoom(clickCallback) {
 
     // Function to handle the mouse up event, stopping the panning
     function onMouseUp(e) {
-        console.log('MOUSE UP');
         panning = false;
 
         // Check if the target is an image element
@@ -117,7 +116,6 @@ export default function useImageZoom(clickCallback) {
 
     // Handle touch events
     function onTouchStart(e) {
-        console.log('touch start');
         
         if (e.touches.length === 1) {
             // Single touch: start panning
