@@ -1,22 +1,4 @@
 <template>
-    <header>
-        <a href="/">Où est Alex ?</a>
-        <template v-if="currentQuestIndex + 1 < questsCount">
-            <button class="oea-btn ask-clue" @click="showClue" :title="$t('header.ask-clue')" :disabled="displayClue">
-            <img class="icon icon-lg" src="@/assets/icons/circle-question-solid.svg" />
-        </button>
-        <div class="right-buttons">
-            <button class="oea-btn" :disabled="currentQuestIndex == 0" @click="questsStore.goToPreviousQuest">
-                <img class="icon" src="@/assets/icons/arrow-left-solid.svg" />
-            </button>
-            <span> {{ currentQuestIndex + 1 }} / {{ questsCount - 1 }} </span>
-            <button class="oea-btn" @click="goToNextQuest">
-                <img class="icon" src="@/assets/icons/arrow-right-solid.svg" />
-            </button>
-        </div>
-        </template>
-        <span v-else> Fin </span>
-    </header>
     <main>
         <div
             v-if="currentQuest?.type == 'quest'"
@@ -34,6 +16,10 @@
             <img ref="image" class="oea-img" :src="currentQuest.url" />
         </div>
         <oea-end-stats v-else></oea-end-stats>
+
+        <button class="ask-clue" :title="$t('header.ask-clue')" :disabled="displayClue" @click="showClue">
+            <img src="@/assets/icons/circle-question-solid.svg" />
+        </button>
     </main>
     <oea-current-quest-stats
         v-if="currentQuest?.type == 'quest'"
@@ -49,7 +35,7 @@
 import OeaCurrentQuestStats from '@/components/OeaCurrentQuestStats.vue';
 import OeaEndStats from '@/components/OeaEndStats.vue';
 
-import { ref, watch, computed, onMounted } from 'vue';
+import { ref, watch, computed, onMounted, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
@@ -98,16 +84,11 @@ function onAlexFound() {
     playOk();
     confetti.start();
     questStats.value.found = true;
-    goToNextQuest();
     setTimeout(() => {
         confetti.stop();
     }, 1500);
-}
-
-function goToNextQuest() {
-    questStats.value.end = new Date();
-    questsStore.goToNextQuest({
-        ...questStats.value,
+    nextTick(() => {
+        questsStore.goToNextQuest();
     });
 }
 
@@ -127,6 +108,7 @@ function resetQuestStats() {
 const wrapperStyle = ref({ height: '100%', width: '100%' });
 
 function updateWrapperStyle() {
+    console.log('updateWrapperStyle');
     /* Compute wrapper dimmensions */
     const mainDimensions = document.querySelector('main').getBoundingClientRect();
     const aspectRatio = currentQuest.value.width / currentQuest.value.height;
@@ -197,7 +179,7 @@ onMounted(() => {
 });
 
 //change url on quest change
-watch(currentQuestIndex, (value) => {
+watch(currentQuestIndex, (value, oldValue) => {
     router.push({
         name: 'homeIndex',
         params: {
@@ -206,6 +188,14 @@ watch(currentQuestIndex, (value) => {
     });
     resetTransform();
     resetClueSize();
+
+    if (value === oldValue + 1) {
+        questStats.value.end = new Date();
+        questsStore.pushQuestStats({
+            ...questStats.value,
+        });
+    }
+
     resetQuestStats();
     if (currentQuest.value.type == 'quest') {
         updateWrapperStyle();

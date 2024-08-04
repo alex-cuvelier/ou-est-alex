@@ -24,14 +24,10 @@ export const useQuestsStore = defineStore('quests', () => {
 
     const questsCount = computed(() => filteredQuests.length);
 
-    function goToNextQuest(questStat) {
+    function goToNextQuest() {
         if (currentQuestIndex.value >= filteredQuests.length - 1) {
             currentQuestIndex.value = 0;
             return;
-        }
-
-        if (questStat) {
-            questsStats.value.push(questStat);
         }
 
         currentQuestIndex.value++;
@@ -54,10 +50,14 @@ export const useQuestsStore = defineStore('quests', () => {
         currentQuestIndex.value = index;
     }
 
+    function pushQuestStats(questStat) {
+        questsStats.value.push(questStat);
+    }
+
     function resetQuests() {
         questsStats.value = [];
         currentQuestIndex.value = 0;
     }
 
-    return { currentQuestIndex, currentQuest, nextQuest, questsCount, questsStats, goToNextQuest, goToPreviousQuest, setCurrentQuestIndex, resetQuests };
+    return { currentQuestIndex, currentQuest, nextQuest, questsCount, questsStats, goToNextQuest, goToPreviousQuest, setCurrentQuestIndex, pushQuestStats, resetQuests };
 });
