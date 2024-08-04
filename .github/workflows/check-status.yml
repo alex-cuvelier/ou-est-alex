@@ -1,0 +1,21 @@
+name: Check Website Status
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # Runs every 30 minutes
+  workflow_dispatch:       # Allows manual triggering
+
+jobs:
+  check_website:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check website status
+      run: |
+        URL="${{ vars.WEBSITE_URL }}"
+        STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" $URL)
+        if [ "$STATUS" -ne 200 ]; then
+          echo "Website is down with status code $STATUS"
+          exit 1
+        else
+          echo "Website is online with status code $STATUS"
