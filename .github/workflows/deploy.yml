@@ -1,4 +1,4 @@
-name: Deploy to Debian Server
+name: Deploy
 
 on:
   push:
