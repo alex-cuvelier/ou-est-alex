@@ -38,8 +38,8 @@ jobs:
     - name: Add server to known_hosts
       run: |
         mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ vars.SSH_HOST}} >> ~/.ssh/known_hosts
+        ssh-keyscan -H ${{ vars.SSH_HOST }} >> ~/.ssh/known_hosts
 
     - name: Deploy to Server
       run: |
-        rsync -avz --delete dist/ ${{ vars.SSH_USER}}@${{ vars.SSH_HOST}}:${{ vars.DEPLOY_REPOSITORY}}
+        rsync -avz --delete dist/ ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}:${{ vars.DEPLOY_REPOSITORY }}
