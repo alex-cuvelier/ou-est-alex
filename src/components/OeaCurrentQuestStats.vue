@@ -1,8 +1,7 @@
 <template>
     <div class="oea-quest-stats">
         <div class="oea-quest-stat">
-            <span class="oea-quest-stat-title">{{ $t('footer.difficultyLevel') }}</span>
-            <span class="oea-quest-stat-value">{{ difficultyLevel + 1 }}</span>
+            <span class="oea-quest-stat-title">{{ $t('difficulty.' + difficultyLevel) }}</span>
         </div>
         <div class="oea-quest-stat">
             <span class="oea-quest-stat-title">{{ $t('footer.timer') }}</span>

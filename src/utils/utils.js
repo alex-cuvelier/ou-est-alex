@@ -25,6 +25,9 @@ export function getPolygonCenter(polygon) {
 }
 
 export function toPolygon(coordsStr, xRatio, yRatio) {
+    if(!coordsStr) {
+        return [];
+    }
     return coordsStr
         .split(',')
         .map((coord, index, coords) => {

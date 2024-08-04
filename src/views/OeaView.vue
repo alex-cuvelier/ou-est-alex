@@ -50,14 +50,14 @@ const route = useRoute();
 const router = useRouter();
 
 const questsStore = useQuestsStore();
-const { currentQuest, nextQuest, currentQuestIndex, questsCount, questsStats } = storeToRefs(questsStore);
+const { currentDifficultyLevel, currentQuest, nextQuest, currentQuestIndex, questsCount, questsStats } = storeToRefs(questsStore);
 
 const questStats = ref({});
 const timer = ref(0);
 setInterval(() => {
     timer.value++;
 }, 1000);
-
+questsStore.currentDifficultyLevel = parseInt(route?.params?.difficultyLevel || 0);
 questsStore.setCurrentQuestIndex(parseInt(route?.params?.imageIndex || 1) - 1);
 
 const clueSize = ref(0);
@@ -167,6 +167,7 @@ function resetClueSize() {
 
 onMounted(() => {
     if (currentQuest.value.type == 'end' && questsStats.value.length == 0) {
+        debugger;
         location.href = '/';
     }
 
@@ -180,8 +181,9 @@ onMounted(() => {
 //change url on quest change
 watch(currentQuestIndex, (value, oldValue) => {
     router.push({
-        name: 'homeIndex',
+        name: 'quest',
         params: {
+            difficultyLevel: currentDifficultyLevel.value,
             imageIndex: value + 1,
         },
     });

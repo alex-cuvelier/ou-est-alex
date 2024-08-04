@@ -1,5 +1,9 @@
 <template>
     <div class="oea-end-stats">
+
+        <div class="oea-end-stats-container">
+
+        
         <div class="oea-end-stat">
             <span class="oea-end-stat-title">{{ $t('end.found') }}</span>
             <span class="oea-end-stat-value">{{ endStats.found }} / {{ questsCount - 1 }}</span>
@@ -16,8 +20,18 @@
             <span class="oea-end-stat-title">{{ $t('end.time') }}</span>
             <span class="oea-end-stat-value">{{ formatMillisecondsToTime(endStats.time) }}</span>
         </div>
-        <div class="oea-end-button-container">
-            <button class="oea-btn" @click="questsStore.resetQuests">{{ $t('end.restart') }}</button>
+    </div>
+
+        <div class="oea-end-buttons">
+            <div class="oea-end-button-container">
+                <button class="oea-btn" @click="goToNextDifficultyLevel">{{ $t('end.continue') }}</button>
+            </div>
+            <div class="oea-end-button-container">
+                <button class="oea-btn" @click="router.push({ name: 'levelChooser' })">{{ $t('end.chooseLevel') }}</button>
+            </div>
+            <div class="oea-end-button-container">
+                <button class="oea-btn" @click="questsStore.resetQuests">{{ $t('end.restart') }}</button>
+            </div>
         </div>
     </div>
 </template>
@@ -25,10 +39,14 @@
 <script setup>
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
 import { formatMillisecondsToTime } from '@/utils/utils.js';
 import { useQuestsStore } from '@/stores/questsStore.js';
+
+const router = useRouter();
+
 const questsStore = useQuestsStore();
-const { questsCount, questsStats } = storeToRefs(questsStore);
+const { questsCount, questsStats, difficultyLevels, currentDifficultyLevel, currentQuestIndex } = storeToRefs(questsStore);
 
 const endStats = computed(() => {
     return questsStats.value.reduce(
@@ -42,4 +60,13 @@ const endStats = computed(() => {
         { found: 0, noCount: 0, clueCount: 0, time: 0 },
     );
 });
+
+const goToNextDifficultyLevel = () => {
+    const nextDifficultyLevel = currentDifficultyLevel.value + 1;
+    if (nextDifficultyLevel < difficultyLevels.value.length) {
+        currentDifficultyLevel.value = nextDifficultyLevel;
+        currentQuestIndex.value = 0;
+        router.push({ name: 'quest', params: { difficultyLevel: nextDifficultyLevel, imageIndex: 1 } });
+    }
+};
 </script>

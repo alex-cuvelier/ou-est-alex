@@ -4,28 +4,39 @@ import { defineStore } from 'pinia';
 import quests from '@/quests.json';
 
 export const useQuestsStore = defineStore('quests', () => {
+
+    const difficultyLevels = computed(() => {
+        return Array.from(new Set(quests
+            .filter(quest => quest.difficultyLevel != null)
+            .map((quest) => quest.difficultyLevel)
+            .sort()));
+    });
     
-    const filteredQuests = quests
+    const currentDifficultyLevel = ref(0);
+
+    const filteredQuests = computed(()=>{
+        return quests
         .sort((a, b) => a.difficultyLevel - b.difficultyLevel)
-        .filter((quest) => quest.difficultyLevel < 4 || quest.type === 'end')
+        .filter((quest) => quest.difficultyLevel == currentDifficultyLevel.value || quest.type === 'end')
         .map((quest, index) => ({
             id: index,
             type: 'quest',
             ...quest,
         }));
+    });
 
     const currentQuestIndex = ref(0);
 
     const questsStats = ref([]);
 
-    const currentQuest = computed(() => filteredQuests[currentQuestIndex.value]);
+    const currentQuest = computed(() => filteredQuests.value[currentQuestIndex.value]);
 
-    const nextQuest = computed(() => filteredQuests[currentQuestIndex.value + (1 % filteredQuests.length)]);
+    const nextQuest = computed(() => filteredQuests.value[currentQuestIndex.value + (1 % filteredQuests.value.length)]);
 
-    const questsCount = computed(() => filteredQuests.length);
+    const questsCount = computed(() => filteredQuests.value.length);
 
     function goToNextQuest() {
-        if (currentQuestIndex.value >= filteredQuests.length - 1) {
+        if (currentQuestIndex.value >= filteredQuests.value.length - 1) {
             currentQuestIndex.value = 0;
             return;
         }
@@ -35,7 +46,7 @@ export const useQuestsStore = defineStore('quests', () => {
 
     function goToPreviousQuest() {
         if (currentQuestIndex.value === 0) {
-            currentQuestIndex.value = filteredQuests.length - 1;
+            currentQuestIndex.value = filteredQuests.value.length - 1;
             return;
         }
 
@@ -43,7 +54,7 @@ export const useQuestsStore = defineStore('quests', () => {
     }
 
     function setCurrentQuestIndex(index) {
-        if (index < 0 || index >= filteredQuests.length) {
+        if (index < 0 || index >= filteredQuests.value.length) {
             return;
         }
 
@@ -59,5 +70,5 @@ export const useQuestsStore = defineStore('quests', () => {
         currentQuestIndex.value = 0;
     }
 
-    return { currentQuestIndex, currentQuest, nextQuest, questsCount, questsStats, goToNextQuest, goToPreviousQuest, setCurrentQuestIndex, pushQuestStats, resetQuests };
+    return { currentDifficultyLevel, difficultyLevels, currentQuestIndex, currentQuest, nextQuest, questsCount, questsStats, goToNextQuest, goToPreviousQuest, setCurrentQuestIndex, pushQuestStats, resetQuests };
 });

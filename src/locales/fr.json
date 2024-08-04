@@ -13,7 +13,18 @@
     "errors": "Erreurs",
     "clues": "Indices",
     "time": "Temps",
-    "restart": "Recommencer"
+    "restart": "Recommencer",
+    "chooseLevel": "Choisir la difficulté",
+    "continue": "Continuer"
+  },
+  "difficulty": {
+    "0": "Facile",
+    "1": "Moyen",
+    "2": "Difficile",
+    "3": "Très difficile",
+    "4": "Impossible"
+  },
+  "level-chooser": {
+    "title": "Choisir un niveau"
   }
 }
-  

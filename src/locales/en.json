@@ -13,6 +13,11 @@
     "errors": "Erreurs",
     "clues": "Indices",
     "time": "Temps",
-    "restart": "Recommencer"
+    "restart": "Recommencer",
+    "chooseLevel": "Choose difficulty",
+    "continue": "Continue"
+  },
+  "level-chooser": {
+    "title": "Choose a level"
   }
 }
