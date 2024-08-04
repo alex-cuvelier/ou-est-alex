@@ -42,4 +42,4 @@ jobs:
 
     - name: Deploy to Server
       run: |
-        rsync -avz --delete dist/ debian@79.137.35.132:/var/www/ouestalex.fr/html
+        rsync -avz --delete dist/ ${{ secrets.SSH_USER}}@${{ secrets.SSH_HOST}}:${{ secrets.DEPLOY_REPOSITORY}}
