@@ -108,7 +108,6 @@ function resetQuestStats() {
 const wrapperStyle = ref({ height: '100%', width: '100%' });
 
 function updateWrapperStyle() {
-    console.log('updateWrapperStyle');
     /* Compute wrapper dimmensions */
     const mainDimensions = document.querySelector('main').getBoundingClientRect();
     const aspectRatio = currentQuest.value.width / currentQuest.value.height;
