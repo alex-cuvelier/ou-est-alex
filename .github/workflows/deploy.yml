@@ -23,12 +23,6 @@ jobs:
 
     - name: Build the Vue app
       run: npm run build
-
-    - name: Install rsync
-      run: sudo apt-get update && sudo apt-get install -y rsync
-
-    - name: Verify rsync installation
-      run: rsync --version
       
     - name: Set up SSH key
       uses: webfactory/ssh-agent@v0.5.3
