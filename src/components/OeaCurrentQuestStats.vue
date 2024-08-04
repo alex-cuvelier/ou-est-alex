@@ -6,7 +6,7 @@
         </div>
         <div class="oea-quest-stat">
             <span class="oea-quest-stat-title">{{ $t('footer.timer') }}</span>
-            <span class="oea-quest-stat-value">{{ timer }}</span>
+            <span class="oea-quest-stat-value">{{ formmatSecondsToTime(timer) }}</span>
         </div>
         <div class="oea-quest-stat">
             <span class="oea-quest-stat-title">{{ $t('footer.clue') }}</span>
@@ -20,6 +20,8 @@
 </template>
 
 <script setup>
+import {formmatSecondsToTime} from '@/utils/utils.js';
+
 defineProps({
     difficultyLevel: Number,
     timer: Number,

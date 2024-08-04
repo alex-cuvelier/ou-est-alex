@@ -75,3 +75,23 @@ export function formatMillisecondsToTime(milliseconds) {
   
     return `${formattedHrs}:${formattedMins}:${formattedSecs}`;
   }
+
+  export function formmatSecondsToTime(seconds) {
+    // Ensure the input is a number
+    if (typeof seconds !== 'number' || isNaN(seconds)) {
+      return 'Invalid input';
+    }
+  
+    // Calculate hours, minutes, and seconds
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+  
+    // Pad with leading zeros if necessary
+    const formattedHrs = String(hrs).padStart(2, '0');
+    const formattedMins = String(mins).padStart(2, '0');
+    const formattedSecs = String(secs).padStart(2, '0');
+  
+    return `${formattedHrs}:${formattedMins}:${formattedSecs}`;
+  }
+
