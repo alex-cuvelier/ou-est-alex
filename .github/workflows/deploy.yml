@@ -3,7 +3,7 @@ name: Deploy to Debian Server
 on:
   push:
     branches:
-      - main  # Adjust this if your deployment branch is different
+      - main
 
 jobs:
   build-and-deploy:
