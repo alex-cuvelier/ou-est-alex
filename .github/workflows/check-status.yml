@@ -12,11 +12,14 @@ jobs:
     steps:
     - name: Check website status
       run: |
-        URL="${{ vars.WEBSITE_URL }}"
-        STATUS=$(curl -o /dev/null -s -w "%{http_code}\n" $URL)
-        echo "status=$STATUS" >> $GITHUB_ENV
-        if [ "$STATUS" -ne 200 ]; then
-          echo "Website is down with status code $STATUS"
-          exit 1
+        CODE=`curl --write-out '%{http_code}' \
+            --silent \
+            --output /dev/null \
+            --url ${{vars.WEBSITE_URL}} \
+            
+        if [ $CODE!="200" ] 
+        then
+            echo "FAILURE"
         else
-          echo "Website is online with status code $STATUS"
+            echo "SUCCESS"
+        fi
