@@ -50,7 +50,7 @@ const route = useRoute();
 const router = useRouter();
 
 const questsStore = useQuestsStore();
-const { currentDifficultyLevel, currentQuest, nextQuest, currentQuestIndex, questsCount, questsStats } = storeToRefs(questsStore);
+const { currentDifficultyLevel, currentQuest, nextQuest, currentQuestIndex, questsStats } = storeToRefs(questsStore);
 
 const questStats = ref({});
 const timer = ref(0);
@@ -167,7 +167,6 @@ function resetClueSize() {
 
 onMounted(() => {
     if (currentQuest.value.type == 'end' && questsStats.value.length == 0) {
-        debugger;
         location.href = '/';
     }
 
