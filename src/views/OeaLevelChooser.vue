@@ -5,7 +5,6 @@
             <Button v-for="level in difficultyLevels" outlined raised severity="contrast" @click="setLevel(level)">
                 {{ $t('difficulty.' + level) }}
             </Button>
-
         </div>
     </div>
 </template>
@@ -42,6 +41,12 @@ const setLevel = (difficultyLevel) => {
         justify-content: center;
         gap: 1rem;
         align-items: center;
+
+        button{
+            font-size: 1.25rem;
+            padding: 1rem 2rem;
+            min-width: 15rem;
+        }
     }
 }
 </style>

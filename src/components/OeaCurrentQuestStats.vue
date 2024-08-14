@@ -4,7 +4,7 @@
             <span class="oea-quest-stat-title">{{ $t('difficulty.' + difficultyLevel) }}</span>
         </div>
         <div class="oea-quest-stat">
-            <span class="oea-quest-stat-value">{{ formmatSecondsToTime(timer) }}</span>
+            <span class="oea-quest-stat-title">{{ formmatSecondsToTime(timer) }}</span>
         </div>
         <div class="oea-quest-stat">
             <span class="oea-quest-stat-title">{{ $t('footer.clue') }}</span>
