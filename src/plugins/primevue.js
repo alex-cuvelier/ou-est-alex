@@ -4,6 +4,7 @@ import { definePreset } from '@primevue/themes';
 
 import Button from 'primevue/button';
 import Drawer from 'primevue/drawer';
+import Card from 'primevue/card';
 
 
 const Noir = definePreset(Aura, {
@@ -60,6 +61,7 @@ export default {
 
         app.component('Button', Button);
         app.component('Drawer', Drawer);
+        app.component('Card', Card);
 
 
         app.use(PrimeVue, {

@@ -168,25 +168,18 @@
 
             .oea-end-stats-container{
                 display: flex;
-                width: 100%;
                 justify-content: space-evenly;
                 align-content: flex-start;
                 font-size: 1.25rem;
                 padding: 1rem;
                 flex-wrap: wrap;
+                gap: 1rem;
 
-                .oea-end-stat {
-                    display: flex;
-                    flex-direction: column;
-
-                    display: flex;
-                    .oea-end-stat-title {
-                        font-weight: bold;
+                .p-card{
+                    border: 1px solid black;
+                    flex: 1 1;
+                    .p-card-title, .p-card-content{
                         text-align: center;
-                    }
-                    .oea-end-stat-value {
-                        text-align: center;
-                        margin-left: 0.5rem;
                     }
                 }
             }

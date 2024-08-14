@@ -2,24 +2,22 @@
     <div class="oea-end-stats">
 
         <div class="oea-end-stats-container">
-
-
-            <div class="oea-end-stat">
-                <span class="oea-end-stat-title">{{ $t('end.found') }}</span>
-                <span class="oea-end-stat-value">{{ endStats.found }} / {{ questsCount - 1 }}</span>
-            </div>
-            <div class="oea-end-stat">
-                <span class="oea-end-stat-title">{{ $t('end.errors') }}</span>
-                <span class="oea-end-stat-value">{{ endStats.noCount }}</span>
-            </div>
-            <div class="oea-end-stat">
-                <span class="oea-end-stat-title">{{ $t('end.clues') }}</span>
-                <span class="oea-end-stat-value">{{ endStats.clueCount }}</span>
-            </div>
-            <div class="oea-end-stat">
-                <span class="oea-end-stat-title">{{ $t('end.time') }}</span>
-                <span class="oea-end-stat-value">{{ formatMillisecondsToTime(endStats.time) }}</span>
-            </div>
+            <Card>
+                <template #title>{{ $t('end.found') }}</template>
+                <template #content>{{ endStats.found }} / {{ questsCount - 1 }}</template>
+            </Card>
+            <Card>
+                <template #title>{{ $t('end.errors') }}</template>
+                <template #content>{{ endStats.noCount }}</template>
+            </Card>
+            <Card>
+                <template #title>{{ $t('end.clues') }}</template>
+                <template #content>{{ endStats.clueCount }}</template>
+            </Card>
+            <Card>
+                <template #title>{{ $t('end.time') }}</template>
+                <template #content>{{ formatMillisecondsToTime(endStats.time) }}</template>
+            </Card>
         </div>
 
         <div class="oea-end-buttons">
