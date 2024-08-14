@@ -73,6 +73,38 @@
             align-items: center;
             gap: 0.5rem;
         }
+        .current-quest{
+            cursor: pointer;
+            padding: .25rem;
+            border-radius: .25rem;
+            &:hover{
+                background-color: #ccc;
+            }
+        }
+
+        .quest-popover{
+            display: flex;
+            flex-direction: column;
+            gap : .25rem;
+            overflow-y: auto;
+            max-height: 70vh;
+
+            .quest-popover-item{
+                padding: 0.25rem 1rem;
+                border-radius: .25rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                &.active{
+                    background-color: orange;
+                }
+                &:hover{
+                    background-color: #ccc;
+                }
+            }
+
+        }
     }
 
     .oea-quest-stats {
