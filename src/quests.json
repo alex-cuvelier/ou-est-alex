@@ -259,6 +259,20 @@
         "difficultyLevel": 3
     },
     {
+        "url": "/images/38.jpg",
+        "coords": "1453,558,1469,565,1480,555,1473,541,1459,542",
+        "width": 2016,
+        "height": 1512,
+        "difficultyLevel": 2
+    },
+    {
+        "url": "/images/39.jpg",
+        "coords": "1617,955,1644,967,1658,955,1658,931,1638,923,1622,931",
+        "width": 2016,
+        "height": 1512,
+        "difficultyLevel": 2
+    },
+    {
         "type": "end"
     }
 ]
