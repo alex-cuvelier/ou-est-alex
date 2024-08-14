@@ -18,9 +18,16 @@
         <Drawer v-model:visible="drawerVisible" :header="$t('header.chooseQuest')" appendTop="self" position="top"
             style="height: auto">
             <div class="quest-drawer">
-                <Button v-for="i in questsCount - 1" class="quest-drawer-item" outlined raised severity="contrast"
-                    :class="{ active: i == currentQuestIndex + 1 }" @click="goToQuest(i - 1)">
-                    {{ i }}
+                <Button 
+                    v-for="i in questsCount - 1" 
+                    class="quest-drawer-item" 
+                    :outlined="currentQuestIndex + 1 != i"
+                    raised 
+                    :severity="getQuestSeverity(i)"
+                    @click="goToQuest(i - 1)">
+                    <span v-if="questsStore.isQuestCompleted(i)" class="completed">✓</span>
+                    <span v-else-if="questsStore.isQuestFailed(i)" class="failed">✗</span>
+                     {{ i }}
             </Button>
             </div>
         </Drawer>
@@ -46,5 +53,18 @@ const togglePopover = (event) => {
 const goToQuest = index => {
     drawerVisible.value = false;
     questsStore.setCurrentQuestIndex(index);
+}
+
+const getQuestSeverity = (index) => {
+    console.log(index, currentQuestIndex);
+    if(index == currentQuestIndex.value + 1) {
+        return 'warn';
+    }else if(questsStore.isQuestCompleted(index)) {
+        return 'success';
+    }else if (questsStore.isQuestFailed(index)) {
+        return 'danger';
+    }else {
+        return 'contrast';
+    }
 }
 </script>

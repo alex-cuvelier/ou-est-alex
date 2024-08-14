@@ -189,7 +189,7 @@ watch(currentQuestIndex, (value, oldValue) => {
     resetTransform();
     resetClueSize();
 
-    if (value === oldValue + 1) {
+    if (value === oldValue + 1 || value == oldValue - 1) {
         questStats.value.end = new Date();
         questsStore.pushQuestStats({
             ...questStats.value,

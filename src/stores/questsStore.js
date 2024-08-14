@@ -65,10 +65,19 @@ export const useQuestsStore = defineStore('quests', () => {
         questsStats.value.push(questStat);
     }
 
+    function isQuestCompleted(questId) {
+        console.log('isQuestCompleted', questId);
+        return questsStats.value.some((questStat) => questStat.id === questId && questStat.found);
+    }   
+
+    function isQuestFailed(questId) {
+        return questsStats.value.some((questStat) => questStat.id === questId && !questStat.found);
+    }
+
     function resetQuests() {
         questsStats.value = [];
         currentQuestIndex.value = 0;
     }
 
-    return { currentDifficultyLevel, difficultyLevels, currentQuestIndex, currentQuest, nextQuest, questsCount, questsStats, goToNextQuest, goToPreviousQuest, setCurrentQuestIndex, pushQuestStats, resetQuests };
+    return { currentDifficultyLevel, difficultyLevels, currentQuestIndex, currentQuest, nextQuest, questsCount, questsStats, goToNextQuest, goToPreviousQuest, setCurrentQuestIndex, pushQuestStats, isQuestCompleted, isQuestFailed, resetQuests };
 });
