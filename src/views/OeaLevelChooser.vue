@@ -2,14 +2,9 @@
     <div class="level-chooser">
         <h1>{{ $t('level-chooser.title') }}</h1>
         <div class="levels-container">
-            <button
-                v-for="level in difficultyLevels"
-                :key="level"
-                class="oea-button"
-                @click="setLevel(level)"
-            >
+            <Button v-for="level in difficultyLevels" outlined raised severity="contrast" @click="setLevel(level)">
                 {{ $t('difficulty.' + level) }}
-            </button>
+            </Button>
 
         </div>
     </div>
@@ -33,20 +28,20 @@ const setLevel = (difficultyLevel) => {
 </script>
 
 <style lang="scss" scoped>
-.level-chooser{
+.level-chooser {
     padding: 2rem;
 
-    h1{
+    h1 {
         text-align: center;
         margin-bottom: 1rem;
     }
-    
+
     .levels-container {
         display: flex;
         flex-direction: column;
         justify-content: center;
         gap: 1rem;
+        align-items: center;
     }
 }
-
 </style>

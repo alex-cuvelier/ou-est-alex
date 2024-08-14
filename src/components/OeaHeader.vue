@@ -6,7 +6,8 @@
                 <button class="oea-btn" :disabled="currentQuestIndex == 0" @click="questsStore.goToPreviousQuest">
                     <img class="icon" src="@/assets/icons/arrow-left-solid.svg" />
                 </button>
-                <span class="current-quest" @click="togglePopover"> {{ currentQuestIndex + 1 }} / {{ questsCount - 1 }} </span>
+                <span class="current-quest" @click="togglePopover"> {{ currentQuestIndex + 1 }} / {{ questsCount - 1 }}
+                </span>
                 <button class="oea-btn" :disabled="currentQuestIndex == questsCount - 2"
                     @click="questsStore.goToNextQuest">
                     <img class="icon" src="@/assets/icons/arrow-right-solid.svg" />
@@ -14,17 +15,15 @@
             </div>
             <span v-else> Fin </span>
         </template>
-        <Popover ref="op" appendTo="self">
-            <div class="quest-popover">
-                <div 
-                    v-for="i in questsCount - 1" 
-                    class="quest-popover-item"
-                    :class="{ active: i == currentQuestIndex + 1 }"
-                    @click="goToQuest(i-1)">
+        <Drawer v-model:visible="drawerVisible" :header="$t('header.chooseQuest')" appendTop="self" position="top"
+            style="height: auto">
+            <div class="quest-drawer">
+                <Button v-for="i in questsCount - 1" class="quest-drawer-item" outlined raised severity="contrast"
+                    :class="{ active: i == currentQuestIndex + 1 }" @click="goToQuest(i - 1)">
                     {{ i }}
-                </div>
+            </Button>
             </div>
-        </Popover>
+        </Drawer>
     </header>
 </template>
 <script setup>
@@ -38,14 +37,14 @@ const { currentQuestIndex, questsCount } = storeToRefs(questsStore);
 
 const route = useRoute();
 
-const op = ref();
+const drawerVisible = ref(false);
 
 const togglePopover = (event) => {
-    op.value.toggle(event);
+    drawerVisible.value = !drawerVisible.value;
 }
 
 const goToQuest = index => {
-    op.value.hide();
+    drawerVisible.value = false;
     questsStore.setCurrentQuestIndex(index);
 }
 </script>

@@ -82,29 +82,7 @@
             }
         }
 
-        .quest-popover{
-            display: flex;
-            flex-direction: column;
-            gap : .25rem;
-            overflow-y: auto;
-            max-height: 70vh;
-
-            .quest-popover-item{
-                padding: 0.25rem 1rem;
-                border-radius: .25rem;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                &.active{
-                    background-color: orange;
-                }
-                &:hover{
-                    background-color: #ccc;
-                }
-            }
-
-        }
+        
     }
 
     .oea-quest-stats {
@@ -218,24 +196,9 @@
                 align-items: center;
                 gap: 2rem;
                 margin-top: 3rem;
-                
-                .oea-end-button-container {
-                    display: flex;
-                    align-items: start;
-                    justify-content: center;
-                    
-                    button {
-                        border: 2px solid black;
-                        background-color: #fff;
-                        padding: 1rem 2rem;
-                        font-weight: bold;
-                        width: 50vw;
-                        
-                        &:active {
-                            background-color: orange;
-                        }
-                    }
-
+                button{
+                    flex: 1 1 100%;
+                    width: 15rem;
                 }
             }
         }
@@ -252,4 +215,26 @@
             background-color: orange;
         }
     }
+}
+
+.quest-drawer{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    overflow-y: auto;
+    max-height: 70vh;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+
+    .quest-drawer-item{
+        padding: 1rem 2rem;
+        flex : 0 0;
+        &.active{
+            background-color: orange;
+            color: #000;
+        }
+    }
+
 }

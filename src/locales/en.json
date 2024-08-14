@@ -1,6 +1,7 @@
 {
   "header": {
-    "ask-clue": "Ask for a clue"
+    "ask-clue": "Ask for a clue",
+    "chooseQuest": "Choose a level"
   },
   "footer": {
     "difficultyLevel": "Difficulty",
@@ -25,6 +26,6 @@
     "4": "Impossible"
   },
   "level-chooser": {
-    "title": "Choose a level"
+    "title": "Choose a difficulty level"
   }
 }

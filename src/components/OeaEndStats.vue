@@ -3,35 +3,36 @@
 
         <div class="oea-end-stats-container">
 
-        
-        <div class="oea-end-stat">
-            <span class="oea-end-stat-title">{{ $t('end.found') }}</span>
-            <span class="oea-end-stat-value">{{ endStats.found }} / {{ questsCount - 1 }}</span>
+
+            <div class="oea-end-stat">
+                <span class="oea-end-stat-title">{{ $t('end.found') }}</span>
+                <span class="oea-end-stat-value">{{ endStats.found }} / {{ questsCount - 1 }}</span>
+            </div>
+            <div class="oea-end-stat">
+                <span class="oea-end-stat-title">{{ $t('end.errors') }}</span>
+                <span class="oea-end-stat-value">{{ endStats.noCount }}</span>
+            </div>
+            <div class="oea-end-stat">
+                <span class="oea-end-stat-title">{{ $t('end.clues') }}</span>
+                <span class="oea-end-stat-value">{{ endStats.clueCount }}</span>
+            </div>
+            <div class="oea-end-stat">
+                <span class="oea-end-stat-title">{{ $t('end.time') }}</span>
+                <span class="oea-end-stat-value">{{ formatMillisecondsToTime(endStats.time) }}</span>
+            </div>
         </div>
-        <div class="oea-end-stat">
-            <span class="oea-end-stat-title">{{ $t('end.errors') }}</span>
-            <span class="oea-end-stat-value">{{ endStats.noCount }}</span>
-        </div>
-        <div class="oea-end-stat">
-            <span class="oea-end-stat-title">{{ $t('end.clues') }}</span>
-            <span class="oea-end-stat-value">{{ endStats.clueCount }}</span>
-        </div>
-        <div class="oea-end-stat">
-            <span class="oea-end-stat-title">{{ $t('end.time') }}</span>
-            <span class="oea-end-stat-value">{{ formatMillisecondsToTime(endStats.time) }}</span>
-        </div>
-    </div>
 
         <div class="oea-end-buttons">
-            <div class="oea-end-button-container">
-                <button class="oea-btn" @click="goToNextDifficultyLevel">{{ $t('end.continue') }}</button>
-            </div>
-            <div class="oea-end-button-container">
-                <button class="oea-btn" @click="router.push({ name: 'levelChooser' })">{{ $t('end.chooseLevel') }}</button>
-            </div>
-            <div class="oea-end-button-container">
-                <button class="oea-btn" @click="questsStore.resetQuests">{{ $t('end.restart') }}</button>
-            </div>
+            <Button outlined  raised severity="contrast" @click="goToNextDifficultyLevel">
+                {{ $t('end.continue') }}
+            </Button>
+            <Button outlined  raised severity="contrast" @click="router.push({ name: 'levelChooser' })">
+                {{$t('end.chooseLevel') }}
+            </Button>
+            <Button outlined  raised severity="contrast" @click="questsStore.resetQuests">
+                {{ $t('end.restart') }}
+            </Button>
+
         </div>
     </div>
 </template>

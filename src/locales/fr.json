@@ -1,6 +1,7 @@
 {
   "header": {
-    "ask-clue": "Demander un indice"
+    "ask-clue": "Demander un indice",
+    "chooseQuest": "Choisir un niveau"
   },
   "footer": {
     "difficultyLevel": "Difficulté",
@@ -25,6 +26,6 @@
     "4": "Impossible"
   },
   "level-chooser": {
-    "title": "Choisir un niveau"
+    "title": "Choisir une difficulté"
   }
 }
