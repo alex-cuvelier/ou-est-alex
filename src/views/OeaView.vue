@@ -17,7 +17,7 @@
         </div>
         <oea-end-stats v-else></oea-end-stats>
 
-        <button class="ask-clue" :title="$t('header.ask-clue')" :disabled="displayClue" @click="showClue">
+        <button v-if="currentQuest?.type == 'quest'" class="ask-clue" :title="$t('header.ask-clue')" :disabled="displayClue" @click="showClue">
             <img src="@/assets/icons/circle-question-solid.svg" />
         </button>
     </main>

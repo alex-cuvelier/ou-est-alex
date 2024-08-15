@@ -5,6 +5,11 @@
     flex-direction: column;
     height: 100svh;
 
+    @media (prefers-color-scheme: dark) {
+        background-color: #000;
+        color: #fff;
+    }
+
     header {
         padding: 0.25rem 1rem;
         display: flex;
@@ -12,8 +17,10 @@
         align-items: center;
         position: relative;
         z-index: 1;
-        background-color: #fff;
         border-bottom: 1px solid #ccc;
+        @media (prefers-color-scheme: dark) {
+            border-color: #555;
+        }
 
         @media screen and (max-device-width: 768px) {
             font-size: 1.25rem;
@@ -56,6 +63,10 @@
                 filter: invert(41%) sepia(90%) saturate(2696%) hue-rotate(357deg) brightness(100%) contrast(100%) !important;
             }
 
+            @media (prefers-color-scheme: dark) {
+                filter: invert(100%);
+            }
+
             .icon{
                 height: 0.75rem;
                 width: 0.75rem;
@@ -91,12 +102,16 @@
         align-items: center;
         font-size: 0.75rem;
         height: 1.5rem;
-        background-color: #fff;
-        border-bottom: 1px solid #ccc;
+        border-top: 1px solid #ccc;
+
+        @media (prefers-color-scheme: dark) {
+            border-color: #555;
+        }
 
         @media screen and (max-device-width: 768px) {
             font-size: 1rem;
             padding: 1rem 0rem;
+            border-top: 1px solid #ccc;
         }
 
         .oea-quest-stat {
@@ -156,7 +171,6 @@
         }
 
         .oea-end-stats {
-            background-color: white;
             flex: 1;
             height: 100%;
             width: 100%;
