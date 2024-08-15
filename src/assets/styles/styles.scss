@@ -150,6 +150,11 @@
                 height: 3.5rem;
             }
 
+            @media only screen and (min-device-width: 768px) and (max-device-width: 1366px) {
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+            
             img{
                 filter: invert(100%);
                 &:hover{
