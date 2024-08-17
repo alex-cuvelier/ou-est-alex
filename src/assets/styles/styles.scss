@@ -124,12 +124,15 @@
 
     main {
         flex: 1;
-        background-color: #000;
         overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
+        
+        &.quest{
+            background-color: #000;
+        }
 
         .ask-clue{
             position: absolute;

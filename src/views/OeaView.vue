@@ -1,5 +1,5 @@
 <template>
-    <main>
+    <main :class="{quest : currentQuest?.type == 'quest'}">
         <div
             v-if="currentQuest?.type == 'quest'"
             ref="imageWrapper"
