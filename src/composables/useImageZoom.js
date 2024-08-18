@@ -1,9 +1,12 @@
 import { ref, computed, watch } from 'vue';
 
+const MINSCALE = 1;
+const MAXSCALE = 10;
+
 // Define the default export function for the image zoom feature
 export default function useImageZoom(clickCallback) {
     // Reactive variables to track the scale and position of the image
-    const scale = ref(1),
+    const scale = ref(MINSCALE),
         pointX = ref(0),
         pointY = ref(0);
     // Variables to track the panning state and positions
@@ -11,7 +14,7 @@ export default function useImageZoom(clickCallback) {
         start = { x: 0, y: 0 },
         pointSaved = { x: 0, y: 0 },
         initialDistance = 0,
-        initialScale = 1;
+        initialScale = MINSCALE;
 
     // Computed property to generate the transform style for the image
     const transformStyle = computed(() => {
@@ -22,7 +25,7 @@ export default function useImageZoom(clickCallback) {
 
     // Function to reset the transform properties to their initial values
     function resetTransform() {
-        scale.value = 1;
+        scale.value = MINSCALE;
         pointX.value = 0;
         pointY.value = 0;
     }
@@ -89,19 +92,19 @@ export default function useImageZoom(clickCallback) {
         const delta = event.wheelDelta ? event.wheelDelta : -event.deltaY;
 
         // Reset transform if scale is 1 and wheel scrolled down
-        if (scale.value == 1 && delta < 0) {
+        if (scale.value == MINSCALE && delta < 0) {
             resetTransform();
             return;
         }
 
         // Update scale value based on wheel scroll direction
         if (delta > 0) {
-            if (scale.value > 10) {
+            if (scale.value > MAXSCALE) {
                 return;
             }
             scale.value = parseFloat((scale.value + 0.4).toFixed(1));
         } else {
-            if (scale.value <= 1) {
+            if (scale.value <= MINSCALE) {
                 return;
             }
             scale.value = parseFloat((scale.value - 0.4).toFixed(1));
@@ -123,6 +126,7 @@ export default function useImageZoom(clickCallback) {
             // Double touch: start zooming
             initialDistance = getDistance(e.touches);
             initialScale = scale.value;
+            start = getMidPoint(e.touches);
         }
     }
 
@@ -139,7 +143,9 @@ export default function useImageZoom(clickCallback) {
             // Handle zooming
             const currentDistance = getDistance(e.touches);
             const scaleChange = currentDistance / initialDistance;
-            scale.value = Math.min(Math.max(initialScale * scaleChange, 1), 10);
+            scale.value = Math.min(Math.max(initialScale * scaleChange, MINSCALE), MAXSCALE);
+            //pointX.value = pointX.value + e.touches[0].clientX - start.x;
+            //pointY.value = pointY.value + e.touches[0].clientY - start.y;
         }
     }
 
@@ -155,18 +161,21 @@ export default function useImageZoom(clickCallback) {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    function getMidPoint(touches) {
+        const x = (touches[0].clientX + touches[1].clientX) / 2;
+        const y = (touches[0].clientY + touches[1].clientY) / 2;
+        return { x, y };
+    }
+
     // Watcher to reset transform when scale is reset to 1
     watch(scale, (value) => {
-        if (value == 1) {
+        if (value == MINSCALE) {
             resetTransform();
         }
     });
 
     // Return the reactive variables and event handling functions
     return {
-        scale,
-        pointX,
-        pointY,
         transformStyle,
         resetTransform,
         onMouseDown,
