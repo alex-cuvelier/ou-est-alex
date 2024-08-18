@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import OeaView from '@/views/OeaView.vue';
 import OeaLevelChooser from '@/views/OeaLevelChooser.vue';
+import OeaAddImageView from '@/views/OeaAddImageView.vue';
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -15,6 +16,12 @@ const router = createRouter({
             name: 'quest',
             component: OeaView,
         },
+        {
+          path: '/alex',
+          name: 'addImage',
+          component: OeaAddImageView,
+
+        }
     ],
 });
 

@@ -1,6 +1,6 @@
 {
   "name": "ou-est-alex",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "@primevue/themes": "^4.0.4",
+    "heic2any": "^0.0.4",
     "pinia": "^2.1.4",
+    "primeicons": "^7.0.0",
     "primevue": "^4.0.4",
     "vue": "^3.3.4",
     "vue-confetti": "^2.3.0",
