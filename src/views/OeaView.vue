@@ -94,7 +94,7 @@ function onAlexFound() {
 
 function resetQuestStats() {
     questStats.value = {
-        id: currentQuestIndex.value + 1,
+        questId: currentQuest.id,
         start: new Date(),
         end: null,
         clueCount: 0,
@@ -196,7 +196,6 @@ watch(currentQuestIndex, (value, oldValue) => {
         });
     }
 
-    resetQuestStats();
     if (currentQuest.value.type == 'quest') {
         updateWrapperStyle();
     }

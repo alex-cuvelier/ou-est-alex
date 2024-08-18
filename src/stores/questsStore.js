@@ -89,5 +89,17 @@ export const useQuestsStore = defineStore('quests', () => {
         currentQuestIndex.value = 0;
     }
 
-    return { currentDifficultyLevel, difficultyLevels, currentQuestIndex, currentQuest, nextQuest, questsCount, questsStats, goToNextQuest, goToPreviousQuest, setCurrentQuestIndex, pushQuestStats, isQuestCompleted, isQuestFailed, resetQuests };
+    function getCompletedCount(difficultyLevel) {
+        return questsStats.value.filter((questStat) =>{
+            const quest = quests.find(q=>q.id == questStat.questId);
+            return questStat.found && (difficultyLevel=='all' || 
+                quest?.difficultyLevel == difficultyLevel)
+        }).length;
+    }
+
+    function getTotalCount(difficultyLevel) {
+        return quests.filter(q => q.type != 'end' && (difficultyLevel=='all' || q.difficultyLevel    == difficultyLevel)).length
+    }
+
+    return { currentDifficultyLevel, difficultyLevels, currentQuestIndex, currentQuest, nextQuest, questsCount, questsStats, goToNextQuest, goToPreviousQuest, setCurrentQuestIndex, pushQuestStats, isQuestCompleted, isQuestFailed, resetQuests, getCompletedCount, getTotalCount };
 });
