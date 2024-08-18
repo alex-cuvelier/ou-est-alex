@@ -18,7 +18,6 @@ export const useQuestsStore = defineStore('quests', () => {
 
         if(currentDifficultyLevel.value === 'all') {
 
-            console.log('all', quests);
             return quests
             .map((quest, index) => ({
                 id: index,
@@ -78,7 +77,6 @@ export const useQuestsStore = defineStore('quests', () => {
     }
 
     function isQuestCompleted(questId) {
-        console.log('isQuestCompleted', questId);
         return questsStats.value.some((questStat) => questStat.id === questId && questStat.found);
     }   
 

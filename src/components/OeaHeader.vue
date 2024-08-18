@@ -56,7 +56,6 @@ const goToQuest = index => {
 }
 
 const getQuestSeverity = (index) => {
-    console.log(index, currentQuestIndex);
     if(index == currentQuestIndex.value + 1) {
         return 'warn';
     }else if(questsStore.isQuestCompleted(index)) {
