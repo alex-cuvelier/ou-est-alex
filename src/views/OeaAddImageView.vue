@@ -260,42 +260,47 @@
   };
   
   const drawPolygon = () => {
-    const canvas = document.querySelector('.canvas');
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas before drawing
-  
-    // Draw the polygon
-    if (polygonPoints.value.length > 1) {
-      ctx.beginPath();
-      for (let i = 0; i < polygonPoints.value.length - 1; i++) {
-        const startX = polygonPoints.value[i].x;
-        const startY = polygonPoints.value[i].y;
-        const endX = polygonPoints.value[i + 1].x;
-        const endY = polygonPoints.value[i + 1].y;
-        ctx.moveTo(startX, startY);
-        ctx.lineTo(endX, endY);
-      }
-  
-      if (polygonPoints.value.length >= 3) {
-        const startX = polygonPoints.value[polygonPoints.value.length - 1].x;
-        const startY = polygonPoints.value[polygonPoints.value.length - 1].y;
-        const endX = polygonPoints.value[0].x;
-        const endY = polygonPoints.value[0].y;
-        ctx.moveTo(startX, startY);
-        ctx.lineTo(endX, endY);
-      }
-      ctx.strokeStyle = 'red';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-  
-      polygonPoints.value.forEach(point => {
-        ctx.beginPath();
-        ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
-        ctx.fillStyle = 'blue';
-        ctx.fill();
-      });
+  const canvas = document.querySelector('.canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas before drawing
+
+  // Draw the polygon
+  if (polygonPoints.value.length > 1) {
+    ctx.beginPath();
+    ctx.moveTo(polygonPoints.value[0].x, polygonPoints.value[0].y);
+
+    // Draw all segments
+    for (let i = 1; i < polygonPoints.value.length; i++) {
+      ctx.lineTo(polygonPoints.value[i].x, polygonPoints.value[i].y);
     }
-  };
+
+    // Close the polygon if there are at least 3 points
+    if (polygonPoints.value.length >= 3) {
+      ctx.lineTo(polygonPoints.value[0].x, polygonPoints.value[0].y);
+    }
+
+    // Fill the polygon area
+    ctx.fillStyle = 'rgba(102, 102, 102, 0.6)';
+    ctx.fill();
+
+    // Draw the polygon border
+    ctx.strokeStyle = 'rgba(51, 51, 51, 0.6)';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+  }
+
+  // Draw all points
+  polygonPoints.value.forEach(point => {
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, 10, 0, 2 * Math.PI);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; // White with opacity
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)'; // Black border with opacity
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+};
+
   
   const downloadImage = () => {
     const tempCanvas = document.createElement('canvas');
