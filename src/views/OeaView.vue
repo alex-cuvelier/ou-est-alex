@@ -57,7 +57,7 @@ const timer = ref(0);
 setInterval(() => {
     timer.value++;
 }, 1000);
-questsStore.currentDifficultyLevel = parseInt(route?.params?.difficultyLevel || 0);
+questsStore.currentDifficultyLevel = route?.params?.difficultyLevel != 'all' ? parseInt(route?.params?.difficultyLevel || 0) : 'all' ;
 questsStore.setCurrentQuestIndex(parseInt(route?.params?.imageIndex || 1) - 1);
 
 const clueSize = ref(0);
@@ -167,7 +167,7 @@ function resetClueSize() {
 
 onMounted(() => {
     if (currentQuest.value.type == 'end' && questsStats.value.length == 0) {
-        location.href = '/';
+       // location.href = '/';
     }
 
     resetClueSize();

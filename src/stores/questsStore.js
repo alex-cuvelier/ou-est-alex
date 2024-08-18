@@ -15,7 +15,19 @@ export const useQuestsStore = defineStore('quests', () => {
     const currentDifficultyLevel = ref(0);
 
     const filteredQuests = computed(()=>{
-        return quests
+
+        if(currentDifficultyLevel.value === 'all') {
+
+            console.log('all', quests);
+            return quests
+            .map((quest, index) => ({
+                id: index,
+                type: 'quest',
+                ...quest,
+            }));
+        }
+
+        return [...quests]
         .sort((a, b) => a.difficultyLevel - b.difficultyLevel)
         .filter((quest) => quest.difficultyLevel == currentDifficultyLevel.value || quest.type === 'end')
         .map((quest, index) => ({

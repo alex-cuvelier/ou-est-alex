@@ -23,7 +23,8 @@
     "1": "Moyen",
     "2": "Difficile",
     "3": "Très difficile",
-    "4": "Impossible"
+    "4": "Impossible",
+    "all": "Tout !"
   },
   "level-chooser": {
     "title": "Choisir une difficulté"
