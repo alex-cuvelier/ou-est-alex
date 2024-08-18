@@ -46,7 +46,7 @@
           <StepPanel value="3">
             <div v-if="imageLoaded" class="polygon-container">
               <img :src="imageSrc" class="background-image" alt="Background Image" />
-              <canvas ref="canvas" class="canvas" @click="addPoint"></canvas>
+              <canvas ref="canvas" class="canvas" @mousedown="startDragging" @mousemove="dragPoint" @mouseup="stopDragging"></canvas>
             </div>
             <div class="button-container">
               <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="previousStep" />
@@ -103,6 +103,7 @@
   const displayWidth = ref(0);
   const displayHeight = ref(0);
   let aspectRatio = 1;
+  const pointRadius = 15;
   const polygonPoints = ref([]);
   const selectedPercentage = ref(100);
   const percentageOptions = [
@@ -234,12 +235,14 @@
     polygonPoints.value = [];
   };
   
-  const addPoint = (event) => {
-    const rect = event.target.getBoundingClientRect();
-    const x = (event.clientX - rect.left) * (displayWidth.value / rect.width);
-    const y = (event.clientY - rect.top) * (displayHeight.value / rect.height);
-    polygonPoints.value.push({ x, y });
-    drawPolygon(); // Ensure the polygon is redrawn after adding a point
+  const addPointIfNotDragging = (event) => {
+    if (draggingPointIndex === null) {
+      const rect = event.target.getBoundingClientRect();
+      const x = (event.clientX - rect.left) * (displayWidth.value / rect.width);
+      const y = (event.clientY - rect.top) * (displayHeight.value / rect.height);
+      polygonPoints.value.push({ x, y });
+      drawPolygon(); // Ensure the polygon is redrawn after adding a point
+    }
   };
   
   const resetPolygon = () => {
@@ -260,47 +263,82 @@
   };
   
   const drawPolygon = () => {
-  const canvas = document.querySelector('.canvas');
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas before drawing
-
-  // Draw the polygon
-  if (polygonPoints.value.length > 1) {
-    ctx.beginPath();
-    ctx.moveTo(polygonPoints.value[0].x, polygonPoints.value[0].y);
-
-    // Draw all segments
-    for (let i = 1; i < polygonPoints.value.length; i++) {
-      ctx.lineTo(polygonPoints.value[i].x, polygonPoints.value[i].y);
+    const canvas = document.querySelector('.canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas before drawing
+  
+    // Draw the polygon
+    if (polygonPoints.value.length > 1) {
+      ctx.beginPath();
+      ctx.moveTo(polygonPoints.value[0].x, polygonPoints.value[0].y);
+  
+      // Draw all segments
+      for (let i = 1; i < polygonPoints.value.length; i++) {
+        ctx.lineTo(polygonPoints.value[i].x, polygonPoints.value[i].y);
+      }
+  
+      // Close the polygon if there are at least 3 points
+      if (polygonPoints.value.length >= 3) {
+        ctx.lineTo(polygonPoints.value[0].x, polygonPoints.value[0].y);
+      }
+  
+      // Fill the polygon area
+      ctx.fillStyle = 'rgba(102, 102, 102, 0.6)';
+      ctx.fill();
+  
+      // Draw the polygon border
+      ctx.strokeStyle = 'rgba(51, 51, 51, 0.6)';
+      ctx.lineWidth = 4;
+      ctx.stroke();
     }
-
-    // Close the polygon if there are at least 3 points
-    if (polygonPoints.value.length >= 3) {
-      ctx.lineTo(polygonPoints.value[0].x, polygonPoints.value[0].y);
+  
+    // Draw all points
+    polygonPoints.value.forEach(point => {
+      ctx.beginPath();
+      ctx.arc(point.x, point.y, pointRadius, 0, 2 * Math.PI);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; // White with opacity
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)'; // Black border with opacity
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    });
+  };
+  
+  let draggingPointIndex = null;
+  
+  const startDragging = (event) => {
+    const rect = event.target.getBoundingClientRect();
+    const x = (event.clientX - rect.left) * (displayWidth.value / rect.width);
+    const y = (event.clientY - rect.top) * (displayHeight.value / rect.height);
+  
+    // Check if the click is on a point
+    let foundPoint = false;
+    polygonPoints.value.forEach((point, index) => {
+      const distance = Math.sqrt((point.x - x) ** 2 + (point.y - y) ** 2);
+      if (distance < pointRadius) {
+        draggingPointIndex = index;
+        foundPoint = true;
+      }
+    });
+    if(!foundPoint) {
+      addPointIfNotDragging(event);
     }
-
-    // Fill the polygon area
-    ctx.fillStyle = 'rgba(102, 102, 102, 0.6)';
-    ctx.fill();
-
-    // Draw the polygon border
-    ctx.strokeStyle = 'rgba(51, 51, 51, 0.6)';
-    ctx.lineWidth = 4;
-    ctx.stroke();
-  }
-
-  // Draw all points
-  polygonPoints.value.forEach(point => {
-    ctx.beginPath();
-    ctx.arc(point.x, point.y, 10, 0, 2 * Math.PI);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; // White with opacity
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)'; // Black border with opacity
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  });
-};
-
+  };
+  
+  const dragPoint = (event) => {
+    if (draggingPointIndex !== null) {
+      const rect = event.target.getBoundingClientRect();
+      const x = (event.clientX - rect.left) * (displayWidth.value / rect.width);
+      const y = (event.clientY - rect.top) * (displayHeight.value / rect.height);
+  
+      polygonPoints.value[draggingPointIndex] = { x, y };
+      drawPolygon();
+    }
+  };
+  
+  const stopDragging = () => {
+    draggingPointIndex = null;
+  };
   
   const downloadImage = () => {
     const tempCanvas = document.createElement('canvas');
