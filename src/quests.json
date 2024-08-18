@@ -280,6 +280,13 @@
         "difficultyLevel": 0
     },
     {
+        "url": "/images/41.jpg",
+        "coords": "618,853,645,872,659,853,656,830,629,828",
+        "width": 2016,
+        "height": 1512,
+        "difficultyLevel": 3
+    },
+    {
         "type": "end"
     }
 ]
