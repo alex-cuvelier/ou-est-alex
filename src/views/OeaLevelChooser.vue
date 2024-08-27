@@ -4,7 +4,7 @@
         <div class="levels-container">
             <Button v-for="level in [...difficultyLevels, 'all']" outlined raised severity="contrast" @click="setLevel(level)">
                 {{ $t('difficulty.' + level) }}
-                {{ questsStore.getCompletedCount(level) }} / {{  questsStore.getTotalCount(level) }}
+                <!-- {{ questsStore.getCompletedCount(level) }} / {{  questsStore.getTotalCount(level) }} -->
             </Button>
         </div>
     </div>
