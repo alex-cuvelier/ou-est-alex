@@ -2,7 +2,7 @@
     <div class="level-chooser">
         <h1>{{ $t('level-chooser.title') }}</h1>
         <div class="levels-container">
-            <Button v-for="level in [...difficultyLevels, 'all']" outlined raised severity="contrast" @click="setLevel(level)">
+            <Button v-for="level in [...difficultyLevels, 'all']" :key="level" outlined raised severity="contrast" @click="setLevel(level)">
                 {{ $t('difficulty.' + level) }}
                 <!-- {{ questsStore.getCompletedCount(level) }} / {{  questsStore.getTotalCount(level) }} -->
             </Button>

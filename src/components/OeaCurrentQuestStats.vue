@@ -8,17 +8,17 @@
         </div>
         <div class="oea-quest-stat">
             <span class="oea-quest-stat-title">{{ $t('footer.clue') }}</span>
-            <span class="oea-quest-stat-value">{{ clueCount }}</span>
+            <span class="oea-quest-stat-value" :key="clueCount">{{ clueCount }}</span>
         </div>
         <div class="oea-quest-stat">
             <span class="oea-quest-stat-title">{{ $t('footer.no') }}</span>
-            <span class="oea-quest-stat-value">{{ noCount }}</span>
+            <span class="oea-quest-stat-value" :key="noCount">{{ noCount }}</span>
         </div>
     </div>
 </template>
 
 <script setup>
-import {formmatSecondsToTime} from '@/utils/utils.js';
+import { formmatSecondsToTime } from '@/utils/utils.js';
 
 defineProps({
     difficultyLevel: Number,
@@ -27,3 +27,17 @@ defineProps({
     noCount: Number,
 });
 </script>
+
+<style scoped>
+/* Animation des valeurs qui changent */
+.oea-quest-stat-value {
+    display: inline-block;
+    animation: numberPulse 0.3s ease;
+}
+
+/* Icônes ou indicateurs visuels pour les stats */
+.oea-quest-stat-title {
+    color: var(--color-text-secondary);
+    font-size: 0.9em;
+}
+</style>

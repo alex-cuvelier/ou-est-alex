@@ -1,0 +1,49 @@
+// ============================================
+// VARIABLES DE COULEURS - Thème élégant et sobre
+// ============================================
+
+:root {
+  // === MODE CLAIR (par défaut) ===
+  --color-background: #FFFFFF;
+  --color-surface: #F8F9FA;
+  --color-text-primary: #1A1D24;
+  --color-text-secondary: #64748B;
+  --color-border: #E2E8F0;
+  --color-border-hover: #CBD5E1;
+  --color-accent: #2563EB;
+  --color-success: #10B981;
+  --color-error: #EF4444;
+  --color-warning: #F59E0B;
+  --color-shadow: rgba(15, 23, 42, 0.08);
+  --color-shadow-lg: rgba(15, 23, 42, 0.15);
+  --color-overlay: rgba(15, 23, 42, 0.6);
+
+  // === VARIABLES DE TRANSITIONS ===
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 600ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  // === ESPACEMENTS ===
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  // === MODE SOMBRE ===
+  @media (prefers-color-scheme: dark) {
+    --color-background: #0F1419;
+    --color-surface: #1A1D24;
+    --color-text-primary: #F1F5F9;
+    --color-text-secondary: #94A3B8;
+    --color-border: #2D3748;
+    --color-border-hover: #4A5568;
+    --color-accent: #3B82F6;
+    --color-success: #34D399;
+    --color-error: #F87171;
+    --color-warning: #FBBF24;
+    --color-shadow: rgba(0, 0, 0, 0.3);
+    --color-shadow-lg: rgba(0, 0, 0, 0.5);
+    --color-overlay: rgba(0, 0, 0, 0.7);
+  }
+}

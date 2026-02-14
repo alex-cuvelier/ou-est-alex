@@ -70,7 +70,7 @@ const Noir = definePreset(Aura, {
 
 export default {
     install(app) {
-
+        /* eslint-disable vue/multi-word-component-names, vue/no-reserved-component-names */
         app.component('Button', Button);
         app.component('Drawer', Drawer);
         app.component('Card', Card);
@@ -83,6 +83,7 @@ export default {
         app.component('StepPanel', StepPanel);
         app.component('InputText', InputText);
         app.component('Toast', Toast);
+        /* eslint-enable vue/multi-word-component-names, vue/no-reserved-component-names */
 
         app.use(ToastService);
 

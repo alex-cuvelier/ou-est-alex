@@ -150,7 +150,7 @@ export default function useImageZoom(clickCallback) {
     }
 
     // Function to handle touch end event
-    function onTouchEnd(e) {
+    function onTouchEnd() {
         panning = false;
     }
 

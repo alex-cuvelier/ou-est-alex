@@ -69,3 +69,36 @@ const goToNextDifficultyLevel = () => {
     }
 };
 </script>
+
+<style scoped>
+/* Optimisations GPU pour les animations */
+.oea-end-stats-container {
+    will-change: opacity;
+}
+
+/* Amélioration des boutons */
+.oea-end-buttons :deep(.p-button) {
+    position: relative;
+    overflow: hidden;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    transition: all var(--transition-base);
+
+    &:hover {
+        transform: translateY(-2px);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+/* Stats cards - support pour le gradient de texte */
+.oea-end-stats-container :deep(.p-card-content) {
+    /* Le gradient est déjà appliqué dans styles.scss */
+    /* On s'assure juste que le texte est bien visible */
+    font-weight: 700;
+}
+
+/* Animation des cards déjà définie dans styles.scss via fadeInUp */
+</style>

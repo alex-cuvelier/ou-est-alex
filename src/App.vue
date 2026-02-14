@@ -1,6 +1,10 @@
 <template>
     <OeaHeader />
-    <RouterView />
+    <RouterView v-slot="{ Component }">
+        <Transition name="page" mode="out-in">
+            <component :is="Component" />
+        </Transition>
+    </RouterView>
     <Toast />
 </template>
 <script setup>
@@ -27,3 +31,21 @@ onUnmounted(() => {
 });
 
 </script>
+
+<style>
+/* Transitions de page fluides */
+.page-enter-active,
+.page-leave-active {
+    transition: all var(--transition-base);
+}
+
+.page-enter-from {
+    opacity: 0;
+    transform: translateX(10px);
+}
+
+.page-leave-to {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+</style>
