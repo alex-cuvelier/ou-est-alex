@@ -35,7 +35,7 @@
 import OeaCurrentQuestStats from '@/components/OeaCurrentQuestStats.vue';
 import OeaEndStats from '@/components/OeaEndStats.vue';
 
-import { ref, watch, computed, onMounted, nextTick } from 'vue';
+import { ref, watch, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
@@ -54,7 +54,9 @@ const { currentDifficultyLevel, currentQuest, nextQuest, currentQuestIndex, ques
 
 const questStats = ref({});
 const timer = ref(0);
-setInterval(() => {
+let timerInterval = null;
+
+timerInterval = setInterval(() => {
     timer.value++;
 }, 1000);
 questsStore.currentDifficultyLevel = route?.params?.difficultyLevel != 'all' ? parseInt(route?.params?.difficultyLevel || 0) : 'all' ;
@@ -175,6 +177,14 @@ onMounted(() => {
     updateWrapperStyle();
 
     document.addEventListener('mouseup', onMouseUp);
+});
+
+onUnmounted(() => {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    document.removeEventListener('mouseup', onMouseUp);
 });
 
 //change url on quest change

@@ -4,17 +4,26 @@
     <Toast />
 </template>
 <script setup>
+import { onMounted, onUnmounted } from 'vue';
 import OeaHeader from '@/components/OeaHeader.vue';
 
 import { useQuestsStore } from '@/stores/questsStore.js';
 const questsStore = useQuestsStore();
 
-document.onkeydown = function(e) {
-    if(e.key == 'ArrowRight') {
+function handleKeyboardNavigation(e) {
+    if (e.key === 'ArrowRight') {
         questsStore.goToNextQuest();
-    }else if(e.key == 'ArrowLeft') {
+    } else if (e.key === 'ArrowLeft') {
         questsStore.goToPreviousQuest();
     }
 }
+
+onMounted(() => {
+    document.addEventListener('keydown', handleKeyboardNavigation);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('keydown', handleKeyboardNavigation);
+});
 
 </script>
