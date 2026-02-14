@@ -8,7 +8,14 @@
   --color-pink: #EC4899;
   --color-cyan: #06B6D4;
   --color-orange: #F97316;
-  --color-lime: #84CC16;
+
+  // === COULEURS RGB (pour rgba avec opacité) ===
+  --color-purple-rgb: 139, 92, 246;
+  --color-pink-rgb: 236, 72, 153;
+  --bg-surface-rgb: 26, 31, 58;
+  --bg-primary-rgb: 10, 14, 39;
+  --white-rgb: 255, 255, 255;
+  --black-rgb: 0, 0, 0;
 
   // === COULEURS DE BASE (conservées pour compatibilité) ===
   --color-background: #0a0e27;
@@ -16,14 +23,12 @@
   --color-text-primary: #F1F5F9;
   --color-text-secondary: #94A3B8;
   --color-border: #2D3748;
-  --color-border-hover: #4A5568;
   --color-accent: #8B5CF6;
   --color-success: #34D399;
   --color-error: #F87171;
   --color-warning: #FBBF24;
   --color-shadow: rgba(0, 0, 0, 0.3);
   --color-shadow-lg: rgba(0, 0, 0, 0.5);
-  --color-overlay: rgba(0, 0, 0, 0.7);
 
   // === DÉGRADÉS SPECTACULAIRES ===
   --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -32,9 +37,6 @@
   --gradient-sunset: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
   --gradient-ocean: linear-gradient(135deg, #667eea 0%, #06B6D4 100%);
   --gradient-fire: linear-gradient(135deg, #F97316 0%, #EC4899 100%);
-
-  // === DÉGRADÉ ANIMÉ MULTI-COULEURS ===
-  --gradient-animated: linear-gradient(270deg, #667eea, #764ba2, #f093fb, #4facfe);
 
   // === EFFETS DE GLOW/NÉON ===
   --glow-purple: rgba(139, 92, 246, 0.5);
@@ -45,7 +47,6 @@
   // === BACKGROUNDS RICHES ===
   --bg-primary: #0a0e27;
   --bg-surface: #1a1f3a;
-  --bg-elevated: #242b4a;
 
   // === VARIABLES DE TRANSITIONS ===
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -57,7 +58,6 @@
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --radius-xl: 20px;
 
   // === MODE SOMBRE ===
   @media (prefers-color-scheme: dark) {
@@ -66,14 +66,12 @@
     --color-text-primary: #F1F5F9;
     --color-text-secondary: #94A3B8;
     --color-border: #2D3748;
-    --color-border-hover: #4A5568;
     --color-accent: #3B82F6;
     --color-success: #34D399;
     --color-error: #F87171;
     --color-warning: #FBBF24;
     --color-shadow: rgba(0, 0, 0, 0.3);
     --color-shadow-lg: rgba(0, 0, 0, 0.5);
-    --color-overlay: rgba(0, 0, 0, 0.7);
   }
 
   // === SURCHARGE DES VARIABLES PRIMEVUE ===
@@ -88,59 +86,3 @@
   --p-stepper-steppanel-background: transparent;
 }
 
-// ============================================
-// MIXINS RÉUTILISABLES
-// ============================================
-
-// Mixin pour créer un effet de glow néon avec une couleur
-@mixin neon-glow($color) {
-  box-shadow:
-    0 0 10px rgba($color, 0.3),
-    0 0 20px rgba($color, 0.2),
-    0 0 30px rgba($color, 0.1),
-    0 0 40px rgba($color, 0.05);
-}
-
-// Mixin pour créer un glow vibrant autour d'un élément
-@mixin vibrant-glow($color-start, $color-end) {
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    background: linear-gradient(135deg, $color-start, $color-end);
-    opacity: 0;
-    transition: opacity var(--transition-base);
-    z-index: -1;
-    filter: blur(10px);
-  }
-
-  &:hover::before {
-    opacity: 0.6;
-  }
-}
-
-// Mixin pour créer un border gradient animé
-@mixin gradient-border($gradient, $width: 2px) {
-  position: relative;
-  background: var(--color-surface);
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: $width;
-    background: $gradient;
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-  }
-}

@@ -46,8 +46,8 @@ const setLevel = (difficultyLevel) => {
         position: absolute;
         inset: 0;
         background-image:
-            linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+            linear-gradient(rgba(var(--color-purple-rgb), 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(var(--color-purple-rgb), 0.03) 1px, transparent 1px);
         background-size: 50px 50px;
         mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, transparent 70%);
         -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, transparent 70%);
@@ -147,7 +147,7 @@ const setLevel = (difficultyLevel) => {
             padding: 1.5rem 3rem !important;
             min-width: 20rem;
             background: var(--gradient-primary) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(var(--white-rgb), 0.1) !important;
             color: white !important;
             font-weight: 600;
             letter-spacing: 0.05em;
@@ -155,7 +155,7 @@ const setLevel = (difficultyLevel) => {
             overflow: hidden;
             box-shadow:
                 0 10px 40px -10px var(--glow-purple),
-                0 0 0 1px rgba(255, 255, 255, 0.1) inset !important;
+                0 0 0 1px rgba(var(--white-rgb), 0.1) inset !important;
             transition: all var(--transition-base) !important;
             animation: fadeInUp 0.6s var(--transition-bounce);
 
@@ -188,7 +188,7 @@ const setLevel = (difficultyLevel) => {
                 box-shadow:
                     0 20px 60px -10px var(--glow-purple),
                     0 0 40px var(--glow-pink),
-                    0 0 0 1px rgba(255, 255, 255, 0.2) inset !important;
+                    0 0 0 1px rgba(var(--white-rgb), 0.2) inset !important;
 
                 &::before {
                     left: 100%;

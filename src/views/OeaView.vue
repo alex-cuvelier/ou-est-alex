@@ -231,6 +231,7 @@ watch(currentQuestIndex, preloadNextImage, { immediate: true });
         &::after,
         &::before {
             display: block;
+            animation: clueGlow 2s ease-in-out infinite;
         }
     }
 
@@ -240,23 +241,42 @@ watch(currentQuestIndex, preloadNextImage, { immediate: true });
         display: none;
         position: absolute;
         border-radius: 50%;
-        border-radius: 50%;
     }
 
+    // Cercle extérieur avec glow rose
     &::after {
         top: var(--clueCenterY);
         left: var(--clueCenterX);
         width: v-bind(clueSizeWithUnit);
         height: v-bind(clueSizeWithUnit);
-        border: 2px solid black;
+        border: 3px solid rgba(var(--color-pink-rgb), 0.8);
+        box-shadow:
+            0 0 20px var(--glow-pink),
+            0 0 40px var(--glow-pink),
+            0 0 60px rgba(var(--color-pink-rgb), 0.4),
+            inset 0 0 20px rgba(var(--color-pink-rgb), 0.1);
     }
 
+    // Cercle intérieur avec bordure blanche subtile
     &::before {
-        top: calc(var(--clueCenterY) + 1px);
-        left: calc(var(--clueCenterX) + 1px);
-        width: calc(v-bind(clueSizeWithUnit) - 2px);
-        height: calc(v-bind(clueSizeWithUnit) - 2px);
-        border: 2px solid white;
+        top: calc(var(--clueCenterY) + 4px);
+        left: calc(var(--clueCenterX) + 4px);
+        width: calc(v-bind(clueSizeWithUnit) - 8px);
+        height: calc(v-bind(clueSizeWithUnit) - 8px);
+        border: 2px solid rgba(var(--white-rgb), 0.6);
+        box-shadow:
+            0 0 10px rgba(var(--white-rgb), 0.3),
+            inset 0 0 10px rgba(var(--color-pink-rgb), 0.2);
+    }
+}
+
+// Animation de pulse pour le glow de l'indice
+@keyframes clueGlow {
+    0%, 100% {
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 1;
     }
 }
 </style>
