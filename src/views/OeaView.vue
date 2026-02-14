@@ -1,34 +1,36 @@
 <template>
-    <main :class="{quest : currentQuest?.type == 'quest'}">
-        <div
-            v-if="currentQuest?.type == 'quest'"
-            ref="imageWrapper"
-            class="oea-image-wrapper"
-            :class="{ displayClue }"
-            :style="{ ...wrapperStyle, ...transformStyle }"
-            @mousedown.left="onMouseDown"
-            @mousemove="onMouseMove"
-            @wheel="onWheel"
-            @touchstart="onTouchStart"
-            @touchmove="onTouchMove"
-            @touchend="onTouchEnd"
-        >
-            <img ref="image" class="oea-img" :src="currentQuest.url" />
-        </div>
-        <oea-end-stats v-else></oea-end-stats>
+    <div class="oea-view-wrapper">
+        <main :class="{'oea-quest' : currentQuest?.type == 'quest'}">
+            <div
+                v-if="currentQuest?.type == 'quest'"
+                ref="imageWrapper"
+                class="oea-image-wrapper"
+                :class="{ 'oea-display-clue': displayClue }"
+                :style="{ ...wrapperStyle, ...transformStyle }"
+                @mousedown.left="onMouseDown"
+                @mousemove="onMouseMove"
+                @wheel="onWheel"
+                @touchstart="onTouchStart"
+                @touchmove="onTouchMove"
+                @touchend="onTouchEnd"
+            >
+                <img ref="image" class="oea-img" :src="currentQuest.url" />
+            </div>
+            <oea-end-stats v-else></oea-end-stats>
 
-        <button v-if="currentQuest?.type == 'quest'" class="ask-clue" :title="$t('header.ask-clue')" :disabled="displayClue" @click="showClue">
-            <img src="@/assets/icons/circle-question-solid.svg" />
-        </button>
-    </main>
-    <oea-current-quest-stats
-        v-if="currentQuest?.type == 'quest'"
-        :difficultyLevel="currentQuest.difficultyLevel"
-        :timer="timer"
-        :clueCount="questStats.clueCount"
-        :noCount="questStats.noCount"
-    >
-    </oea-current-quest-stats>
+            <button v-if="currentQuest?.type == 'quest'" class="oea-ask-clue" :title="$t('header.ask-clue')" :disabled="displayClue" @click="showClue">
+                <img src="@/assets/icons/circle-question-solid.svg" />
+            </button>
+        </main>
+        <oea-current-quest-stats
+            v-if="currentQuest?.type == 'quest'"
+            :difficultyLevel="currentQuest.difficultyLevel"
+            :timer="timer"
+            :clueCount="questStats.clueCount"
+            :noCount="questStats.noCount"
+        >
+        </oea-current-quest-stats>
+    </div>
 </template>
 
 <script setup>
@@ -215,9 +217,17 @@ watch(currentQuestIndex, preloadNextImage, { immediate: true });
 </script>
 
 <style lang="scss">
+/* Wrapper pour éviter le warning Vue Transition */
+.oea-view-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex: 1;
+}
+
 /* Clue circles */
 .oea-image-wrapper {
-    &.displayClue {
+    &.oea-display-clue {
         &::after,
         &::before {
             display: block;

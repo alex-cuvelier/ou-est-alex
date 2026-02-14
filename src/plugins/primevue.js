@@ -64,6 +64,22 @@ const Noir = definePreset(Aura, {
                 }
             }
         }
+    },
+    components: {
+        drawer: {
+            colorScheme: {
+                light: {
+                    background: 'rgba(10, 14, 39, 0.95)',
+                    color: '{zinc.50}',
+                    borderColor: 'transparent'
+                },
+                dark: {
+                    background: 'rgba(10, 14, 39, 0.95)',
+                    color: '{zinc.50}',
+                    borderColor: 'transparent'
+                }
+            }
+        }
     }
 });
 

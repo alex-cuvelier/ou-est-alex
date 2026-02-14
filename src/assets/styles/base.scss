@@ -53,6 +53,65 @@ h1 {
     font-size: clamp(2rem, 5vw, 3rem);
 }
 
+// === OPTIMISATIONS GPU ===
+
+// Activer l'accélération GPU pour les éléments animés
+[class*="animate-"],
+[class*="blob"],
+[class*="gradient"],
+.oea-btn,
+.oea-ask-clue,
+.p-card,
+button[class*="Button"] {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+// will-change pour les éléments qui vont être animés
+[class*="animate-"],
+[class*="blob"] {
+    will-change: transform, opacity;
+}
+
+.oea-btn:hover,
+.oea-ask-clue:hover,
+.p-card:hover,
+button:hover {
+    will-change: transform, box-shadow;
+}
+
+// === OPTIMISATIONS MOBILE ===
+
+@media (max-device-width: 768px) {
+    // Réduire l'intensité des glows sur mobile
+    .oea-ask-clue {
+        &::before {
+            opacity: 0.4 !important;
+        }
+
+        &:not(:disabled) {
+            box-shadow:
+                0 0 15px var(--glow-pink),
+                0 0 30px var(--glow-pink),
+                0 4px 12px var(--color-shadow) !important;
+        }
+    }
+
+    // Désactiver shimmer sur mobile pour performances
+    button::before,
+    .oea-button::before {
+        display: none !important;
+    }
+
+    // Réduire blur pour performances
+    header,
+    .oea-quest-stats {
+        backdrop-filter: blur(12px) saturate(150%) !important;
+    }
+}
+
 // Support pour l'accessibilité : réduire les animations si demandé
 @media (prefers-reduced-motion: reduce) {
     *,
@@ -61,5 +120,16 @@ h1 {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    // Désactiver will-change pour éviter les problèmes
+    [class*="animate-"],
+    [class*="blob"],
+    .oea-btn:hover,
+    .oea-ask-clue:hover,
+    .p-card:hover,
+    button:hover {
+        will-change: auto !important;
     }
 }
