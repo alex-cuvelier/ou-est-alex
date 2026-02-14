@@ -1,75 +1,75 @@
-# 🔍 Où est Alex ?
+# 🔍 Where is Alex?
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
 [![Version](https://img.shields.io/badge/version-0.3.0-blue)]()
 [![License](https://img.shields.io/badge/license-private-red)]()
 
-> Un jeu de type "Où est Charlie?" - Trouvez Alex dans des images complexes !
+> A "Where's Waldo?" style game - Find Alex in complex images!
 
-🎮 **[Jouer maintenant →](https://ouestalex.fr)**
+🎮 **[Play Now →](https://ouestalex.fr)**
 
-![Où est Alex Screenshot](https://ouestalex.fr/images/ogImage.jpeg)
+![Where is Alex Screenshot](https://ouestalex.fr/images/ogImage.jpeg)
 
 ---
 
-## ✨ Fonctionnalités
+## ✨ Features
 
--   🎯 **6 niveaux de difficulté** - Du débutant à l'expert
--   🔍 **Système de zoom/pan** - Navigation fluide sur mobile et desktop
--   💡 **Système d'indices** - Cercle d'aide qui rétrécit à chaque utilisation
--   🌍 **Multilingue** - Interface en Français et Anglais
--   📊 **Statistiques** - Suivez vos performances (temps, indices, erreurs)
--   🛠️ **Éditeur de quêtes** - Interface d'ajout de nouvelles images
--   🎉 **Effets visuels** - Confettis et sons de victoire
--   📱 **Responsive** - Jouable sur mobile, tablette et desktop
--   ⌨️ **Navigation clavier** - Utilisez ← et → pour naviguer
+-   🎯 **6 difficulty levels** - From beginner to expert
+-   🔍 **Zoom/pan system** - Smooth navigation on mobile and desktop
+-   💡 **Hint system** - Help circle that shrinks with each use
+-   🌍 **Multilingual** - Interface in French and English
+-   📊 **Statistics** - Track your performance (time, hints, errors)
+-   🛠️ **Quest editor** - Interface for adding new images
+-   🎉 **Visual effects** - Confetti and victory sounds
+-   📱 **Responsive** - Playable on mobile, tablet and desktop
+-   ⌨️ **Keyboard navigation** - Use ← and → to navigate
 
 ---
 
 ## 🚀 Installation
 
-### Prérequis
+### Prerequisites
 
--   [Node.js](https://nodejs.org/) v16 ou supérieur
--   npm ou yarn
+-   [Node.js](https://nodejs.org/) v16 or higher
+-   npm or yarn
 
-### Installation locale
+### Local Installation
 
 ```bash
-# Cloner le repository
-git clone https://github.com/votre-username/ou-est-alex.git
+# Clone the repository
+git clone https://github.com/your-username/ou-est-alex.git
 cd ou-est-alex
 
-# Installer les dépendances
+# Install dependencies
 npm install
 
-# Lancer en mode développement
+# Run in development mode
 npm run dev
 
-# Ouvrir votre navigateur sur http://localhost:8080
+# Open your browser at http://localhost:8080
 ```
 
 ---
 
-## 📜 Scripts disponibles
+## 📜 Available Scripts
 
-| Script                  | Description                                        |
-| ----------------------- | -------------------------------------------------- |
-| `npm run dev`           | Lance le serveur de développement sur le port 8080 |
-| `npm run dev-host`      | Lance le serveur accessible sur le réseau local    |
-| `npm run build`         | Crée la version de production dans `/dist`         |
-| `npm run preview`       | Prévisualise le build de production                |
-| `npm test`              | Lance les tests unitaires avec Vitest              |
-| `npm run test:ui`       | Lance Vitest avec interface graphique              |
-| `npm run test:coverage` | Génère le rapport de couverture de code            |
-| `npm run lint`          | Vérifie et corrige les erreurs ESLint              |
-| `npm run format`        | Formate le code avec Prettier                      |
+| Script                  | Description                                      |
+| ----------------------- | ------------------------------------------------ |
+| `npm run dev`           | Starts development server on port 8080          |
+| `npm run dev-host`      | Starts server accessible on local network       |
+| `npm run build`         | Creates production build in `/dist`              |
+| `npm run preview`       | Previews production build                        |
+| `npm test`              | Runs unit tests with Vitest                      |
+| `npm run test:ui`       | Runs Vitest with graphical interface             |
+| `npm run test:coverage` | Generates code coverage report                   |
+| `npm run lint`          | Checks and fixes ESLint errors                   |
+| `npm run format`        | Formats code with Prettier                       |
 
 ---
 
 ## 🏗️ Architecture
 
-### Stack technique
+### Tech Stack
 
 -   **Framework:** [Vue 3](https://vuejs.org/) (Composition API)
 -   **Build Tool:** [Vite](https://vitejs.dev/) 7.x
@@ -80,44 +80,44 @@ npm run dev
 -   **Testing:** [Vitest](https://vitest.dev/) + [@vue/test-utils](https://test-utils.vuejs.org/)
 -   **Linting:** ESLint + Prettier
 
-### Structure du projet
+### Project Structure
 
 ```
 ou-est-alex/
-├── public/                    # Fichiers statiques
-│   └── images/               # Images du jeu
+├── public/                    # Static files
+│   └── images/               # Game images
 ├── src/
-│   ├── assets/               # Assets (styles, sons, icônes)
-│   │   ├── sounds/          # Fichiers audio
-│   │   ├── styles/          # Styles SCSS globaux
-│   │   └── icons/           # Icônes SVG
-│   ├── components/           # Composants Vue réutilisables
+│   ├── assets/               # Assets (styles, sounds, icons)
+│   │   ├── sounds/          # Audio files
+│   │   ├── styles/          # Global SCSS styles
+│   │   └── icons/           # SVG icons
+│   ├── components/           # Reusable Vue components
 │   │   ├── OeaHeader.vue
 │   │   ├── OeaCurrentQuestStats.vue
 │   │   └── OeaEndStats.vue
-│   ├── composables/          # Logique réutilisable (Composition API)
+│   ├── composables/          # Reusable logic (Composition API)
 │   │   ├── useConfetti.js
 │   │   ├── useImageZoom.js
 │   │   └── useSounds.js
-│   ├── locales/              # Fichiers de traduction
+│   ├── locales/              # Translation files
 │   │   ├── fr.json
 │   │   └── en.json
-│   ├── plugins/              # Plugins Vue
+│   ├── plugins/              # Vue plugins
 │   │   ├── i18n.js
 │   │   └── primevue.js
-│   ├── router/               # Configuration Vue Router
+│   ├── router/               # Vue Router configuration
 │   │   └── index.js
-│   ├── stores/               # Stores Pinia
+│   ├── stores/               # Pinia stores
 │   │   └── questsStore.js
-│   ├── utils/                # Fonctions utilitaires
+│   ├── utils/                # Utility functions
 │   │   └── utils.js
-│   ├── views/                # Pages/Vues principales
-│   │   ├── OeaView.vue      # Vue principale du jeu
+│   ├── views/                # Main pages/views
+│   │   ├── OeaView.vue      # Main game view
 │   │   ├── OeaLevelChooser.vue
 │   │   └── OeaAddImageView.vue
-│   ├── App.vue               # Composant racine
-│   ├── main.js               # Point d'entrée
-│   └── quests.json           # Données des quêtes
+│   ├── App.vue               # Root component
+│   ├── main.js               # Entry point
+│   └── quests.json           # Quest data
 ├── .github/workflows/        # CI/CD GitHub Actions
 ├── package.json
 ├── vite.config.js
@@ -127,20 +127,20 @@ ou-est-alex/
 
 ---
 
-## 🎮 Comment jouer
+## 🎮 How to Play
 
-1. **Choisissez un niveau** - 6 niveaux de difficulté disponibles
-2. **Cherchez Alex** - Cliquez sur l'image où vous pensez qu'Alex se cache
-3. **Utilisez les indices** - Cliquez sur le bouton `?` pour afficher un cercle d'aide (rétrécit à chaque utilisation)
-4. **Zoomez et déplacez** - Utilisez la souris ou le tactile pour naviguer :
-    - **Souris:** Clic+glisser pour déplacer, molette pour zoomer
-    - **Tactile:** Pincer pour zoomer, glisser avec un doigt pour déplacer
-5. **Naviguez** - Flèches ← → pour passer aux quêtes suivantes/précédentes
-6. **Consultez vos stats** - Temps, indices utilisés et erreurs affichés en bas
+1. **Choose a level** - 6 difficulty levels available
+2. **Find Alex** - Click on the image where you think Alex is hiding
+3. **Use hints** - Click the `?` button to display a help circle (shrinks with each use)
+4. **Zoom and pan** - Use mouse or touch to navigate:
+    - **Mouse:** Click+drag to move, scroll wheel to zoom
+    - **Touch:** Pinch to zoom, swipe with one finger to move
+5. **Navigate** - Arrow keys ← → to go to next/previous quests
+6. **Check your stats** - Time, hints used and errors displayed at the bottom
 
 ---
 
-## 📝 Format des quêtes (quests.json)
+## 📝 Quest Format (quests.json)
 
 ```json
 {
@@ -153,82 +153,82 @@ ou-est-alex/
 }
 ```
 
-### Propriétés
+### Properties
 
--   **id:** Identifiant unique de la quête
--   **url:** Chemin vers l'image
--   **coords:** Coordonnées du polygone (format: `x1,y1,x2,y2,x3,y3,...`)
--   **width/height:** Dimensions originales de l'image
--   **difficultyLevel:** Niveau de difficulté (0-5)
--   **type:** `"end"` pour marquer la fin d'un niveau (optionnel)
-
----
-
-## 🛠️ Ajouter une nouvelle quête
-
-### Méthode 1 : Via l'interface
-
-1. Accédez à `/alex` (route d'administration)
-2. **Étape 1:** Glissez-déposez votre image (support HEIC)
-3. **Étape 2:** Ajustez les dimensions si nécessaire
-4. **Étape 3:** Dessinez le polygone autour d'Alex :
-    - Cliquez pour ajouter des points
-    - Glissez les points pour les déplacer
-5. **Étape 4:** Copiez le JSON généré et ajoutez-le à `src/quests.json`
-
-### Méthode 2 : Manuellement
-
-1. Ajoutez l'image dans `/public/images/`
-2. Créez un nouvel objet dans `src/quests.json`
-3. Définissez les coordonnées du polygone
-4. Testez dans le jeu
+-   **id:** Unique quest identifier
+-   **url:** Path to image
+-   **coords:** Polygon coordinates (format: `x1,y1,x2,y2,x3,y3,...`)
+-   **width/height:** Original image dimensions
+-   **difficultyLevel:** Difficulty level (0-5)
+-   **type:** `"end"` to mark the end of a level (optional)
 
 ---
 
-## 🧪 Tests
+## 🛠️ Adding a New Quest
 
-Le projet utilise **Vitest** pour les tests unitaires.
+### Method 1: Via Interface
+
+1. Access `/alex` (admin route)
+2. **Step 1:** Drag and drop your image (HEIC support)
+3. **Step 2:** Adjust dimensions if necessary
+4. **Step 3:** Draw the polygon around Alex:
+    - Click to add points
+    - Drag points to move them
+5. **Step 4:** Copy the generated JSON and add it to `src/quests.json`
+
+### Method 2: Manually
+
+1. Add the image to `/public/images/`
+2. Create a new object in `src/quests.json`
+3. Define polygon coordinates
+4. Test in the game
+
+---
+
+## 🧪 Testing
+
+The project uses **Vitest** for unit testing.
 
 ```bash
-# Lancer tous les tests
+# Run all tests
 npm test
 
-# Mode watch
+# Watch mode
 npm test -- --watch
 
-# Interface graphique
+# Graphical interface
 npm run test:ui
 
-# Couverture de code
+# Code coverage
 npm run test:coverage
 ```
 
-### Couverture actuelle
+### Current Coverage
 
--   ✅ **Utilitaires** (utils.js) - 27 tests
+-   ✅ **Utilities** (utils.js) - 27 tests
 -   ✅ **Composables** (useSounds.js) - 8 tests
--   ⚠️ **Store** (questsStore.js) - Tests partiels
+-   ⚠️ **Store** (questsStore.js) - Partial tests
 
 ---
 
-## 🌐 Déploiement
+## 🌐 Deployment
 
-Le projet est configuré avec GitHub Actions pour un déploiement automatique.
+The project is configured with GitHub Actions for automatic deployment.
 
-### Workflow CI/CD
+### CI/CD Workflow
 
--   **Déclenchement:** Push sur `main` ou déclenchement manuel
--   **Étapes:**
-    1. Checkout du code
-    2. Installation des dépendances
-    3. Build de production
-    4. Déploiement via SSH/rsync
+-   **Trigger:** Push to `main` or manual trigger
+-   **Steps:**
+    1. Code checkout
+    2. Install dependencies
+    3. Production build
+    4. Deploy via SSH/rsync
 
-### Build manuel
+### Manual Build
 
 ```bash
 npm run build
-# Les fichiers de production sont dans /dist
+# Production files are in /dist
 ```
 
 ---
@@ -237,51 +237,75 @@ npm run build
 
 ### Vite (vite.config.js)
 
--   Port de développement: `8080`
--   Alias `@` pointant vers `/src`
--   Plugin Vue 3
+-   Development port: `8080`
+-   Alias `@` pointing to `/src`
+-   Vue 3 plugin
 
 ### ESLint + Prettier
 
--   Règles Vue 3 recommandées
--   Auto-fix sur save
--   Format: 4 espaces, single quotes, 160 caractères max
+-   Vue 3 recommended rules
+-   Auto-fix on save
+-   Format: 4 spaces, single quotes, 160 characters max
 
-### Variables d'environnement
+### Environment Variables
 
-Aucune variable d'environnement requise pour l'instant.
-
----
-
-## 🐛 Problèmes connus
-
-Consultez les [Issues GitHub](https://github.com/votre-username/ou-est-alex/issues) pour les bugs en cours.
+No environment variables required at this time.
 
 ---
 
-## 📄 Licence
+## 📊 Upcoming Features
 
-Projet privé - Tous droits réservés
+-   [ ] Online leaderboard system
+-   [ ] Multiplayer mode
+-   [ ] More levels
+-   [ ] Achievements/Trophies
+-   [ ] Story mode
+-   [ ] Social score sharing
 
 ---
 
-## 👨‍💻 Auteur
+## 🐛 Known Issues
 
-Créé avec ❤️ par Alex
+Check [GitHub Issues](https://github.com/your-username/ou-est-alex/issues) for current bugs.
 
 ---
 
-## 🙏 Remerciements
+## 🤝 Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### Code Standards
+
+-   Use ESLint and Prettier
+-   Write tests for new features
+-   Follow Vue 3 naming conventions
+-   Comment complex code
+
+---
+
+## 📄 License
+
+Private project - All rights reserved
+
+---
+
+## 👨‍💻 Author
+
+Created with ❤️ by Alex
+
+---
+
+## 🙏 Acknowledgments
 
 -   Vue.js community
--   PrimeVue pour l'UI
+-   PrimeVue for UI
 
 ---
 
 <div align="center">
 
-**[⬆ Retour en haut](#-où-est-alex-)**
+**[⬆ Back to top](#-where-is-alex)**
 
-Made with Vue 3 + Vite | [Site web](https://ouestalex.fr)
+Made with Vue 3 + Vite | [Website](https://ouestalex.fr)
 
 </div>
