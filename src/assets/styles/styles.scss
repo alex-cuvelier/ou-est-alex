@@ -64,15 +64,14 @@
             text-decoration: none;
             font-weight: 700;
             font-size: 1.5rem;
-            color: var(--color-text-primary);
             transition: all var(--transition-base);
-
-            &:visited {
-                color: var(--color-text-primary);
-            }
+            background: var(--gradient-vibrant);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
 
             &:hover {
-                background: var(--gradient-vibrant);
+                background: var(--gradient-primary);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
@@ -187,8 +186,6 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--color-cyan), var(--color-purple));
         }
 
         @media (prefers-color-scheme: dark) {
@@ -198,6 +195,12 @@
         @media screen and (max-device-width: 768px) {
             font-size: 1.25rem;
             padding: 1.25rem 1rem;
+        }
+
+        .oea-quest-stat-divider {
+            width: 1px;
+            background: linear-gradient(90deg, var(--color-cyan), var(--color-purple));
+            height: 70%;
         }
 
         .oea-quest-stat {
@@ -213,8 +216,6 @@
                 top: 50%;
                 transform: translateY(-50%);
                 width: 2px;
-                height: 70%;
-                background: rgba(139, 92, 246, 0.4);
             }
 
             .oea-quest-stat-value {
@@ -223,7 +224,7 @@
                 font-size: 1.25rem;
                 font-variant-numeric: tabular-nums;
                 font-feature-settings: 'tnum';
-                background: var(--gradient-neon);
+                background: var(--gradient-ocean);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;

@@ -1,15 +1,18 @@
 <template>
     <div class="oea-quest-stats">
         <div class="oea-quest-stat">
-            <span class="oea-quest-stat-title">{{ $t('difficulty.' + difficultyLevel) }}</span>
+            <span class="oea-quest-stat-value">{{ $t('difficulty.' + difficultyLevel) }}</span>
         </div>
+        <div class="oea-quest-stat-divider"></div>
         <div class="oea-quest-stat">
-            <span class="oea-quest-stat-title">{{ formmatSecondsToTime(timer) }}</span>
+            <span class="oea-quest-stat-value">{{ formmatSecondsToTime(timer) }}</span>
         </div>
+        <div class="oea-quest-stat-divider"></div>
         <div class="oea-quest-stat">
             <span class="oea-quest-stat-title">{{ $t('footer.clue') }}</span>
             <span class="oea-quest-stat-value" :key="clueCount">{{ clueCount }}</span>
         </div>
+        <div class="oea-quest-stat-divider"></div>
         <div class="oea-quest-stat">
             <span class="oea-quest-stat-title">{{ $t('footer.no') }}</span>
             <span class="oea-quest-stat-value" :key="noCount">{{ noCount }}</span>
