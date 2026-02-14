@@ -1,10 +1,10 @@
-# 🔍 Where is Alex?
+# 🔍 Où est alex ?
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
-[![Version](https://img.shields.io/badge/version-0.3.0-blue)]()
+[![Version](https://img.shields.io/badge/version-1.0.0-blue)]()
 [![License](https://img.shields.io/badge/license-private-red)]()
 
-> A "Where's Waldo?" style game - Find Alex in complex images!
+> Where the hell could he be ?
 
 🎮 **[Play Now →](https://ouestalex.fr)**
 
@@ -53,17 +53,17 @@ npm run dev
 
 ## 📜 Available Scripts
 
-| Script                  | Description                                      |
-| ----------------------- | ------------------------------------------------ |
-| `npm run dev`           | Starts development server on port 8080          |
-| `npm run dev-host`      | Starts server accessible on local network       |
-| `npm run build`         | Creates production build in `/dist`              |
-| `npm run preview`       | Previews production build                        |
-| `npm test`              | Runs unit tests with Vitest                      |
-| `npm run test:ui`       | Runs Vitest with graphical interface             |
-| `npm run test:coverage` | Generates code coverage report                   |
-| `npm run lint`          | Checks and fixes ESLint errors                   |
-| `npm run format`        | Formats code with Prettier                       |
+| Script                  | Description                               |
+| ----------------------- | ----------------------------------------- |
+| `npm run dev`           | Starts development server on port 8080    |
+| `npm run dev-host`      | Starts server accessible on local network |
+| `npm run build`         | Creates production build in `/dist`       |
+| `npm run preview`       | Previews production build                 |
+| `npm test`              | Runs unit tests with Vitest               |
+| `npm run test:ui`       | Runs Vitest with graphical interface      |
+| `npm run test:coverage` | Generates code coverage report            |
+| `npm run lint`          | Checks and fixes ESLint errors            |
+| `npm run format`        | Formats code with Prettier                |
 
 ---
 
@@ -253,33 +253,9 @@ No environment variables required at this time.
 
 ---
 
-## 📊 Upcoming Features
-
--   [ ] Online leaderboard system
--   [ ] Multiplayer mode
--   [ ] More levels
--   [ ] Achievements/Trophies
--   [ ] Story mode
--   [ ] Social score sharing
-
----
-
 ## 🐛 Known Issues
 
 Check [GitHub Issues](https://github.com/your-username/ou-est-alex/issues) for current bugs.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-### Code Standards
-
--   Use ESLint and Prettier
--   Write tests for new features
--   Follow Vue 3 naming conventions
--   Comment complex code
 
 ---
 
