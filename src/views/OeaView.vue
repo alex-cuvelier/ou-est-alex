@@ -206,11 +206,18 @@ watch(currentQuestIndex, (value, oldValue) => {
         questsStore.pushQuestStats({
             ...questStats.value,
         });
+        resetQuestStats();
     }
 
     if (currentQuest.value.type == 'quest') {
         updateWrapperStyle();
     }
+});
+
+// Reset stats when difficulty level changes
+watch(currentDifficultyLevel, () => {
+    questsStore.resetQuests();
+    resetQuestStats();
 });
 
 watch(currentQuestIndex, preloadNextImage, { immediate: true });
