@@ -8,6 +8,11 @@ import router from '@/router';
 import i18n from '@/plugins/i18n';
 import primevue from '@/plugins/primevue';
 
+// Update title in dev mode
+if (import.meta.env.DEV) {
+  document.title = '[DEV] ' + document.title;
+}
+
 const app = createApp(App);
 
 app.use(createPinia());
