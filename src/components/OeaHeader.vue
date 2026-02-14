@@ -13,7 +13,14 @@
             </div>
             <span v-else> Fin </span>
         </template>
-        <Drawer v-model:visible="drawerVisible" :header="$t('header.chooseQuest')" appendTop="self" position="top" class="oea-vibrant-drawer" style="height: auto">
+        <Drawer
+            v-model:visible="drawerVisible"
+            :header="$t('header.chooseQuest')"
+            appendTop="self"
+            position="top"
+            class="oea-vibrant-drawer"
+            style="height: auto"
+        >
             <div class="oea-quest-drawer">
                 <Button
                     v-for="i in questsCount - 1"

@@ -1,96 +1,96 @@
 <template>
     <div class="admin-view-wrapper">
         <div class="container">
-        <Stepper :value="activeStep" linear class="stepper">
-            <StepList>
-                <Step value="1">Upload Image</Step>
-                <Step value="2">Adjust Dimensions</Step>
-                <Step value="3">Draw Polygon</Step>
-                <Step value="4">Download & JSON</Step>
-            </StepList>
+            <Stepper :value="activeStep" linear class="stepper">
+                <StepList>
+                    <Step value="1">Upload Image</Step>
+                    <Step value="2">Adjust Dimensions</Step>
+                    <Step value="3">Draw Polygon</Step>
+                    <Step value="4">Download & JSON</Step>
+                </StepList>
 
-            <StepPanels>
-                <!-- Step 1: Image Upload -->
-                <StepPanel value="1">
-                    <div class="upload-container">
-                        <div v-if="!imageLoaded && !loading" class="upload-area" @dragover.prevent @drop.prevent="handleDrop" @click="triggerFileInput">
-                            <p>Drag & Drop or Click to Select an Image (JPG, PNG, HEIC)</p>
-                            <input type="file" ref="fileInput" @change="handleFileChange" accept="image/*,.heic" />
+                <StepPanels>
+                    <!-- Step 1: Image Upload -->
+                    <StepPanel value="1">
+                        <div class="upload-container">
+                            <div v-if="!imageLoaded && !loading" class="upload-area" @dragover.prevent @drop.prevent="handleDrop" @click="triggerFileInput">
+                                <p>Drag & Drop or Click to Select an Image (JPG, PNG, HEIC)</p>
+                                <input type="file" ref="fileInput" @change="handleFileChange" accept="image/*,.heic" />
+                            </div>
+                            <div v-if="loading" class="loader">Loading...</div>
                         </div>
-                        <div v-if="loading" class="loader">Loading...</div>
-                    </div>
-                </StepPanel>
+                    </StepPanel>
 
-                <!-- Step 2: Adjust Dimensions -->
-                <StepPanel value="2">
-                    <div v-if="imageLoaded" class="image-container">
-                        <div class="dimension-toolbar">
-                            <div class="dimension-inputs">
+                    <!-- Step 2: Adjust Dimensions -->
+                    <StepPanel value="2">
+                        <div v-if="imageLoaded" class="image-container">
+                            <div class="dimension-toolbar">
+                                <div class="dimension-inputs">
+                                    <label>
+                                        Width
+                                        <InputText type="number" v-model.number="displayWidth" @input="updateHeight" />
+                                    </label>
+                                    <label>
+                                        Height
+                                        <InputText type="number" v-model.number="displayHeight" @input="updateWidth" />
+                                    </label>
+                                </div>
+                                <SelectButton
+                                    :options="percentageOptions"
+                                    v-model="selectedPercentage"
+                                    @change="updateDimensions"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                />
+                            </div>
+                            <img :src="imageSrc" :style="{ width: displayWidth + 'px', height: 'auto' }" alt="Uploaded Image" />
+                        </div>
+                        <div class="button-container">
+                            <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="previousStep" />
+                            <Button label="Next" icon="pi pi-arrow-right" @click="nextStep" />
+                        </div>
+                    </StepPanel>
+
+                    <!-- Step 3: Draw Polygon -->
+                    <StepPanel value="3">
+                        <div v-if="imageLoaded" class="polygon-container">
+                            <img :src="imageSrc" class="background-image" alt="Background Image" />
+                            <canvas ref="canvas" class="canvas" @mousedown="startDragging" @mousemove="dragPoint" @mouseup="stopDragging"></canvas>
+                        </div>
+                        <div class="button-container">
+                            <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="previousStep" />
+                            <Button label="Reset" severity="danger" icon="pi pi-refresh" @click="resetPolygon" />
+                            <Button label="Next" icon="pi pi-arrow-right" @click="nextStep" />
+                        </div>
+                    </StepPanel>
+
+                    <!-- Step 4: Download & JSON -->
+                    <StepPanel value="4">
+                        <div class="download-container">
+                            <div class="input-fields">
                                 <label>
-                                    Width
-                                    <InputText type="number" v-model.number="displayWidth" @input="updateHeight" />
+                                    Image ID:
+                                    <InputText v-model="imageId" placeholder="Enter image ID" />
                                 </label>
                                 <label>
-                                    Height
-                                    <InputText type="number" v-model.number="displayHeight" @input="updateWidth" />
+                                    Difficulty Level:
+                                    <SelectButton :options="difficultyOptions" v-model="difficultyLevel" optionLabel="label" optionValue="value" />
                                 </label>
                             </div>
-                            <SelectButton
-                                :options="percentageOptions"
-                                v-model="selectedPercentage"
-                                @change="updateDimensions"
-                                optionLabel="label"
-                                optionValue="value"
-                            />
-                        </div>
-                        <img :src="imageSrc" :style="{ width: displayWidth + 'px', height: 'auto' }" alt="Uploaded Image" />
-                    </div>
-                    <div class="button-container">
-                        <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="previousStep" />
-                        <Button label="Next" icon="pi pi-arrow-right" @click="nextStep" />
-                    </div>
-                </StepPanel>
-
-                <!-- Step 3: Draw Polygon -->
-                <StepPanel value="3">
-                    <div v-if="imageLoaded" class="polygon-container">
-                        <img :src="imageSrc" class="background-image" alt="Background Image" />
-                        <canvas ref="canvas" class="canvas" @mousedown="startDragging" @mousemove="dragPoint" @mouseup="stopDragging"></canvas>
-                    </div>
-                    <div class="button-container">
-                        <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="previousStep" />
-                        <Button label="Reset" severity="danger" icon="pi pi-refresh" @click="resetPolygon" />
-                        <Button label="Next" icon="pi pi-arrow-right" @click="nextStep" />
-                    </div>
-                </StepPanel>
-
-                <!-- Step 4: Download & JSON -->
-                <StepPanel value="4">
-                    <div class="download-container">
-                        <div class="input-fields">
-                            <label>
-                                Image ID:
-                                <InputText v-model="imageId" placeholder="Enter image ID" />
-                            </label>
-                            <label>
-                                Difficulty Level:
-                                <SelectButton :options="difficultyOptions" v-model="difficultyLevel" optionLabel="label" optionValue="value" />
-                            </label>
-                        </div>
-                        <div class="json-output">
-                            <div class="json-container">
-                                <Button v-if="imageId != null && difficultyLevel != null" icon="pi pi-copy" class="copy-button" @click="copyJsonOutput" />
-                                <pre>{{ jsonOutput }}</pre>
+                            <div class="json-output">
+                                <div class="json-container">
+                                    <Button v-if="imageId != null && difficultyLevel != null" icon="pi pi-copy" class="copy-button" @click="copyJsonOutput" />
+                                    <pre>{{ jsonOutput }}</pre>
+                                </div>
                             </div>
+                            <Button label="Download Image" icon="pi pi-download" @click="downloadImage" />
                         </div>
-                        <Button label="Download Image" icon="pi pi-download" @click="downloadImage" />
-                    </div>
-                    <div class="button-container">
-                        <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="previousStep" />
-                    </div>
-                </StepPanel>
-            </StepPanels>
-        </Stepper>
+                        <div class="button-container">
+                            <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="previousStep" />
+                        </div>
+                    </StepPanel>
+                </StepPanels>
+            </Stepper>
         </div>
     </div>
 </template>
@@ -412,7 +412,9 @@ const copyJsonOutput = () => {
         border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
         opacity: 0.2;
         filter: blur(60px);
-        animation: float 25s ease-in-out infinite, morph 10s ease-in-out infinite;
+        animation:
+            float 25s ease-in-out infinite,
+            morph 10s ease-in-out infinite;
         pointer-events: none;
     }
 
@@ -427,7 +429,9 @@ const copyJsonOutput = () => {
         border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
         opacity: 0.2;
         filter: blur(60px);
-        animation: floatReverse 30s ease-in-out infinite, morph 12s ease-in-out infinite 2s;
+        animation:
+            floatReverse 30s ease-in-out infinite,
+            morph 12s ease-in-out infinite 2s;
         pointer-events: none;
     }
 
@@ -779,16 +783,11 @@ const copyJsonOutput = () => {
                 left: -100%;
                 width: 100%;
                 height: 100%;
-                background: linear-gradient(
-                    90deg,
-                    transparent 0%,
-                    rgba(255, 255, 255, 0.2) 50%,
-                    transparent 100%
-                );
+                background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
                 transition: left var(--transition-slow);
             }
 
-            &:not([severity]):not([severity="secondary"]):not([severity="danger"]) {
+            &:not([severity]):not([severity='secondary']):not([severity='danger']) {
                 background: var(--gradient-primary) !important;
                 border: 1px solid rgba(255, 255, 255, 0.1) !important;
                 color: white !important;

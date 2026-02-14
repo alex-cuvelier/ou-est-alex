@@ -29,7 +29,6 @@ onMounted(() => {
 onUnmounted(() => {
     document.removeEventListener('keydown', handleKeyboardNavigation);
 });
-
 </script>
 
 <style>

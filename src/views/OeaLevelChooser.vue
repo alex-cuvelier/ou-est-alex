@@ -25,7 +25,6 @@ const questsStore = useQuestsStore();
 
 const { currentDifficultyLevel, difficultyLevels } = storeToRefs(questsStore);
 
-
 const setLevel = (difficultyLevel) => {
     currentDifficultyLevel.value = difficultyLevel;
     router.push({ name: 'quest', params: { difficultyLevel, imageIndex: 1 } });
@@ -45,12 +44,11 @@ const setLevel = (difficultyLevel) => {
         content: '';
         position: absolute;
         inset: 0;
-        background-image:
-            linear-gradient(rgba(var(--color-purple-rgb), 0.03) 1px, transparent 1px),
+        background-image: linear-gradient(rgba(var(--color-purple-rgb), 0.03) 1px, transparent 1px),
             linear-gradient(90deg, rgba(var(--color-purple-rgb), 0.03) 1px, transparent 1px);
         background-size: 50px 50px;
-        mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, transparent 70%);
-        -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, transparent 70%);
+        mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.3) 0%, transparent 70%);
+        -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.3) 0%, transparent 70%);
         pointer-events: none;
         z-index: 0;
     }
@@ -70,7 +68,9 @@ const setLevel = (difficultyLevel) => {
             left: -100px;
             background: var(--gradient-vibrant);
             border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-            animation: float 20s ease-in-out infinite, morph 8s ease-in-out infinite;
+            animation:
+                float 20s ease-in-out infinite,
+                morph 8s ease-in-out infinite;
         }
 
         &.oea-blob-2 {
@@ -80,7 +80,9 @@ const setLevel = (difficultyLevel) => {
             right: -80px;
             background: var(--gradient-neon);
             border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
-            animation: floatReverse 25s ease-in-out infinite, morph 10s ease-in-out infinite 2s;
+            animation:
+                floatReverse 25s ease-in-out infinite,
+                morph 10s ease-in-out infinite 2s;
         }
 
         &.oea-blob-3 {
@@ -91,14 +93,22 @@ const setLevel = (difficultyLevel) => {
             transform: translateX(-50%);
             background: var(--gradient-fire);
             border-radius: 40% 60% 60% 40% / 40% 50% 60% 50%;
-            animation: float 30s ease-in-out infinite, morph 12s ease-in-out infinite 4s;
+            animation:
+                float 30s ease-in-out infinite,
+                morph 12s ease-in-out infinite 4s;
         }
 
         // Mobile : animations plus lentes
         @media (max-device-width: 768px) {
-            &.oea-blob-1 { animation-duration: 30s, 12s; }
-            &.oea-blob-2 { animation-duration: 35s, 14s; }
-            &.oea-blob-3 { animation-duration: 40s, 16s; }
+            &.oea-blob-1 {
+                animation-duration: 30s, 12s;
+            }
+            &.oea-blob-2 {
+                animation-duration: 35s, 14s;
+            }
+            &.oea-blob-3 {
+                animation-duration: 40s, 16s;
+            }
         }
     }
 
@@ -160,11 +170,31 @@ const setLevel = (difficultyLevel) => {
             animation: fadeInUp 0.6s var(--transition-bounce);
 
             // Échelonnement de l'animation d'entrée
-            &:nth-child(1) { animation-delay: 0.1s; opacity: 0; animation-fill-mode: forwards; }
-            &:nth-child(2) { animation-delay: 0.2s; opacity: 0; animation-fill-mode: forwards; }
-            &:nth-child(3) { animation-delay: 0.3s; opacity: 0; animation-fill-mode: forwards; }
-            &:nth-child(4) { animation-delay: 0.4s; opacity: 0; animation-fill-mode: forwards; }
-            &:nth-child(5) { animation-delay: 0.5s; opacity: 0; animation-fill-mode: forwards; }
+            &:nth-child(1) {
+                animation-delay: 0.1s;
+                opacity: 0;
+                animation-fill-mode: forwards;
+            }
+            &:nth-child(2) {
+                animation-delay: 0.2s;
+                opacity: 0;
+                animation-fill-mode: forwards;
+            }
+            &:nth-child(3) {
+                animation-delay: 0.3s;
+                opacity: 0;
+                animation-fill-mode: forwards;
+            }
+            &:nth-child(4) {
+                animation-delay: 0.4s;
+                opacity: 0;
+                animation-fill-mode: forwards;
+            }
+            &:nth-child(5) {
+                animation-delay: 0.5s;
+                opacity: 0;
+                animation-fill-mode: forwards;
+            }
 
             // Shimmer overlay
             &::before {
@@ -174,12 +204,7 @@ const setLevel = (difficultyLevel) => {
                 left: -100%;
                 width: 100%;
                 height: 100%;
-                background: linear-gradient(
-                    90deg,
-                    transparent 0%,
-                    rgba(255, 255, 255, 0.3) 50%,
-                    transparent 100%
-                );
+                background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
                 transition: left var(--transition-slow);
             }
 

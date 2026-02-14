@@ -10,7 +10,7 @@ import primevue from '@/plugins/primevue';
 
 // Update title in dev mode
 if (import.meta.env.DEV) {
-  document.title = '[DEV] ' + document.title;
+    document.title = '[DEV] ' + document.title;
 }
 
 const app = createApp(App);

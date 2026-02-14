@@ -1,6 +1,6 @@
 <template>
     <div class="oea-view-wrapper">
-        <main :class="{'oea-quest' : currentQuest?.type == 'quest'}">
+        <main :class="{ 'oea-quest': currentQuest?.type == 'quest' }">
             <div
                 v-if="currentQuest?.type == 'quest'"
                 ref="imageWrapper"
@@ -61,7 +61,7 @@ let timerInterval = null;
 timerInterval = setInterval(() => {
     timer.value++;
 }, 1000);
-questsStore.currentDifficultyLevel = route?.params?.difficultyLevel != 'all' ? parseInt(route?.params?.difficultyLevel || 0) : 'all' ;
+questsStore.currentDifficultyLevel = route?.params?.difficultyLevel != 'all' ? parseInt(route?.params?.difficultyLevel || 0) : 'all';
 questsStore.setCurrentQuestIndex(parseInt(route?.params?.imageIndex || 1) - 1);
 
 const clueSize = ref(0);
@@ -171,7 +171,7 @@ function resetClueSize() {
 
 onMounted(() => {
     if (currentQuest.value.type == 'end' && questsStats.value.length == 0) {
-       // location.href = '/';
+        // location.href = '/';
     }
 
     resetClueSize();
@@ -279,7 +279,8 @@ watch(currentQuestIndex, preloadNextImage, { immediate: true });
 
 // Animation de pulse pour le glow de l'indice
 @keyframes clueGlow {
-    0%, 100% {
+    0%,
+    100% {
         opacity: 0.8;
     }
     50% {

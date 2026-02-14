@@ -4,22 +4,22 @@ import { defineStore } from 'pinia';
 import quests from '@/quests.json';
 
 export const useQuestsStore = defineStore('quests', () => {
-
     const difficultyLevels = computed(() => {
-        return Array.from(new Set(quests
-            .filter(quest => quest.difficultyLevel != null)
-            .map((quest) => quest.difficultyLevel)
-            .sort()));
+        return Array.from(
+            new Set(
+                quests
+                    .filter((quest) => quest.difficultyLevel != null)
+                    .map((quest) => quest.difficultyLevel)
+                    .sort(),
+            ),
+        );
     });
-    
+
     const currentDifficultyLevel = ref(0);
 
-    const filteredQuests = computed(()=>{
-
-        if(currentDifficultyLevel.value === 'all') {
-
-            return quests
-            .map((quest, index) => ({
+    const filteredQuests = computed(() => {
+        if (currentDifficultyLevel.value === 'all') {
+            return quests.map((quest, index) => ({
                 id: index,
                 type: 'quest',
                 ...quest,
@@ -27,13 +27,13 @@ export const useQuestsStore = defineStore('quests', () => {
         }
 
         return [...quests]
-        .sort((a, b) => a.difficultyLevel - b.difficultyLevel)
-        .filter((quest) => quest.difficultyLevel == currentDifficultyLevel.value || quest.type === 'end')
-        .map((quest, index) => ({
-            id: index,
-            type: 'quest',
-            ...quest,
-        }));
+            .sort((a, b) => a.difficultyLevel - b.difficultyLevel)
+            .filter((quest) => quest.difficultyLevel == currentDifficultyLevel.value || quest.type === 'end')
+            .map((quest, index) => ({
+                id: index,
+                type: 'quest',
+                ...quest,
+            }));
     });
 
     const currentQuestIndex = ref(0);
@@ -78,7 +78,7 @@ export const useQuestsStore = defineStore('quests', () => {
 
     function isQuestCompleted(questId) {
         return questsStats.value.some((questStat) => questStat.id === questId && questStat.found);
-    }   
+    }
 
     function isQuestFailed(questId) {
         return questsStats.value.some((questStat) => questStat.id === questId && !questStat.found);
@@ -90,16 +90,32 @@ export const useQuestsStore = defineStore('quests', () => {
     }
 
     function getCompletedCount(difficultyLevel) {
-        return questsStats.value.filter((questStat) =>{
-            const quest = quests.find(q=>q.id == questStat.questId);
-            return questStat.found && (difficultyLevel=='all' || 
-                quest?.difficultyLevel == difficultyLevel)
+        return questsStats.value.filter((questStat) => {
+            const quest = quests.find((q) => q.id == questStat.questId);
+            return questStat.found && (difficultyLevel == 'all' || quest?.difficultyLevel == difficultyLevel);
         }).length;
     }
 
     function getTotalCount(difficultyLevel) {
-        return quests.filter(q => q.type != 'end' && (difficultyLevel=='all' || q.difficultyLevel    == difficultyLevel)).length
+        return quests.filter((q) => q.type != 'end' && (difficultyLevel == 'all' || q.difficultyLevel == difficultyLevel)).length;
     }
 
-    return { currentDifficultyLevel, difficultyLevels, currentQuestIndex, currentQuest, nextQuest, questsCount, questsStats, goToNextQuest, goToPreviousQuest, setCurrentQuestIndex, pushQuestStats, isQuestCompleted, isQuestFailed, resetQuests, getCompletedCount, getTotalCount };
+    return {
+        currentDifficultyLevel,
+        difficultyLevels,
+        currentQuestIndex,
+        currentQuest,
+        nextQuest,
+        questsCount,
+        questsStats,
+        goToNextQuest,
+        goToPreviousQuest,
+        setCurrentQuestIndex,
+        pushQuestStats,
+        isQuestCompleted,
+        isQuestFailed,
+        resetQuests,
+        getCompletedCount,
+        getTotalCount,
+    };
 });

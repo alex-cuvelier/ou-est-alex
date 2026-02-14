@@ -1,6 +1,5 @@
 <template>
     <div class="oea-end-stats">
-
         <div class="oea-end-stats-container">
             <Card>
                 <template #title>{{ $t('end.found') }}</template>
@@ -21,16 +20,15 @@
         </div>
 
         <div class="oea-end-buttons">
-            <Button outlined  raised severity="contrast" @click="goToNextDifficultyLevel">
+            <Button outlined raised severity="contrast" @click="goToNextDifficultyLevel">
                 {{ $t('end.continue') }}
             </Button>
-            <Button outlined  raised severity="contrast" @click="router.push({ name: 'levelChooser' })">
-                {{$t('end.chooseLevel') }}
+            <Button outlined raised severity="contrast" @click="router.push({ name: 'levelChooser' })">
+                {{ $t('end.chooseLevel') }}
             </Button>
-            <Button outlined  raised severity="contrast" @click="questsStore.resetQuests">
+            <Button outlined raised severity="contrast" @click="questsStore.resetQuests">
                 {{ $t('end.restart') }}
             </Button>
-
         </div>
     </div>
 </template>
@@ -222,12 +220,7 @@ const goToNextDifficultyLevel = () => {
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0.2) 50%,
-            transparent 100%
-        );
+        background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
         transition: left var(--transition-slow);
     }
 

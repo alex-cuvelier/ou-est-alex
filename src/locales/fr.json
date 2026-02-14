@@ -1,32 +1,32 @@
 {
-  "header": {
-    "ask-clue": "Demander un indice",
-    "chooseQuest": "Choisir un niveau"
-  },
-  "footer": {
-    "difficultyLevel": "Difficulté",
-    "timer": "Timer",
-    "clue": "Indice",
-    "no": "Non"
-  },
-  "end": {
-    "found": "Trouvés",
-    "errors": "Erreurs",
-    "clues": "Indices",
-    "time": "Temps",
-    "restart": "Recommencer",
-    "chooseLevel": "Choisir la difficulté",
-    "continue": "Continuer"
-  },
-  "difficulty": {
-    "0": "Facile",
-    "1": "Moyen",
-    "2": "Difficile",
-    "3": "Très difficile",
-    "4": "Impossible",
-    "all": "Tout !"
-  },
-  "level-chooser": {
-    "title": "Choisir une difficulté"
-  }
+    "header": {
+        "ask-clue": "Demander un indice",
+        "chooseQuest": "Choisir un niveau"
+    },
+    "footer": {
+        "difficultyLevel": "Difficulté",
+        "timer": "Timer",
+        "clue": "Indice",
+        "no": "Non"
+    },
+    "end": {
+        "found": "Trouvés",
+        "errors": "Erreurs",
+        "clues": "Indices",
+        "time": "Temps",
+        "restart": "Recommencer",
+        "chooseLevel": "Choisir la difficulté",
+        "continue": "Continuer"
+    },
+    "difficulty": {
+        "0": "Facile",
+        "1": "Moyen",
+        "2": "Difficile",
+        "3": "Très difficile",
+        "4": "Impossible",
+        "all": "Tout !"
+    },
+    "level-chooser": {
+        "title": "Choisir une difficulté"
+    }
 }

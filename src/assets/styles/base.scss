@@ -43,7 +43,12 @@ body {
     color: var(--color-text-primary);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-weight: 700;
     letter-spacing: -0.025em;
     line-height: 1.2;
@@ -56,13 +61,13 @@ h1 {
 // === OPTIMISATIONS GPU ===
 
 // Activer l'accélération GPU pour les éléments animés
-[class*="animate-"],
-[class*="blob"],
-[class*="gradient"],
+[class*='animate-'],
+[class*='blob'],
+[class*='gradient'],
 .oea-btn,
 .oea-ask-clue,
 .p-card,
-button[class*="Button"] {
+button[class*='Button'] {
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     transform: translateZ(0);
@@ -70,8 +75,8 @@ button[class*="Button"] {
 }
 
 // will-change pour les éléments qui vont être animés
-[class*="animate-"],
-[class*="blob"] {
+[class*='animate-'],
+[class*='blob'] {
     will-change: transform, opacity;
 }
 
@@ -124,8 +129,8 @@ button:hover {
     }
 
     // Désactiver will-change pour éviter les problèmes
-    [class*="animate-"],
-    [class*="blob"],
+    [class*='animate-'],
+    [class*='blob'],
     .oea-btn:hover,
     .oea-ask-clue:hover,
     .p-card:hover,

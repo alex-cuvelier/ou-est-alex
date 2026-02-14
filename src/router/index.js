@@ -17,11 +17,10 @@ const router = createRouter({
             component: OeaView,
         },
         {
-          path: '/alex',
-          name: 'addImage',
-          component: OeaAddImageView,
-
-        }
+            path: '/alex',
+            name: 'addImage',
+            component: OeaAddImageView,
+        },
     ],
 });
 
