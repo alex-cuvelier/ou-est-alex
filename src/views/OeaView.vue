@@ -120,7 +120,7 @@ async function onAlexFound(event) {
     const polygon = toPolygon(currentQuest.value.coords, xRatio, yRatio);
     const center = getPolygonCenter(polygon);
 
-    await animateZoomTo(center.x, center.y, 10, 1600);
+    await animateZoomTo(center.x, center.y, 15, 1600);
     confetti.stop();
     questsStore.goToNextQuest();
 }

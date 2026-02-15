@@ -166,20 +166,32 @@ export default function useImageZoom(clickCallback, wrapperRef) {
      * @returns {Promise} Resolves when animation completes
      */
     function animateZoomTo(centerX, centerY, targetScale = 10, duration = 1600) {
+        const isTouchDevice = 'ontouchstart' in window;
+
         return new Promise((resolve) => {
-            isZooming.value = true;
-            const wrapper = wrapperRef.value;
-            const wrapperW = wrapper.offsetWidth;
-            const wrapperH = wrapper.offsetHeight;
-            // With transform-origin: center, to center point (cx,cy) in viewport:
-            // tx = (w/2 - cx) * scale,  ty = (h/2 - cy) * scale
-            pointX.value = (wrapperW / 2 - centerX) * targetScale;
-            pointY.value = (wrapperH / 2 - centerY) * targetScale;
-            scale.value = targetScale;
-            setTimeout(() => {
-                isZooming.value = false;
-                resolve();
-            }, duration);
+            isSnapping.value = false;
+            isZooming.value = false;
+
+            // On mobile, reset to clean state first to avoid weird intermediate states
+            if (isTouchDevice) {
+                resetTransform();
+            }
+
+            requestAnimationFrame(() => {
+                isZooming.value = true;
+                const wrapper = wrapperRef.value;
+                const wrapperW = wrapper.offsetWidth;
+                const wrapperH = wrapper.offsetHeight;
+                // With transform-origin: center, to center point (cx,cy) in viewport:
+                // tx = (w/2 - cx) * scale,  ty = (h/2 - cy) * scale
+                pointX.value = (wrapperW / 2 - centerX) * targetScale;
+                pointY.value = (wrapperH / 2 - centerY) * targetScale;
+                scale.value = targetScale;
+                setTimeout(() => {
+                    isZooming.value = false;
+                    resolve();
+                }, duration);
+            });
         });
     }
 
@@ -333,9 +345,9 @@ export default function useImageZoom(clickCallback, wrapperRef) {
 
     // --- Watchers ---
 
-    // Auto-reset position when zoom returns to 1x
+    // Auto-reset position when zoom returns to 1x (skip during animated zoom)
     watch(scale, (value) => {
-        if (value == MINSCALE) {
+        if (value == MINSCALE && !isZooming.value) {
             resetTransform();
         }
     });
