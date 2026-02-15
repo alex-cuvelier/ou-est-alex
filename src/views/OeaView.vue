@@ -5,7 +5,7 @@
                 v-if="currentQuest?.type == 'quest'"
                 ref="imageWrapper"
                 class="oea-image-wrapper"
-                :class="{ 'oea-display-clue': displayClue }"
+                :class="{ 'oea-display-clue': displayClue, 'oea-dragging': isDragging }"
                 :style="{ ...wrapperStyle, ...transformStyle }"
                 @mousedown.left="onMouseDown"
                 @mousemove="onMouseMove"
@@ -68,7 +68,7 @@ const clueSize = ref(0);
 const clueSizeWithUnit = computed(() => clueSize.value + 'px');
 const displayClue = ref(false);
 
-const { transformStyle, resetTransform, onMouseDown, onMouseUp, onMouseMove, onWheel, onTouchStart, onTouchMove, onTouchEnd } = useImageZoom(checkAlexFound);
+const { isDragging, transformStyle, resetTransform, onMouseDown, onMouseUp, onMouseMove, onWheel, onTouchStart, onTouchMove, onTouchEnd } = useImageZoom(checkAlexFound);
 
 function checkAlexFound(event) {
     const xRatio = event.target.naturalWidth / event.target.width;

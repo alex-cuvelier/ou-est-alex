@@ -17,6 +17,7 @@
     height: 100svh;
     background-color: var(--color-background);
     color: var(--color-text-primary);
+    touch-action: pan-x pan-y;
 
     header {
         padding: 1rem 1.5rem;
@@ -193,8 +194,8 @@
         }
 
         @media screen and (max-device-width: 768px) {
-            font-size: 1.25rem;
-            padding: 1.25rem 1rem;
+            font-size: 1rem;
+            padding-inline: 0.5rem;
         }
 
         .oea-quest-stat-divider {
@@ -221,7 +222,7 @@
             .oea-quest-stat-value {
                 margin-left: 1rem;
                 font-weight: 700;
-                font-size: 1.25rem;
+                font-size: 1rem;
                 font-variant-numeric: tabular-nums;
                 font-feature-settings: 'tnum';
                 background: var(--gradient-ocean);
@@ -350,12 +351,17 @@
         .oea-image-wrapper {
             position: relative;
             overflow: hidden;
+            touch-action: none;
 
             .oea-img {
                 max-width: 100%;
                 max-height: 100%;
                 transform-origin: center;
                 cursor: crosshair;
+            }
+
+            &.oea-dragging .oea-img {
+                cursor: grabbing;
             }
         }
 

@@ -8,7 +8,8 @@ export default function useImageZoom(clickCallback) {
     // Reactive variables to track the scale and position of the image
     const scale = ref(MINSCALE),
         pointX = ref(0),
-        pointY = ref(0);
+        pointY = ref(0),
+        isDragging = ref(false);
     // Variables to track the panning state and positions
     let panning = false,
         start = { x: 0, y: 0 },
@@ -35,12 +36,14 @@ export default function useImageZoom(clickCallback) {
         e.preventDefault();
         start = { x: e.clientX - pointX.value, y: e.clientY - pointY.value };
         panning = true;
+        isDragging.value = true;
         pointSaved = { x: pointX.value, y: pointY.value };
     }
 
     // Function to handle the mouse up event, stopping the panning
     function onMouseUp(e) {
         panning = false;
+        isDragging.value = false;
 
         // Check if the target is an image element
         if (!e.target.classList.contains('oea-img')) {
@@ -152,6 +155,7 @@ export default function useImageZoom(clickCallback) {
     // Function to handle touch end event
     function onTouchEnd() {
         panning = false;
+        isDragging.value = false;
     }
 
     // Utility function to calculate the distance between two touch points
@@ -176,6 +180,7 @@ export default function useImageZoom(clickCallback) {
 
     // Return the reactive variables and event handling functions
     return {
+        isDragging,
         transformStyle,
         resetTransform,
         onMouseDown,
