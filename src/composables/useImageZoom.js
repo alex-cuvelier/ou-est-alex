@@ -5,25 +5,71 @@ const MAXSCALE = 10;
 
 /**
  * Composable for handling image zoom and pan interactions.
- * Supports mouse (drag + wheel) and touch (pan + pinch-zoom).
- * Prevents out-of-bounds panning with a rubber-band effect:
- * - During drag: the image can slightly exceed bounds with dampened resistance
- * - On release: the image snaps back to bounds with a CSS transition
+ * Transforms the image with 3 values: pointX, pointY (position) and scale (zoom),
+ * combined into a CSS `translate(X, Y) scale(S)`.
+ *
+ * Interactions:
+ *
+ *   ┌─────────────────────────────────────────────────┐
+ *   │                   MOUSE                         │
+ *   │                                                 │
+ *   │  mousedown ──► save origin                      │
+ *   │       │                                         │
+ *   │       ▼                                         │
+ *   │  mousemove ──► translate image (soft clamp)     │
+ *   │       │                                         │
+ *   │       ▼                                         │
+ *   │  mouseup ──► distance < 5px ? ──► YES = click   │
+ *   │       │                          NO  = drag     │
+ *   │       └──► snapBack if out of bounds            │
+ *   │                                                 │
+ *   │  wheel ──► scale ±0.4, zoom centered on cursor  │
+ *   ├─────────────────────────────────────────────────┤
+ *   │                   TOUCH                         │
+ *   │                                                 │
+ *   │  1 finger ──► pan (same logic as mouse)         │
+ *   │  2 fingers ──► pinch-zoom (distance ratio)      │
+ *   │  touchend ──► snapBack                          │
+ *   └─────────────────────────────────────────────────┘
+ *
+ * Bounds system:
+ *
+ *   maxPan = dimension * (scale - 1) / 2
+ *
+ *   ◄────────────┼────────────►
+ *      -max      0           max
+ *
+ *   Within bounds → free movement
+ *   Out of bounds → 2 modes:
+ *     • during drag  : rubber-band effect (×0.3 damping)
+ *     • on release   : animated snap-back (300ms)
+ *
+ * Reset: when scale returns to 1, position resets to (0, 0).
  *
  * @param {Function} clickCallback - Called when a click (not a drag) is detected on the image
  * @param {import('vue').Ref<HTMLElement>} wrapperRef - Template ref of the image wrapper element
  */
 export default function useImageZoom(clickCallback, wrapperRef) {
+
+    // --- Reactive state ---
+
     const scale = ref(MINSCALE),
         pointX = ref(0),
         pointY = ref(0),
-        isDragging = ref(false);
+        isDragging = ref(false),
+        isSnapping = ref(false); // True during snap-back animation (triggers CSS transition)
+
+    // --- Internal state ---
+
+    const DAMPING = 0.3; // Rubber-band resistance factor (0 = hard stop, 1 = no resistance)
 
     let panning = false,
         start = { x: 0, y: 0 },
-        pointSaved = { x: 0, y: 0 }, // Saved position to distinguish click vs drag
+        mouseDownPos = { x: 0, y: 0 }, // Mouse position at mousedown to distinguish click vs drag
         initialDistance = 0, // Initial distance between two touch points (pinch-zoom)
         initialScale = MINSCALE;
+
+    // --- Computed ---
 
     const transformStyle = computed(() => {
         return {
@@ -31,10 +77,30 @@ export default function useImageZoom(clickCallback, wrapperRef) {
         };
     });
 
-    // --- Bounds clamping & rubber-band effect ---
+    // --- Pure utilities ---
 
-    const isSnapping = ref(false); // True during snap-back animation (triggers CSS transition)
-    const DAMPING = 0.3; // Rubber-band resistance factor (0 = hard stop, 1 = no resistance)
+    // Applies dampening when value exceeds [min, max] range
+    function dampen(value, min, max) {
+        if (value < min) return min + (value - min) * DAMPING;
+        if (value > max) return max + (value - max) * DAMPING;
+        return value;
+    }
+
+    // Euclidean distance between two touch points
+    function getDistance(touches) {
+        const dx = touches[0].clientX - touches[1].clientX;
+        const dy = touches[0].clientY - touches[1].clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    // Midpoint between two touch points
+    function getMidPoint(touches) {
+        const x = (touches[0].clientX + touches[1].clientX) / 2;
+        const y = (touches[0].clientY + touches[1].clientY) / 2;
+        return { x, y };
+    }
+
+    // --- Bounds clamping & rubber-band effect ---
 
     /**
      * Calculates max allowed pan values based on current scale.
@@ -67,13 +133,6 @@ export default function useImageZoom(clickCallback, wrapperRef) {
         pointY.value = dampen(pointY.value, -bounds.maxY, bounds.maxY);
     }
 
-    // Applies dampening when value exceeds [min, max] range
-    function dampen(value, min, max) {
-        if (value < min) return min + (value - min) * DAMPING;
-        if (value > max) return max + (value - max) * DAMPING;
-        return value;
-    }
-
     // Animates the image back to bounds on release (activates CSS transition via isSnapping)
     function snapBack() {
         const bounds = getBounds();
@@ -88,6 +147,8 @@ export default function useImageZoom(clickCallback, wrapperRef) {
         }
     }
 
+    // --- Actions ---
+
     function resetTransform() {
         scale.value = MINSCALE;
         pointX.value = 0;
@@ -101,22 +162,7 @@ export default function useImageZoom(clickCallback, wrapperRef) {
         start = { x: e.clientX - pointX.value, y: e.clientY - pointY.value };
         panning = true;
         isDragging.value = true;
-        pointSaved = { x: pointX.value, y: pointY.value };
-    }
-
-    function onMouseUp(e) {
-        panning = false;
-        isDragging.value = false;
-        snapBack();
-
-        if (!e.target.classList.contains('oea-img')) {
-            return;
-        }
-
-        // If position hasn't changed, it's a click (not a drag) — trigger callback
-        if (pointSaved.x == pointX.value && pointSaved.y == pointY.value) {
-            clickCallback(e);
-        }
+        mouseDownPos = { x: e.clientX, y: e.clientY };
     }
 
     function onMouseMove(e) {
@@ -139,6 +185,23 @@ export default function useImageZoom(clickCallback, wrapperRef) {
         pointX.value = newXValue;
         pointY.value = newYValue;
         dampenPosition(); // Soft clamp with rubber-band resistance
+    }
+
+    function onMouseUp(e) {
+        panning = false;
+        isDragging.value = false;
+        snapBack();
+
+        if (!e.target.classList.contains('oea-img')) {
+            return;
+        }
+
+        // If mouse barely moved from mousedown, it's a click (not a drag) — trigger callback
+        const dx = e.clientX - mouseDownPos.x;
+        const dy = e.clientY - mouseDownPos.y;
+        if (dx * dx + dy * dy < 25) {
+            clickCallback(e);
+        }
     }
 
     // --- Wheel zoom handler ---
@@ -220,21 +283,7 @@ export default function useImageZoom(clickCallback, wrapperRef) {
         snapBack(); // Animate back to bounds if overscrolled
     }
 
-    // --- Touch utility functions ---
-
-    // Euclidean distance between two touch points
-    function getDistance(touches) {
-        const dx = touches[0].clientX - touches[1].clientX;
-        const dy = touches[0].clientY - touches[1].clientY;
-        return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    // Midpoint between two touch points
-    function getMidPoint(touches) {
-        const x = (touches[0].clientX + touches[1].clientX) / 2;
-        const y = (touches[0].clientY + touches[1].clientY) / 2;
-        return { x, y };
-    }
+    // --- Watchers ---
 
     // Auto-reset position when zoom returns to 1x
     watch(scale, (value) => {
@@ -242,6 +291,8 @@ export default function useImageZoom(clickCallback, wrapperRef) {
             resetTransform();
         }
     });
+
+    // --- Public API ---
 
     return {
         isDragging,
