@@ -97,11 +97,16 @@
             <!-- Tips Section -->
             <div class="oea-tips-section animate-fadeInUp" style="animation-delay: 0.5s">
                 <h3 class="oea-tips-title">
-                    <i class="pi pi-lightbulb"></i>
                     {{ $t('instructions.tips.title') }}
                 </h3>
                 <ul class="oea-tips-list">
-                    <li>{{ $t('instructions.tips.clue') }}</li>
+                    <li>
+                        {{ $t('instructions.tips.cluePrefix') }}
+                        <span class="oea-clue-button-demo">
+                            <img src="@/assets/icons/compass-solid.svg" />
+                        </span>
+                        {{ $t('instructions.tips.clueSuffix') }}
+                    </li>
                     <li>{{ $t('instructions.tips.difficulty') }}</li>
                 </ul>
             </div>
@@ -353,6 +358,38 @@ function closeDialog() {
         &:last-child {
             margin-bottom: 0;
         }
+    }
+}
+
+.oea-clue-button-demo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    vertical-align: middle;
+    background: var(--gradient-vibrant);
+    backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    position: relative;
+    margin: 0 0.25rem;
+
+    // Radial glow
+    &::before {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        background: radial-gradient(circle, var(--glow-pink) 0%, transparent 70%);
+        opacity: 0.6;
+        z-index: -1;
+    }
+
+    img {
+        width: 1.25rem;
+        height: 1.25rem;
+        filter: brightness(0) invert(1);
     }
 }
 

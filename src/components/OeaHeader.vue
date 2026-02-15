@@ -4,7 +4,7 @@
         <template v-if="route.name == 'quest'">
             <div v-if="currentQuestIndex + 1 < questsCount" class="oea-right-buttons">
                 <button class="oea-btn oea-help-btn" :title="$t('header.showInstructions')" @click="$emit('showInstructions')">
-                    <i class="pi pi-question-circle oea-icon"></i>
+                    <img class="oea-icon" src="@/assets/icons/circle-question-solid.svg" />
                 </button>
                 <button class="oea-btn" :disabled="currentQuestIndex == 0" @click="questsStore.goToPreviousQuest">
                     <img class="oea-icon" src="@/assets/icons/arrow-left-solid.svg" />
@@ -103,13 +103,7 @@ header a:hover::after {
 
 /* Bouton d'aide */
 .oea-help-btn {
-    margin-right: 1rem;
-
-    i.oea-icon {
-        filter: none;
-        font-size: 1.25rem;
-        color: var(--color-text-primary);
-    }
+    margin-left: auto;
 }
 
 /* Badges de complétion/échec */

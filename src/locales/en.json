@@ -70,7 +70,8 @@
         },
         "tips": {
             "title": "Tips",
-            "clue": "Use the ? button to get a hint",
+            "cluePrefix": "Use the",
+            "clueSuffix": "button to get a hint",
             "difficulty": "Higher the level, harder it gets!"
         }
     }

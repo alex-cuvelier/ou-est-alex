@@ -25,7 +25,7 @@
             <oea-end-stats v-else></oea-end-stats>
 
             <button v-if="currentQuest?.type == 'quest'" class="oea-ask-clue" :title="$t('header.ask-clue')" :disabled="displayClue" @click="showClue">
-                <img src="@/assets/icons/circle-question-solid.svg" />
+                <img src="@/assets/icons/compass-solid.svg" />
             </button>
         </main>
         <oea-current-quest-stats

@@ -70,7 +70,8 @@
         },
         "tips": {
             "title": "Astuces",
-            "clue": "Utilisez le bouton ? pour obtenir un indice",
+            "cluePrefix": "Utilisez le bouton",
+            "clueSuffix": "pour obtenir un indice",
             "difficulty": "Plus le niveau est élevé, plus c'est difficile !"
         }
     }
