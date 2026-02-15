@@ -97,7 +97,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
-import heic2any from 'heic2any';
+import { heicTo, isHeic } from 'heic-to';
 import InputText from 'primevue/inputtext';
 import { useToast } from 'primevue/usetoast';
 
@@ -155,8 +155,16 @@ const handleFileChange = async (event) => {
 };
 
 const handleDrop = async (event) => {
+    console.log('[handleDrop] event.dataTransfer:', event.dataTransfer);
+    console.log('[handleDrop] files:', event.dataTransfer.files);
+    console.log('[handleDrop] files.length:', event.dataTransfer.files.length);
     const file = event.dataTransfer.files[0];
-    if (!file) return;
+    console.log('[handleDrop] file:', file);
+    if (!file) {
+        console.warn('[handleDrop] No file found in drop event');
+        return;
+    }
+    console.log('[handleDrop] file.name:', file.name, 'file.type:', file.type, 'file.size:', file.size);
     await processFile(file);
 };
 
@@ -165,29 +173,45 @@ const triggerFileInput = () => {
 };
 
 const processFile = async (file) => {
+    console.log('[processFile] Start - file:', file.name, 'type:', file.type, 'size:', file.size);
     loading.value = true;
 
-    if (file.type === 'image/heic') {
+    const fileIsHeic = file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic') || await isHeic(file);
+    if (fileIsHeic) {
+        console.log('[processFile] HEIC detected, converting...');
         try {
-            const convertedBlob = await heic2any({
+            const convertedBlob = await heicTo({
                 blob: file,
-                toType: 'image/jpeg',
+                type: 'image/jpeg',
+                quality: 0.85,
             });
+            console.log('[processFile] HEIC converted - blob type:', convertedBlob.type, 'size:', convertedBlob.size);
             file = new File([convertedBlob], file.name.replace(/\.heic$/i, '.jpg'), {
                 type: 'image/jpeg',
             });
+            console.log('[processFile] HEIC converted successfully');
         } catch (error) {
-            console.error('HEIC conversion error:', error);
+            console.error('[processFile] HEIC conversion error:', error);
             loading.value = false;
             return;
         }
     }
 
     const reader = new FileReader();
+    reader.onerror = (error) => {
+        console.error('[processFile] FileReader error:', error);
+        loading.value = false;
+    };
     reader.onload = (e) => {
+        console.log('[processFile] FileReader onload - data length:', e.target.result.length);
         const image = new Image();
+        image.onerror = (error) => {
+            console.error('[processFile] Image load error:', error);
+            loading.value = false;
+        };
         image.src = e.target.result;
         image.onload = () => {
+            console.log('[processFile] Image loaded -', image.width, 'x', image.height);
             originalWidth.value = image.width;
             originalHeight.value = image.height;
             displayWidth.value = image.width;
@@ -196,9 +220,11 @@ const processFile = async (file) => {
             imageSrc.value = e.target.result;
             imageLoaded.value = true;
             loading.value = false;
-            nextStep(); // Move to the next step after processing
+            console.log('[processFile] Done - moving to next step');
+            nextStep();
         };
     };
+    console.log('[processFile] Starting FileReader.readAsDataURL');
     reader.readAsDataURL(file);
 };
 
@@ -396,7 +422,7 @@ const copyJsonOutput = () => {
     justify-content: center;
     padding: 2rem;
     min-height: 100vh;
-    background: var(--bg-primary);
+    background: var(--color-background);
     position: relative;
     overflow: hidden;
 
@@ -592,6 +618,8 @@ const copyJsonOutput = () => {
         border-radius: var(--radius-lg);
         border: 1px solid rgba(255, 255, 255, 0.1);
         box-shadow: 0 10px 40px -10px var(--color-shadow);
+        overflow: auto;
+        max-height: 60vh;
 
         img {
             height: auto;
@@ -652,6 +680,8 @@ const copyJsonOutput = () => {
         border-radius: var(--radius-lg);
         border: 1px solid rgba(255, 255, 255, 0.1);
         box-shadow: 0 10px 40px -10px var(--color-shadow);
+        overflow: auto;
+        max-height: 60vh;
 
         .background-image {
             position: absolute;
