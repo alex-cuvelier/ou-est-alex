@@ -6,6 +6,7 @@ import { definePreset } from '@primevue/themes';
 
 import Button from 'primevue/button';
 import Drawer from 'primevue/drawer';
+import Dialog from 'primevue/dialog';
 import Card from 'primevue/card';
 import SelectButton from 'primevue/selectbutton';
 import Stepper from 'primevue/stepper';
@@ -88,6 +89,7 @@ export default {
         /* eslint-disable vue/multi-word-component-names, vue/no-reserved-component-names */
         app.component('Button', Button);
         app.component('Drawer', Drawer);
+        app.component('Dialog', Dialog);
         app.component('Card', Card);
         app.component('SelectButton', SelectButton);
         app.component('Stepper', Stepper);

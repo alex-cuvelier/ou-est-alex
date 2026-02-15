@@ -3,6 +3,9 @@
         <a href="/">Où est Alex ?</a>
         <template v-if="route.name == 'quest'">
             <div v-if="currentQuestIndex + 1 < questsCount" class="oea-right-buttons">
+                <button class="oea-btn oea-help-btn" :title="$t('header.showInstructions')" @click="$emit('showInstructions')">
+                    <i class="pi pi-question-circle oea-icon"></i>
+                </button>
                 <button class="oea-btn" :disabled="currentQuestIndex == 0" @click="questsStore.goToPreviousQuest">
                     <img class="oea-icon" src="@/assets/icons/arrow-left-solid.svg" />
                 </button>
@@ -52,6 +55,8 @@ const route = useRoute();
 
 const drawerVisible = ref(false);
 
+defineEmits(['showInstructions']);
+
 const togglePopover = () => {
     drawerVisible.value = !drawerVisible.value;
 };
@@ -94,6 +99,17 @@ header a::after {
 
 header a:hover::after {
     width: 100%;
+}
+
+/* Bouton d'aide */
+.oea-help-btn {
+    margin-right: 1rem;
+
+    i.oea-icon {
+        filter: none;
+        font-size: 1.25rem;
+        color: var(--color-text-primary);
+    }
 }
 
 /* Badges de complétion/échec */

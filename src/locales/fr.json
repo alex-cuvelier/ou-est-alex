@@ -1,7 +1,8 @@
 {
     "header": {
         "ask-clue": "Demander un indice",
-        "chooseQuest": "Choisir un niveau"
+        "chooseQuest": "Choisir un niveau",
+        "showInstructions": "Aide"
     },
     "footer": {
         "difficultyLevel": "Difficulté",
@@ -28,5 +29,49 @@
     },
     "level-chooser": {
         "title": "Choisir une difficulté"
+    },
+    "instructions": {
+        "title": "Comment jouer ?",
+        "subtitle": "Trouvez Alex caché dans l'image !",
+        "gotIt": "J'ai compris !",
+        "desktop": {
+            "title": "Contrôles Bureau",
+            "zoom": {
+                "label": "Zoom",
+                "description": "Utilisez la molette de la souris pour zoomer/dézoomer"
+            },
+            "pan": {
+                "label": "Déplacer",
+                "description": "Cliquez et glissez pour déplacer l'image"
+            },
+            "click": {
+                "label": "Trouver Alex",
+                "description": "Cliquez sur Alex quand vous le voyez"
+            },
+            "keyboard": {
+                "label": "Navigation",
+                "description": "Utilisez les flèches ← → pour changer d'image"
+            }
+        },
+        "mobile": {
+            "title": "Contrôles Tactiles",
+            "pinch": {
+                "label": "Zoom",
+                "description": "Pincez avec deux doigts pour zoomer/dézoomer"
+            },
+            "pan": {
+                "label": "Déplacer",
+                "description": "Glissez avec un doigt pour déplacer l'image"
+            },
+            "tap": {
+                "label": "Trouver Alex",
+                "description": "Tapez sur Alex quand vous le voyez"
+            }
+        },
+        "tips": {
+            "title": "Astuces",
+            "clue": "Utilisez le bouton ? pour obtenir un indice",
+            "difficulty": "Plus le niveau est élevé, plus c'est difficile !"
+        }
     }
 }

@@ -1,4 +1,7 @@
 import { ref, computed, watch } from 'vue';
+import useDeviceDetection from './useDeviceDetection';
+
+const { isTouchDevice } = useDeviceDetection();
 
 const MINSCALE = 1;
 const MAXSCALE = 10;
@@ -166,14 +169,12 @@ export default function useImageZoom(clickCallback, wrapperRef) {
      * @returns {Promise} Resolves when animation completes
      */
     function animateZoomTo(centerX, centerY, targetScale = 10, duration = 1600) {
-        const isTouchDevice = 'ontouchstart' in window;
-
         return new Promise((resolve) => {
             isSnapping.value = false;
             isZooming.value = false;
 
             // On mobile, reset to clean state first to avoid weird intermediate states
-            if (isTouchDevice) {
+            if (isTouchDevice.value) {
                 resetTransform();
             }
 
@@ -309,8 +310,8 @@ export default function useImageZoom(clickCallback, wrapperRef) {
             };
             // Wrapper's untransformed center (stays fixed during the gesture)
             pinchOriginCenter = {
-                x: rect.x + w * initialScale / 2 - pointX.value,
-                y: rect.y + h * initialScale / 2 - pointY.value,
+                x: rect.x + (w * initialScale) / 2 - pointX.value,
+                y: rect.y + (h * initialScale) / 2 - pointY.value,
             };
         }
     }
@@ -323,15 +324,15 @@ export default function useImageZoom(clickCallback, wrapperRef) {
             dampenPosition();
         } else if (e.touches.length === 2) {
             const currentDistance = getDistance(e.touches);
-            const newScale = Math.min(Math.max(initialScale * currentDistance / initialDistance, MINSCALE), MAXSCALE);
+            const newScale = Math.min(Math.max((initialScale * currentDistance) / initialDistance, MINSCALE), MAXSCALE);
             const currentMid = getMidPoint(e.touches);
             const w = wrapperRef.value.offsetWidth;
             const h = wrapperRef.value.offsetHeight;
 
             // Adjust translation so the image point under the initial midpoint
             // stays under the current midpoint as scale changes
-            pointX.value = currentMid.x - pinchOriginCenter.x + w * newScale / 2 - pinchImgPoint.x * newScale;
-            pointY.value = currentMid.y - pinchOriginCenter.y + h * newScale / 2 - pinchImgPoint.y * newScale;
+            pointX.value = currentMid.x - pinchOriginCenter.x + (w * newScale) / 2 - pinchImgPoint.x * newScale;
+            pointY.value = currentMid.y - pinchOriginCenter.y + (h * newScale) / 2 - pinchImgPoint.y * newScale;
             scale.value = newScale;
             clampPosition();
         }

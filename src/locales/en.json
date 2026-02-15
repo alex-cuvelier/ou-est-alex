@@ -1,7 +1,8 @@
 {
     "header": {
         "ask-clue": "Ask for a clue",
-        "chooseQuest": "Choose a level"
+        "chooseQuest": "Choose a level",
+        "showInstructions": "Help"
     },
     "footer": {
         "difficultyLevel": "Difficulty",
@@ -28,5 +29,49 @@
     },
     "level-chooser": {
         "title": "Choose a difficulty level"
+    },
+    "instructions": {
+        "title": "How to Play?",
+        "subtitle": "Find Alex hidden in the image!",
+        "gotIt": "Got it!",
+        "desktop": {
+            "title": "Desktop Controls",
+            "zoom": {
+                "label": "Zoom",
+                "description": "Use mouse wheel to zoom in/out"
+            },
+            "pan": {
+                "label": "Pan",
+                "description": "Click and drag to move the image"
+            },
+            "click": {
+                "label": "Find Alex",
+                "description": "Click on Alex when you see him"
+            },
+            "keyboard": {
+                "label": "Navigation",
+                "description": "Use arrow keys ← → to change image"
+            }
+        },
+        "mobile": {
+            "title": "Touch Controls",
+            "pinch": {
+                "label": "Zoom",
+                "description": "Pinch with two fingers to zoom in/out"
+            },
+            "pan": {
+                "label": "Pan",
+                "description": "Swipe with one finger to move the image"
+            },
+            "tap": {
+                "label": "Find Alex",
+                "description": "Tap on Alex when you see him"
+            }
+        },
+        "tips": {
+            "title": "Tips",
+            "clue": "Use the ? button to get a hint",
+            "difficulty": "Higher the level, harder it gets!"
+        }
     }
 }
