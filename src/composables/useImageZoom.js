@@ -50,14 +50,14 @@ const MAXSCALE = 10;
  * @param {import('vue').Ref<HTMLElement>} wrapperRef - Template ref of the image wrapper element
  */
 export default function useImageZoom(clickCallback, wrapperRef) {
-
     // --- Reactive state ---
 
     const scale = ref(MINSCALE),
         pointX = ref(0),
         pointY = ref(0),
         isDragging = ref(false),
-        isSnapping = ref(false); // True during snap-back animation (triggers CSS transition)
+        isSnapping = ref(false), // True during snap-back animation (triggers CSS transition)
+        isZooming = ref(false); // True during animated zoom-to-point (triggers longer CSS transition)
 
     // --- Internal state ---
 
@@ -112,8 +112,8 @@ export default function useImageZoom(clickCallback, wrapperRef) {
         const w = wrapperRef.value.offsetWidth;
         const h = wrapperRef.value.offsetHeight;
         return {
-            maxX: w * (scale.value - 1) / 2,
-            maxY: h * (scale.value - 1) / 2,
+            maxX: (w * (scale.value - 1)) / 2,
+            maxY: (h * (scale.value - 1)) / 2,
         };
     }
 
@@ -137,13 +137,13 @@ export default function useImageZoom(clickCallback, wrapperRef) {
     function snapBack() {
         const bounds = getBounds();
         if (!bounds) return;
-        const outOfBounds =
-            pointX.value < -bounds.maxX || pointX.value > bounds.maxX ||
-            pointY.value < -bounds.maxY || pointY.value > bounds.maxY;
+        const outOfBounds = pointX.value < -bounds.maxX || pointX.value > bounds.maxX || pointY.value < -bounds.maxY || pointY.value > bounds.maxY;
         if (outOfBounds) {
             isSnapping.value = true;
             clampPosition();
-            setTimeout(() => { isSnapping.value = false; }, 300);
+            setTimeout(() => {
+                isSnapping.value = false;
+            }, 300);
         }
     }
 
@@ -153,6 +153,32 @@ export default function useImageZoom(clickCallback, wrapperRef) {
         scale.value = MINSCALE;
         pointX.value = 0;
         pointY.value = 0;
+    }
+
+    /**
+     * Animates zoom to center on a specific point (e.g. polygon center on correct answer).
+     * @param {number} centerX - Target X in displayed image coordinates
+     * @param {number} centerY - Target Y in displayed image coordinates
+     * @param {number} targetScale - Zoom level to animate to (default 3)
+     * @param {number} duration - Animation duration in ms (default 800)
+     * @returns {Promise} Resolves when animation completes
+     */
+    function animateZoomTo(centerX, centerY, targetScale = 10, duration = 1600) {
+        return new Promise((resolve) => {
+            isZooming.value = true;
+            const wrapper = wrapperRef.value;
+            const wrapperW = wrapper.offsetWidth;
+            const wrapperH = wrapper.offsetHeight;
+            // With transform-origin: center, to center point (cx,cy) in viewport:
+            // tx = (w/2 - cx) * scale,  ty = (h/2 - cy) * scale
+            pointX.value = (wrapperW / 2 - centerX) * targetScale;
+            pointY.value = (wrapperH / 2 - centerY) * targetScale;
+            scale.value = targetScale;
+            setTimeout(() => {
+                isZooming.value = false;
+                resolve();
+            }, duration);
+        });
     }
 
     // --- Mouse event handlers ---
@@ -297,8 +323,10 @@ export default function useImageZoom(clickCallback, wrapperRef) {
     return {
         isDragging,
         isSnapping,
+        isZooming,
         transformStyle,
         resetTransform,
+        animateZoomTo,
         onMouseDown,
         onMouseUp,
         onMouseMove,

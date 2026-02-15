@@ -5,7 +5,13 @@
                 v-if="currentQuest?.type == 'quest'"
                 ref="imageWrapper"
                 class="oea-image-wrapper"
-                :class="{ 'oea-display-clue': displayClue, 'oea-dragging': isDragging, 'oea-snapping': isSnapping }"
+                :class="{
+                    'oea-display-clue': displayClue,
+                    'oea-dragging': isDragging,
+                    'oea-snapping': isSnapping,
+                    'oea-zooming': isZooming,
+                    'oea-shaking': isShaking,
+                }"
                 :style="{ ...wrapperStyle, ...transformStyle }"
                 @mousedown.left="onMouseDown"
                 @mousemove="onMouseMove"
@@ -37,7 +43,7 @@
 import OeaCurrentQuestStats from '@/components/OeaCurrentQuestStats.vue';
 import OeaEndStats from '@/components/OeaEndStats.vue';
 
-import { ref, watch, computed, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
@@ -69,7 +75,22 @@ const clueSize = ref(0);
 const clueSizeWithUnit = computed(() => clueSize.value + 'px');
 const displayClue = ref(false);
 
-const { isDragging, isSnapping, transformStyle, resetTransform, onMouseDown, onMouseUp, onMouseMove, onWheel, onTouchStart, onTouchMove, onTouchEnd } = useImageZoom(checkAlexFound, imageWrapper);
+const isShaking = ref(false);
+const {
+    isDragging,
+    isSnapping,
+    isZooming,
+    transformStyle,
+    resetTransform,
+    animateZoomTo,
+    onMouseDown,
+    onMouseUp,
+    onMouseMove,
+    onWheel,
+    onTouchStart,
+    onTouchMove,
+    onTouchEnd,
+} = useImageZoom(checkAlexFound, imageWrapper);
 
 function checkAlexFound(event) {
     const xRatio = event.target.naturalWidth / event.target.width;
@@ -78,23 +99,30 @@ function checkAlexFound(event) {
     const isInside = pointInPolygon(polygon, event.offsetX, event.offsetY);
 
     if (isInside) {
-        onAlexFound();
+        onAlexFound(event);
     } else {
         playKo();
         questStats.value.noCount++;
+        isShaking.value = true;
+        setTimeout(() => {
+            isShaking.value = false;
+        }, 400);
     }
 }
 
-function onAlexFound() {
+async function onAlexFound(event) {
     playOk();
     confetti.start();
     questStats.value.found = true;
-    setTimeout(() => {
-        confetti.stop();
-    }, 1500);
-    nextTick(() => {
-        questsStore.goToNextQuest();
-    });
+
+    const xRatio = event.target.naturalWidth / event.target.width;
+    const yRatio = event.target.naturalHeight / event.target.height;
+    const polygon = toPolygon(currentQuest.value.coords, xRatio, yRatio);
+    const center = getPolygonCenter(polygon);
+
+    await animateZoomTo(center.x, center.y, 10, 1600);
+    confetti.stop();
+    questsStore.goToNextQuest();
 }
 
 function resetQuestStats() {
@@ -275,6 +303,30 @@ watch(currentQuestIndex, preloadNextImage, { immediate: true });
         box-shadow:
             0 0 10px rgba(var(--white-rgb), 0.3),
             inset 0 0 10px rgba(var(--color-pink-rgb), 0.2);
+    }
+}
+
+// Shake animation on wrong answer (applied to img to avoid conflicting with wrapper transform)
+.oea-image-wrapper.oea-shaking .oea-img {
+    animation: imgShake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes imgShake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    20% {
+        transform: translateX(-8px);
+    }
+    40% {
+        transform: translateX(8px);
+    }
+    60% {
+        transform: translateX(-5px);
+    }
+    80% {
+        transform: translateX(5px);
     }
 }
 

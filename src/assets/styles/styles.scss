@@ -367,6 +367,10 @@
             &.oea-snapping {
                 transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
             }
+
+            &.oea-zooming {
+                transition: transform 1.6s cubic-bezier(0.25, 1, 0.5, 1);
+            }
         }
 
         .oea-end-stats {
