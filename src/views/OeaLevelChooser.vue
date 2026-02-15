@@ -37,7 +37,7 @@ const setLevel = (difficultyLevel) => {
     position: relative;
     min-height: 100vh;
     overflow: hidden;
-    background: var(--bg-primary);
+    background: var(--color-background);
 
     // Pattern géométrique subtil en arrière-plan
     &::before {
@@ -99,7 +99,7 @@ const setLevel = (difficultyLevel) => {
         }
 
         // Mobile : animations plus lentes
-        @media (max-device-width: 768px) {
+        @media (max-width: 768px) {
             &.oea-blob-1 {
                 animation-duration: 30s, 12s;
             }
@@ -225,7 +225,7 @@ const setLevel = (difficultyLevel) => {
             }
 
             // Mobile : réduire les effets
-            @media (max-device-width: 768px) {
+            @media (max-width: 768px) {
                 padding: 1.25rem 2.5rem !important;
                 min-width: 18rem;
 

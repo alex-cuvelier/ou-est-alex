@@ -89,7 +89,7 @@ button:hover {
 
 // === OPTIMISATIONS MOBILE ===
 
-@media (max-device-width: 768px) {
+@media (max-width: 768px) {
     // Réduire l'intensité des glows sur mobile
     .oea-ask-clue {
         &::before {

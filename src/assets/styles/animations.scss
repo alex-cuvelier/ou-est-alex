@@ -118,18 +118,6 @@
     }
 }
 
-@keyframes gradientRotate {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
 // === ANIMATIONS VIBRANTES AVANCÉES ===
 
 @keyframes gradientFlow {
@@ -249,7 +237,7 @@
 }
 
 .animate-shake {
-    animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    animation: shake var(--transition-shake);
 }
 
 .animate-successPulse {

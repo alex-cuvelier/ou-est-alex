@@ -147,7 +147,7 @@ header a:hover::after {
 .oea-vibrant-drawer {
     :deep(.p-drawer) {
         background: rgba(10, 14, 39, 0.95);
-        backdrop-filter: blur(20px) saturate(180%);
+        backdrop-filter: var(--glass-blur);
         border: none;
         box-shadow:
             0 8px 32px rgba(0, 0, 0, 0.5),
@@ -204,7 +204,4 @@ header a:hover::after {
     }
 }
 
-.oea-quest-drawer {
-    background: transparent;
-}
 </style>

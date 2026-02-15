@@ -80,8 +80,8 @@ const goToNextDifficultyLevel = () => {
     /* Transformation des cards avec glassmorphism vibrant */
     :deep(.p-card) {
         position: relative;
-        background: rgba(26, 31, 58, 0.6) !important;
-        backdrop-filter: blur(20px) saturate(180%);
+        background: var(--glass-bg-strong) !important;
+        backdrop-filter: var(--glass-blur);
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         transition: all var(--transition-base);
         transform-style: preserve-3d;
@@ -195,7 +195,7 @@ const goToNextDifficultyLevel = () => {
         transition: text-shadow var(--transition-base);
         animation: numberPulse 0.6s var(--transition-bounce);
 
-        @media (max-device-width: 768px) {
+        @media (max-width: 768px) {
             font-size: 2.5rem !important;
         }
     }

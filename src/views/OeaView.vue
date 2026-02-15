@@ -308,7 +308,7 @@ watch(currentQuestIndex, preloadNextImage, { immediate: true });
 
 // Shake animation on wrong answer (applied to img to avoid conflicting with wrapper transform)
 .oea-image-wrapper.oea-shaking .oea-img {
-    animation: imgShake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    animation: imgShake var(--transition-shake);
 }
 
 @keyframes imgShake {

@@ -15,7 +15,7 @@
                     {{ $t('instructions.desktop.title') }}
                 </h2>
 
-                <div class="oea-instruction-item" style="animation-delay: 0.1s">
+                <div class="oea-instruction-item">
                     <div class="oea-instruction-icon">
                         <i class="pi pi-search-plus"></i>
                     </div>
@@ -25,7 +25,7 @@
                     </div>
                 </div>
 
-                <div class="oea-instruction-item" style="animation-delay: 0.2s">
+                <div class="oea-instruction-item">
                     <div class="oea-instruction-icon">
                         <i class="pi pi-arrows-alt"></i>
                     </div>
@@ -35,7 +35,7 @@
                     </div>
                 </div>
 
-                <div class="oea-instruction-item" style="animation-delay: 0.3s">
+                <div class="oea-instruction-item">
                     <div class="oea-instruction-icon">
                         <i class="pi pi-map-marker"></i>
                     </div>
@@ -45,7 +45,7 @@
                     </div>
                 </div>
 
-                <div class="oea-instruction-item" style="animation-delay: 0.4s">
+                <div class="oea-instruction-item">
                     <div class="oea-instruction-icon">
                         <i class="pi pi-arrow-right-arrow-left"></i>
                     </div>
@@ -63,7 +63,7 @@
                     {{ $t('instructions.mobile.title') }}
                 </h2>
 
-                <div class="oea-instruction-item" style="animation-delay: 0.1s">
+                <div class="oea-instruction-item">
                     <div class="oea-instruction-icon">
                         <i class="pi pi-search-plus"></i>
                     </div>
@@ -73,7 +73,7 @@
                     </div>
                 </div>
 
-                <div class="oea-instruction-item" style="animation-delay: 0.2s">
+                <div class="oea-instruction-item">
                     <div class="oea-instruction-icon">
                         <i class="pi pi-arrows-alt"></i>
                     </div>
@@ -83,7 +83,7 @@
                     </div>
                 </div>
 
-                <div class="oea-instruction-item" style="animation-delay: 0.3s">
+                <div class="oea-instruction-item">
                     <div class="oea-instruction-icon">
                         <i class="pi pi-map-marker"></i>
                     </div>
@@ -95,7 +95,7 @@
             </div>
 
             <!-- Tips Section -->
-            <div class="oea-tips-section animate-fadeInUp" style="animation-delay: 0.5s">
+            <div class="oea-tips-section animate-fadeInUp">
                 <h3 class="oea-tips-title">
                     {{ $t('instructions.tips.title') }}
                 </h3>
@@ -151,7 +151,7 @@ function closeDialog() {
 .oea-instructions-dialog {
     &.p-dialog {
         background: rgba(26, 31, 58, 0.95) !important;
-        backdrop-filter: blur(20px) saturate(180%);
+        backdrop-filter: var(--glass-blur);
         border: 2px solid transparent;
         border-radius: var(--radius-lg);
         background-clip: padding-box;
@@ -199,7 +199,7 @@ function closeDialog() {
         background: transparent;
     }
 
-    @media screen and (max-device-width: 768px) {
+    @media (max-width: 768px) {
         :deep(.p-dialog-header),
         :deep(.p-dialog-content),
         :deep(.p-dialog-footer) {
@@ -265,13 +265,19 @@ function closeDialog() {
     animation: fadeInUp 0.6s ease-out;
     animation-fill-mode: both;
 
+    @for $i from 1 through 4 {
+        &:nth-child(#{$i + 1}) {
+            animation-delay: #{$i * 0.1}s;
+        }
+    }
+
     &:hover {
         background: rgba(255, 255, 255, 0.06);
         border-color: rgba(139, 92, 246, 0.3);
         transform: translateX(4px);
     }
 
-    @media screen and (max-device-width: 768px) {
+    @media (max-width: 768px) {
         padding: 1rem;
         gap: 1rem;
     }
@@ -293,7 +299,7 @@ function closeDialog() {
         color: white;
     }
 
-    @media screen and (max-device-width: 768px) {
+    @media (max-width: 768px) {
         width: 2.5rem;
         height: 2.5rem;
 
@@ -328,6 +334,7 @@ function closeDialog() {
     border: 1px solid rgba(139, 92, 246, 0.2);
     animation: fadeInUp 0.6s ease-out;
     animation-fill-mode: both;
+    animation-delay: 0.5s;
 }
 
 .oea-tips-title {
@@ -432,17 +439,6 @@ function closeDialog() {
         &::before {
             left: 100%;
         }
-    }
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
     }
 }
 
