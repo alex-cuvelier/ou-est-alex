@@ -3,35 +3,99 @@ import { ref, computed, watch } from 'vue';
 const MINSCALE = 1;
 const MAXSCALE = 10;
 
-// Define the default export function for the image zoom feature
-export default function useImageZoom(clickCallback) {
-    // Reactive variables to track the scale and position of the image
+/**
+ * Composable for handling image zoom and pan interactions.
+ * Supports mouse (drag + wheel) and touch (pan + pinch-zoom).
+ * Prevents out-of-bounds panning with a rubber-band effect:
+ * - During drag: the image can slightly exceed bounds with dampened resistance
+ * - On release: the image snaps back to bounds with a CSS transition
+ *
+ * @param {Function} clickCallback - Called when a click (not a drag) is detected on the image
+ * @param {import('vue').Ref<HTMLElement>} wrapperRef - Template ref of the image wrapper element
+ */
+export default function useImageZoom(clickCallback, wrapperRef) {
     const scale = ref(MINSCALE),
         pointX = ref(0),
         pointY = ref(0),
         isDragging = ref(false);
-    // Variables to track the panning state and positions
+
     let panning = false,
         start = { x: 0, y: 0 },
-        pointSaved = { x: 0, y: 0 },
-        initialDistance = 0,
+        pointSaved = { x: 0, y: 0 }, // Saved position to distinguish click vs drag
+        initialDistance = 0, // Initial distance between two touch points (pinch-zoom)
         initialScale = MINSCALE;
 
-    // Computed property to generate the transform style for the image
     const transformStyle = computed(() => {
         return {
             transform: `translate(${pointX.value}px, ${pointY.value}px) scale(${scale.value})`,
         };
     });
 
-    // Function to reset the transform properties to their initial values
+    // --- Bounds clamping & rubber-band effect ---
+
+    const isSnapping = ref(false); // True during snap-back animation (triggers CSS transition)
+    const DAMPING = 0.3; // Rubber-band resistance factor (0 = hard stop, 1 = no resistance)
+
+    /**
+     * Calculates max allowed pan values based on current scale.
+     * At scale=1, maxX/maxY = 0 (no panning). Increases with zoom level.
+     * Formula: maxPan = dimension * (scale - 1) / 2
+     */
+    function getBounds() {
+        if (!wrapperRef.value) return null;
+        const w = wrapperRef.value.offsetWidth;
+        const h = wrapperRef.value.offsetHeight;
+        return {
+            maxX: w * (scale.value - 1) / 2,
+            maxY: h * (scale.value - 1) / 2,
+        };
+    }
+
+    // Hard clamp: forces position strictly within bounds (used on wheel zoom & snap-back)
+    function clampPosition() {
+        const bounds = getBounds();
+        if (!bounds) return;
+        pointX.value = Math.min(Math.max(pointX.value, -bounds.maxX), bounds.maxX);
+        pointY.value = Math.min(Math.max(pointY.value, -bounds.maxY), bounds.maxY);
+    }
+
+    // Soft clamp: allows overscroll with dampened resistance (used during drag)
+    function dampenPosition() {
+        const bounds = getBounds();
+        if (!bounds) return;
+        pointX.value = dampen(pointX.value, -bounds.maxX, bounds.maxX);
+        pointY.value = dampen(pointY.value, -bounds.maxY, bounds.maxY);
+    }
+
+    // Applies dampening when value exceeds [min, max] range
+    function dampen(value, min, max) {
+        if (value < min) return min + (value - min) * DAMPING;
+        if (value > max) return max + (value - max) * DAMPING;
+        return value;
+    }
+
+    // Animates the image back to bounds on release (activates CSS transition via isSnapping)
+    function snapBack() {
+        const bounds = getBounds();
+        if (!bounds) return;
+        const outOfBounds =
+            pointX.value < -bounds.maxX || pointX.value > bounds.maxX ||
+            pointY.value < -bounds.maxY || pointY.value > bounds.maxY;
+        if (outOfBounds) {
+            isSnapping.value = true;
+            clampPosition();
+            setTimeout(() => { isSnapping.value = false; }, 300);
+        }
+    }
+
     function resetTransform() {
         scale.value = MINSCALE;
         pointX.value = 0;
         pointY.value = 0;
     }
 
-    // Function to handle the mouse down event, initiating the panning
+    // --- Mouse event handlers ---
+
     function onMouseDown(e) {
         e.preventDefault();
         start = { x: e.clientX - pointX.value, y: e.clientY - pointY.value };
@@ -40,67 +104,66 @@ export default function useImageZoom(clickCallback) {
         pointSaved = { x: pointX.value, y: pointY.value };
     }
 
-    // Function to handle the mouse up event, stopping the panning
     function onMouseUp(e) {
         panning = false;
         isDragging.value = false;
+        snapBack();
 
-        // Check if the target is an image element
         if (!e.target.classList.contains('oea-img')) {
             return;
         }
 
-        // Check if it's a click or a drag event
+        // If position hasn't changed, it's a click (not a drag) — trigger callback
         if (pointSaved.x == pointX.value && pointSaved.y == pointY.value) {
             clickCallback(e);
         }
     }
 
-    // Function to handle the mouse move event, updating the position of the image
     function onMouseMove(e) {
         e.preventDefault();
         if (!panning) {
             return;
         }
 
-        // Calculate the new position values
         let newXValue = e.clientX - start.x;
         let newYValue = e.clientY - start.y;
         const xDifference = pointX.value + newXValue;
         const yDifference = pointY.value + newYValue;
 
-        // Set a threshold to avoid small, unnecessary movements
+        // Ignore micro-movements (threshold scales with zoom to stay consistent)
         const threshold = 10 * scale.value;
         if (xDifference < threshold && yDifference > -threshold && yDifference < threshold && yDifference > -threshold) {
             return;
         }
 
-        // Update the position values
         pointX.value = newXValue;
         pointY.value = newYValue;
+        dampenPosition(); // Soft clamp with rubber-band resistance
     }
 
-    // Function to handle the wheel event, updating the scale of the image
+    // --- Wheel zoom handler ---
+
     function onWheel(event) {
         event.preventDefault();
+        // Ignore Ctrl+scroll (browser zoom)
         if (event.ctrlKey) {
             return;
         }
 
         const img = event.target;
         const rec = img.getBoundingClientRect();
+        // Mouse position relative to image (unscaled coordinates)
         const x = (event.clientX - rec.x) / scale.value;
         const y = (event.clientY - rec.y) / scale.value;
 
         const delta = event.wheelDelta ? event.wheelDelta : -event.deltaY;
 
-        // Reset transform if scale is 1 and wheel scrolled down
         if (scale.value == MINSCALE && delta < 0) {
             resetTransform();
             return;
         }
 
-        // Update scale value based on wheel scroll direction
+        // Increment/decrement scale by 0.4, clamped to [MINSCALE, MAXSCALE]
         if (delta > 0) {
             if (scale.value > MAXSCALE) {
                 return;
@@ -113,74 +176,76 @@ export default function useImageZoom(clickCallback) {
             scale.value = parseFloat((scale.value - 0.4).toFixed(1));
         }
 
-        // Update the position values based on the scale change
+        // Adjust position to keep zoom centered on mouse cursor
         const m = delta > 0 ? 0.2 : -0.2;
         pointX.value += -x * m * 2 + img.offsetWidth * m;
         pointY.value += -y * m * 2 + img.offsetHeight * m;
+        clampPosition(); // Hard clamp (no rubber-band on zoom)
     }
 
-    // Handle touch events
+    // --- Touch event handlers ---
+
     function onTouchStart(e) {
         if (e.touches.length === 1) {
-            // Single touch: start panning
             start = { x: e.touches[0].clientX - pointX.value, y: e.touches[0].clientY - pointY.value };
             panning = true;
         } else if (e.touches.length === 2) {
-            // Double touch: start zooming
+            // Pinch-zoom: save initial state
             initialDistance = getDistance(e.touches);
             initialScale = scale.value;
             start = getMidPoint(e.touches);
         }
     }
 
-    // Function to handle touch move event
     function onTouchMove(e) {
         e.preventDefault();
         if (panning && e.touches.length === 1) {
-            // Handle panning
             let newXValue = e.touches[0].clientX - start.x;
             let newYValue = e.touches[0].clientY - start.y;
             pointX.value = newXValue;
             pointY.value = newYValue;
+            dampenPosition(); // Soft clamp with rubber-band resistance
         } else if (e.touches.length === 2) {
-            // Handle zooming
+            // Pinch-zoom: scale proportional to finger distance change
             const currentDistance = getDistance(e.touches);
             const scaleChange = currentDistance / initialDistance;
             scale.value = Math.min(Math.max(initialScale * scaleChange, MINSCALE), MAXSCALE);
-            //pointX.value = pointX.value + e.touches[0].clientX - start.x;
-            //pointY.value = pointY.value + e.touches[0].clientY - start.y;
+            clampPosition(); // Hard clamp (no rubber-band on zoom)
         }
     }
 
-    // Function to handle touch end event
     function onTouchEnd() {
         panning = false;
         isDragging.value = false;
+        snapBack(); // Animate back to bounds if overscrolled
     }
 
-    // Utility function to calculate the distance between two touch points
+    // --- Touch utility functions ---
+
+    // Euclidean distance between two touch points
     function getDistance(touches) {
         const dx = touches[0].clientX - touches[1].clientX;
         const dy = touches[0].clientY - touches[1].clientY;
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    // Midpoint between two touch points
     function getMidPoint(touches) {
         const x = (touches[0].clientX + touches[1].clientX) / 2;
         const y = (touches[0].clientY + touches[1].clientY) / 2;
         return { x, y };
     }
 
-    // Watcher to reset transform when scale is reset to 1
+    // Auto-reset position when zoom returns to 1x
     watch(scale, (value) => {
         if (value == MINSCALE) {
             resetTransform();
         }
     });
 
-    // Return the reactive variables and event handling functions
     return {
         isDragging,
+        isSnapping,
         transformStyle,
         resetTransform,
         onMouseDown,

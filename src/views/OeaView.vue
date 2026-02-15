@@ -5,7 +5,7 @@
                 v-if="currentQuest?.type == 'quest'"
                 ref="imageWrapper"
                 class="oea-image-wrapper"
-                :class="{ 'oea-display-clue': displayClue, 'oea-dragging': isDragging }"
+                :class="{ 'oea-display-clue': displayClue, 'oea-dragging': isDragging, 'oea-snapping': isSnapping }"
                 :style="{ ...wrapperStyle, ...transformStyle }"
                 @mousedown.left="onMouseDown"
                 @mousemove="onMouseMove"
@@ -64,11 +64,12 @@ timerInterval = setInterval(() => {
 questsStore.currentDifficultyLevel = route?.params?.difficultyLevel != 'all' ? parseInt(route?.params?.difficultyLevel || 0) : 'all';
 questsStore.setCurrentQuestIndex(parseInt(route?.params?.imageIndex || 1) - 1);
 
+const imageWrapper = ref(null);
 const clueSize = ref(0);
 const clueSizeWithUnit = computed(() => clueSize.value + 'px');
 const displayClue = ref(false);
 
-const { isDragging, transformStyle, resetTransform, onMouseDown, onMouseUp, onMouseMove, onWheel, onTouchStart, onTouchMove, onTouchEnd } = useImageZoom(checkAlexFound);
+const { isDragging, isSnapping, transformStyle, resetTransform, onMouseDown, onMouseUp, onMouseMove, onWheel, onTouchStart, onTouchMove, onTouchEnd } = useImageZoom(checkAlexFound, imageWrapper);
 
 function checkAlexFound(event) {
     const xRatio = event.target.naturalWidth / event.target.width;
