@@ -2,6 +2,7 @@
     "name": "ou-est-alex",
     "version": "1.0.0-SNAPSHOT",
     "private": true,
+    "license": "MIT",
     "scripts": {
         "dev": "vite",
         "dev-host": "vite --host",

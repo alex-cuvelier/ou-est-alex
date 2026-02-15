@@ -2,7 +2,7 @@
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
 [![Version](https://img.shields.io/badge/version-1.0.0-blue)]()
-[![License](https://img.shields.io/badge/license-private-red)]()
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 > Where the hell could he be ?
 
@@ -261,7 +261,7 @@ Check [GitHub Issues](https://github.com/your-username/ou-est-alex/issues) for c
 
 ## 📄 License
 
-Private project - All rights reserved
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
