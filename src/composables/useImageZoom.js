@@ -67,7 +67,9 @@ export default function useImageZoom(clickCallback, wrapperRef) {
         start = { x: 0, y: 0 },
         mouseDownPos = { x: 0, y: 0 }, // Mouse position at mousedown to distinguish click vs drag
         initialDistance = 0, // Initial distance between two touch points (pinch-zoom)
-        initialScale = MINSCALE;
+        initialScale = MINSCALE,
+        pinchImgPoint = { x: 0, y: 0 }, // Image point under initial pinch midpoint
+        pinchOriginCenter = { x: 0, y: 0 }; // Wrapper's untransformed center (fixed during gesture)
 
     // --- Computed ---
 
@@ -279,27 +281,47 @@ export default function useImageZoom(clickCallback, wrapperRef) {
             start = { x: e.touches[0].clientX - pointX.value, y: e.touches[0].clientY - pointY.value };
             panning = true;
         } else if (e.touches.length === 2) {
-            // Pinch-zoom: save initial state
+            panning = false;
             initialDistance = getDistance(e.touches);
             initialScale = scale.value;
-            start = getMidPoint(e.touches);
+
+            const rect = wrapperRef.value.getBoundingClientRect();
+            const w = wrapperRef.value.offsetWidth;
+            const h = wrapperRef.value.offsetHeight;
+            const mid = getMidPoint(e.touches);
+
+            // Image point under the midpoint of the two fingers
+            pinchImgPoint = {
+                x: (mid.x - rect.x) / initialScale,
+                y: (mid.y - rect.y) / initialScale,
+            };
+            // Wrapper's untransformed center (stays fixed during the gesture)
+            pinchOriginCenter = {
+                x: rect.x + w * initialScale / 2 - pointX.value,
+                y: rect.y + h * initialScale / 2 - pointY.value,
+            };
         }
     }
 
     function onTouchMove(e) {
         e.preventDefault();
         if (panning && e.touches.length === 1) {
-            let newXValue = e.touches[0].clientX - start.x;
-            let newYValue = e.touches[0].clientY - start.y;
-            pointX.value = newXValue;
-            pointY.value = newYValue;
-            dampenPosition(); // Soft clamp with rubber-band resistance
+            pointX.value = e.touches[0].clientX - start.x;
+            pointY.value = e.touches[0].clientY - start.y;
+            dampenPosition();
         } else if (e.touches.length === 2) {
-            // Pinch-zoom: scale proportional to finger distance change
             const currentDistance = getDistance(e.touches);
-            const scaleChange = currentDistance / initialDistance;
-            scale.value = Math.min(Math.max(initialScale * scaleChange, MINSCALE), MAXSCALE);
-            clampPosition(); // Hard clamp (no rubber-band on zoom)
+            const newScale = Math.min(Math.max(initialScale * currentDistance / initialDistance, MINSCALE), MAXSCALE);
+            const currentMid = getMidPoint(e.touches);
+            const w = wrapperRef.value.offsetWidth;
+            const h = wrapperRef.value.offsetHeight;
+
+            // Adjust translation so the image point under the initial midpoint
+            // stays under the current midpoint as scale changes
+            pointX.value = currentMid.x - pinchOriginCenter.x + w * newScale / 2 - pinchImgPoint.x * newScale;
+            pointY.value = currentMid.y - pinchOriginCenter.y + h * newScale / 2 - pinchImgPoint.y * newScale;
+            scale.value = newScale;
+            clampPosition();
         }
     }
 
