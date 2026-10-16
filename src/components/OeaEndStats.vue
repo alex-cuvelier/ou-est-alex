@@ -1,7 +1,7 @@
 <template>
     <section class="oea-recap">
         <header class="oea-recap-head">
-            <p class="oea-recap-kicker oea-mono">{{ $t('end.done', { level: levelName }) }}</p>
+            <p class="oea-recap-kicker oea-mono">{{ $t(isRunComplete ? 'end.done' : 'end.inProgress', { level: levelName }) }}</p>
             <h1>{{ $t('end.found', { found: runSummary.found, count: runSummary.count }) }}</h1>
             <dl class="oea-recap-stats">
                 <div>
@@ -28,7 +28,7 @@
                     :class="'is-' + tile.status"
                     :style="tile.style"
                     :aria-label="tile.ariaLabel"
-                    @click="replay(tile.index)"
+                    @click="questsStore.setCurrentQuestIndex(tile.index)"
                 >
                     <span
                         v-if="tile.status === 'found'"
@@ -41,7 +41,8 @@
             </li>
         </ol>
 
-        <div class="oea-share">
+        <!-- A score to share only once the level is complete -->
+        <div v-if="isRunComplete" class="oea-share">
             <pre ref="shareBlock" class="oea-mono">{{ shareText }}</pre>
             <button type="button" class="oea-button" @click="copyShareText">{{ copied ? $t('end.copied') : $t('end.copy') }}</button>
         </div>
@@ -49,8 +50,13 @@
         <!-- Back on the left, forward on the right: the main action comes last (full width at the bottom on phones) -->
         <div class="oea-recap-actions">
             <RouterLink class="oea-button oea-button--ghost" :to="{ name: 'levelChooser' }">{{ $t('end.home') }}</RouterLink>
-            <button type="button" class="oea-button oea-button--ghost" @click="questsStore.resetQuests">{{ $t('end.restart') }}</button>
-            <button v-if="hasNextLevel" type="button" class="oea-button" @click="goToNextDifficultyLevel">{{ $t('end.next') }}</button>
+            <button type="button" class="oea-button oea-button--ghost" @click="questsStore.restartLevel">
+                {{ isRunComplete ? $t('end.restart') : $t('end.startOver') }}
+            </button>
+            <button v-if="!isRunComplete" type="button" class="oea-button" @click="continueRun">
+                {{ $t('end.continue', runSummary.count - runSummary.found) }}
+            </button>
+            <button v-else-if="hasNextLevel" type="button" class="oea-button" @click="goToNextDifficultyLevel">{{ $t('end.next') }}</button>
         </div>
     </section>
 </template>
@@ -67,7 +73,7 @@ import confetti from '@/composables/useConfetti';
 const { t } = useI18n();
 
 const questsStore = useQuestsStore();
-const { runSummary, runStats, levelPhotos, difficultyLevels, currentDifficultyLevel } = storeToRefs(questsStore);
+const { runSummary, runStats, isRunComplete, levelPhotos, difficultyLevels, currentDifficultyLevel } = storeToRefs(questsStore);
 
 const levelName = computed(() => t('difficulty.' + currentDifficultyLevel.value));
 
@@ -75,14 +81,14 @@ const tiles = computed(() =>
     levelPhotos.value.map((quest, index) => {
         const status = questsStore.questStatus(quest.id);
         const alex = alexPosition(quest);
-        const label = status === 'found' ? formatClock(runStats.value[quest.id].time) : t(status === 'missed' ? 'end.missed' : 'end.unseen');
+        const label = status === 'found' ? formatClock(runStats.value[quest.id].time) : t(status === 'missed' ? 'end.missed' : 'end.todo');
         return {
             quest,
             index,
             status,
             alex,
             label,
-            ariaLabel: t('end.replay', { index: index + 1, status: label }),
+            ariaLabel: t('end.open', { index: index + 1, status: label }),
             // Background positioned on Alex: the ring lands on him whatever the crop
             style: { backgroundImage: `url(${thumbUrl(quest)})`, backgroundPosition: `${alex.x}% ${alex.y}%` },
         };
@@ -118,18 +124,20 @@ async function copyShareText() {
     }
 }
 
-function replay(index) {
-    questsStore.setCurrentQuestIndex(index);
+// The first photo still to search
+function continueRun() {
+    questsStore.setCurrentQuestIndex(questsStore.nextToSearchIndex(0));
 }
 
+// Opens where its run is: its recap if it was already completed
 function goToNextDifficultyLevel() {
-    questsStore.startLevel(currentDifficultyLevel.value + 1);
+    questsStore.openLevel(currentDifficultyLevel.value + 1);
 }
 
 // Everything found: one last round of confetti
 let confettiTimeout = null;
 onMounted(() => {
-    if (runSummary.value.count > 0 && runSummary.value.found === runSummary.value.count) {
+    if (isRunComplete.value) {
         confetti.start();
         confettiTimeout = setTimeout(() => confetti.stop(), 2500);
     }

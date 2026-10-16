@@ -127,6 +127,27 @@ export function alexPosition(quest) {
     return { x: (center.x / quest.width) * 100, y: (center.y / quest.height) * 100 };
 }
 
+/**
+ * Ring around Alex once found, as percentages of the photo width and height:
+ * a bit wider than his outline, and never too small to be seen without zooming
+ */
+export function alexRing(quest) {
+    const polygon = toPolygon(quest?.coords, 1, 1);
+    if (!polygon.length || !quest.width || !quest.height) {
+        return null;
+    }
+    const xs = polygon.map(([x]) => x);
+    const ys = polygon.map(([, y]) => y);
+    const [left, right, top, bottom] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+    const size = Math.max(Math.max(right - left, bottom - top) * 1.4, Math.min(quest.width, quest.height) * 0.08);
+    return {
+        x: ((left + right) / 2 / quest.width) * 100,
+        y: ((top + bottom) / 2 / quest.height) * 100,
+        width: (size / quest.width) * 100,
+        height: (size / quest.height) * 100,
+    };
+}
+
 export function formmatSecondsToTime(seconds) {
     // Ensure the input is a number
     if (typeof seconds !== 'number' || isNaN(seconds)) {

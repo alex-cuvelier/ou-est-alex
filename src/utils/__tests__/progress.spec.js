@@ -18,11 +18,22 @@ describe('progress', () => {
 
     it('should save and load progress', () => {
         const storage = memoryStorage();
-        const progress = { found: { 12: { bestTime: 42 } }, playTime: 300, last: { level: 1, index: 2 } };
+        const progress = {
+            found: { 12: { bestTime: 42 } },
+            playTime: 300,
+            last: { level: 1, index: 2 },
+            runs: { 1: { index: 2, stats: { 12: { time: 42, clueCount: 1, noCount: 0, found: true } } } },
+        };
 
         saveProgress(progress, storage);
 
         expect(loadProgress(storage)).toEqual(progress);
+    });
+
+    it('should load progress saved before runs existed', () => {
+        const storage = memoryStorage({ 'oea-progress': JSON.stringify({ found: { 12: { bestTime: 42 } }, playTime: 42, last: null }) });
+
+        expect(loadProgress(storage).runs).toEqual({});
     });
 
     it('should ignore corrupted data', () => {

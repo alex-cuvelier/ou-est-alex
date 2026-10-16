@@ -4,7 +4,10 @@
  *   {
  *     found:    { [questId]: { bestTime } },  // seconds, best time per found photo
  *     playTime: 11520,                         // seconds, all quests together
- *     last:     { level: 1, index: 2 },        // where to resume
+ *     last:     { level: 1, index: 2 },        // where to resume (null once that level is complete)
+ *     runs: {                                  // current run of each level, until "Play again"
+ *       [level]: { index: 2, stats: { [questId]: { time, clueCount, noCount, found } } },
+ *     },
  *   }
  *
  * Every access is wrapped: localStorage can throw in private browsing.
@@ -20,7 +23,7 @@ function defaultStorage() {
 }
 
 export function emptyProgress() {
-    return { found: {}, playTime: 0, last: null };
+    return { found: {}, playTime: 0, last: null, runs: {} };
 }
 
 export function loadProgress(storage = defaultStorage()) {
@@ -34,6 +37,7 @@ export function loadProgress(storage = defaultStorage()) {
             ...emptyProgress(),
             ...data,
             found: { ...(data?.found ?? {}) },
+            runs: { ...(data?.runs ?? {}) },
         };
     } catch {
         return emptyProgress();

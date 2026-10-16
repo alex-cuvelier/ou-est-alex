@@ -27,7 +27,7 @@
                 </h2>
                 <ul class="oea-levels">
                     <li v-for="level in levels" :key="level.id">
-                        <button type="button" class="oea-level" :class="{ 'is-done': level.done }" @click="startLevel(level.id)">
+                        <button type="button" class="oea-level" :class="{ 'is-done': level.done }" @click="openLevel(level.id)">
                             <img :src="level.thumb" alt="" loading="lazy" />
                             <span class="oea-level-name">
                                 {{ level.name }}
@@ -54,22 +54,23 @@ import { formatDuration, thumbUrl } from '@/utils/utils.js';
 const { t } = useI18n();
 const router = useRouter();
 const questsStore = useQuestsStore();
-const { difficultyLevels, progress, currentDifficultyLevel } = storeToRefs(questsStore);
+const { difficultyLevels, progress, currentQuestIndex } = storeToRefs(questsStore);
 const { instructionsVisible } = storeToRefs(useUiStore());
 
+// Each card shows its level's run, the one a tap resumes
 const levels = computed(() =>
     [...difficultyLevels.value, 'all'].map((id) => {
         const photos = questsStore.getLevelPhotos(id);
-        const found = questsStore.getCompletedCount(id);
+        const { found, total } = questsStore.runProgress(id);
         return {
             id,
             name: t('difficulty.' + id),
             // "All" would repeat the first level's photo: take the most recent one instead
             thumb: thumbUrl(id === 'all' ? photos.at(-1) : photos[0]),
             found,
-            total: photos.length,
-            percent: photos.length ? (found / photos.length) * 100 : 0,
-            done: photos.length > 0 && found === photos.length,
+            total,
+            percent: total ? (found / total) * 100 : 0,
+            done: total > 0 && found === total,
         };
     }),
 );
@@ -82,31 +83,32 @@ const subtitle = computed(() => {
     return t('home.progress', { found: questsStore.getCompletedCount('all'), total, time: formatDuration(progress.value.playTime) });
 });
 
+// The last level played, on the photo it will open: the next one still to search
 const resume = computed(() => {
     const last = progress.value.last;
-    const quest = last && questsStore.getLevelPhotos(last.level)[last.index];
+    if (!last) {
+        return null;
+    }
+    const index = questsStore.resumeIndex(last.level);
+    const quest = questsStore.getLevelPhotos(last.level)[index];
     if (!quest) {
         return null;
     }
     return {
-        ...last,
+        level: last.level,
         thumb: thumbUrl(quest),
-        label: t('quest.position', { level: t('difficulty.' + last.level), index: last.index + 1, count: questsStore.getTotalCount(last.level) }),
+        label: t('quest.position', { level: t('difficulty.' + last.level), index: index + 1, count: questsStore.getTotalCount(last.level) }),
     };
 });
 
-function startLevel(level) {
-    questsStore.startLevel(level);
-    router.push({ name: 'quest', params: { difficultyLevel: level, imageIndex: 1 } });
+// Resumes the level's run (its recap if it is complete, its first photo if never played)
+function openLevel(level) {
+    questsStore.openLevel(level);
+    router.push({ name: 'quest', params: { difficultyLevel: level, imageIndex: currentQuestIndex.value + 1 } });
 }
 
-// Keeps the current run when resuming the level being played
 function resumeGame() {
-    const { level, index } = resume.value;
-    if (level !== currentDifficultyLevel.value) {
-        questsStore.startLevel(level);
-    }
-    router.push({ name: 'quest', params: { difficultyLevel: level, imageIndex: index + 1 } });
+    openLevel(resume.value.level);
 }
 </script>
 
