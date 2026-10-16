@@ -1,7 +1,7 @@
 # 🔍 Où est alex ?
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
-[![Version](https://img.shields.io/badge/version-2.1.0-blue)]()
+[![Version](https://img.shields.io/badge/version-2.1.1-blue)]()
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 > Where the hell could he be ?
