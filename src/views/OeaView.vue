@@ -125,6 +125,7 @@ import { playOk, playKo, playNoob } from '@/composables/useSounds.js';
 
 const CLUE_SHRINK = 0.8;
 const CLUE_MIN_SIZE = 50;
+const CLUE_DURATION = 200; // ms on screen: a glimpse, with a quick fade in and out
 const CLUE_NUDGE_DELAY = 90; // seconds searching without a clue before the compass pulses
 const MISS_LIFETIME = 2500;
 
@@ -194,6 +195,7 @@ function resetQuestStats() {
     restartTimer();
     isFound.value = false;
     misses.value = [];
+    hideClue();
     clueFactor.value = 1;
 }
 
@@ -280,6 +282,7 @@ const wrapperStyle = computed(() => {
         '--clue-x': clueCenter.value.x * width - clueSize.value / 2 + 'px',
         '--clue-y': clueCenter.value.y * height - clueSize.value / 2 + 'px',
         '--zoom': scale.value,
+        '--clue-duration': CLUE_DURATION + 'ms',
     };
 });
 
@@ -293,17 +296,25 @@ function randomizeClueCenter() {
     clueCenter.value = { x: point.x / width, y: point.y / height };
 }
 
+let clueTimeout = null;
+
 function showClue() {
     playNoob();
     questStats.value.clueCount++;
     randomizeClueCenter();
     displayClue.value = true;
-    setTimeout(() => {
+    clueTimeout = setTimeout(() => {
         displayClue.value = false;
         if (clueSize.value > CLUE_MIN_SIZE) {
             clueFactor.value *= CLUE_SHRINK;
         }
-    }, 100);
+    }, CLUE_DURATION);
+}
+
+// Photo changed or Alex found while the circle is on screen
+function hideClue() {
+    clearTimeout(clueTimeout);
+    displayClue.value = false;
 }
 
 // --- Clicks on the photo ---
@@ -348,6 +359,7 @@ async function onAlexFound(polygon) {
     isFound.value = true;
     questStats.value.found = true;
     misses.value = [];
+    hideClue();
     playOk();
     confetti.start();
 
@@ -420,6 +432,7 @@ onMounted(() => {
 onUnmounted(() => {
     recordCurrentAttempt();
     clearInterval(timerInterval);
+    clearTimeout(clueTimeout);
     resizeObserver.disconnect();
     confetti.stop();
     document.removeEventListener('mouseup', onMouseUp);
@@ -506,9 +519,16 @@ onUnmounted(() => {
         pointer-events: none;
     }
 
+    // Fades in, stays long enough to be seen, fades out (duration set from CLUE_DURATION)
     &.oea-display-clue::after,
     &.oea-display-clue::before {
         display: block;
+        animation: clueShow var(--clue-duration, 200ms) ease-out forwards;
+
+        // Without motion: shown as is for the same time, no fade
+        @media (prefers-reduced-motion: reduce) {
+            animation: none;
+        }
     }
 
     &::after {
@@ -559,6 +579,23 @@ onUnmounted(() => {
 
     &::after {
         transform: rotate(-45deg);
+    }
+}
+
+@keyframes clueShow {
+    0% {
+        opacity: 0;
+        transform: scale(1.08);
+    }
+    10% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    72% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
     }
 }
 
