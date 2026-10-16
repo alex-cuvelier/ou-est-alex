@@ -3,9 +3,20 @@
         <header class="oea-recap-head">
             <p class="oea-recap-kicker oea-mono">{{ $t('end.done', { level: levelName }) }}</p>
             <h1>{{ $t('end.found', { found: runSummary.found, count: runSummary.count }) }}</h1>
-            <p class="oea-recap-sub oea-mono">
-                {{ formatClock(runSummary.time) }} · {{ $t('quest.clues', runSummary.clueCount) }} · {{ $t('quest.nos', runSummary.noCount) }}
-            </p>
+            <dl class="oea-recap-stats">
+                <div>
+                    <dt>{{ $t('end.statTime') }}</dt>
+                    <dd>{{ formatClock(runSummary.time) }}</dd>
+                </div>
+                <div>
+                    <dt>{{ $t('end.statClues') }}</dt>
+                    <dd>{{ runSummary.clueCount }}</dd>
+                </div>
+                <div>
+                    <dt>{{ $t('end.statNos') }}</dt>
+                    <dd>{{ runSummary.noCount }}</dd>
+                </div>
+            </dl>
         </header>
 
         <ol class="oea-mosaic">
@@ -35,10 +46,11 @@
             <button type="button" class="oea-button" @click="copyShareText">{{ copied ? $t('end.copied') : $t('end.copy') }}</button>
         </div>
 
+        <!-- Back on the left, forward on the right: the main action comes last (full width at the bottom on phones) -->
         <div class="oea-recap-actions">
-            <button v-if="hasNextLevel" type="button" class="oea-button" @click="goToNextDifficultyLevel">{{ $t('end.next') }}</button>
-            <button type="button" class="oea-button oea-button--ghost" @click="questsStore.resetQuests">{{ $t('end.restart') }}</button>
             <RouterLink class="oea-button oea-button--ghost" :to="{ name: 'levelChooser' }">{{ $t('end.home') }}</RouterLink>
+            <button type="button" class="oea-button oea-button--ghost" @click="questsStore.resetQuests">{{ $t('end.restart') }}</button>
+            <button v-if="hasNextLevel" type="button" class="oea-button" @click="goToNextDifficultyLevel">{{ $t('end.next') }}</button>
         </div>
     </section>
 </template>
@@ -148,15 +160,46 @@ onUnmounted(() => {
     }
 }
 
+// Time, clues and misses: the numbers the player looks for first
+.oea-recap-stats {
+    margin: 0.625rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-radius: 16px;
+    background: var(--surface-1);
+    box-shadow: inset 0 0 0 1px var(--hair);
+
+    div {
+        display: grid;
+        gap: 0.25rem;
+        padding: 0.875rem 1rem;
+    }
+
+    div + div {
+        border-left: 1px solid var(--hair);
+    }
+
+    dt {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--mid);
+    }
+
+    dd {
+        margin: 0;
+        font-size: clamp(1.5rem, 5vw, 2rem);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+    }
+}
+
 .oea-recap-kicker {
     font-size: 0.6875rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--mid);
-}
-
-.oea-recap-sub {
-    font-size: 0.8125rem;
     color: var(--mid);
 }
 

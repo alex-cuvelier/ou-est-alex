@@ -17,7 +17,8 @@
         "fresh": "{total} photos, one Alex",
         "resume": "Resume",
         "levels": "Levels",
-        "howTo": "How to play?"
+        "howTo": "How to play?",
+        "howToShort": "How to play"
     },
     "quest": {
         "photoAlt": "Photo where Alex is hiding",
@@ -45,6 +46,9 @@
     "end": {
         "done": "{level} · done",
         "found": "{found} / {count} found",
+        "statTime": "Time",
+        "statClues": "Clues",
+        "statNos": "Misses",
         "missed": "missed",
         "unseen": "not seen",
         "replay": "Replay photo {index} ({status})",

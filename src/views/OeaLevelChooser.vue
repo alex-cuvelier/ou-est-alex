@@ -3,6 +3,11 @@
         <div class="oea-home-inner">
             <header class="oea-home-head">
                 <h1>{{ $t('home.title') }}</h1>
+                <!-- Same "?" as in the game, on the title line where it is seen on arrival -->
+                <button type="button" class="oea-home-help" @click="instructionsVisible = true">
+                    <span class="oea-home-help-icon" aria-hidden="true">?</span>
+                    <span class="oea-home-help-label">{{ $t('home.howToShort') }}</span>
+                </button>
                 <p class="oea-mono">{{ subtitle }}</p>
             </header>
 
@@ -33,8 +38,6 @@
                     </li>
                 </ul>
             </section>
-
-            <button type="button" class="oea-home-help" @click="instructionsVisible = true">{{ $t('home.howTo') }}</button>
         </div>
     </div>
 </template>
@@ -129,16 +132,24 @@ function resumeGame() {
     }
 }
 
+// Title and help on the same line, the subtitle under both
 .oea-home-head {
     display: grid;
-    gap: 0.375rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+        'title help'
+        'sub sub';
+    align-items: center;
+    gap: 0.375rem 0.75rem;
 
     h1 {
+        grid-area: title;
         font-size: clamp(2rem, 7vw, 3.5rem);
         letter-spacing: -0.04em;
     }
 
     p {
+        grid-area: sub;
         font-size: 0.8125rem;
         color: var(--mid);
     }
@@ -342,18 +353,54 @@ function resumeGame() {
 }
 
 .oea-home-help {
-    align-self: flex-start;
-    padding: 0;
+    grid-area: help;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3125rem 0.875rem 0.3125rem 0.3125rem;
     border: 0;
-    background: none;
-    color: var(--mid);
-    font-size: 0.875rem;
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-1);
+    box-shadow: inset 0 0 0 1px var(--hair);
+    color: var(--ink);
+    font-size: 0.8125rem;
+    font-weight: 600;
     cursor: pointer;
+    transition:
+        box-shadow 150ms ease,
+        transform 150ms var(--ease-out);
 
     &:hover {
-        color: var(--ink);
+        box-shadow: inset 0 0 0 1.5px var(--mid);
     }
+
+    &:active {
+        transform: scale(0.97);
+    }
+
+    // Very narrow phones: the "?" alone, the label stays for screen readers
+    @media (max-width: 379px) {
+        padding: 0.3125rem;
+
+        .oea-home-help-label {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip-path: inset(50%);
+            white-space: nowrap;
+        }
+    }
+}
+
+.oea-home-help-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--on-ink);
+    font-weight: 700;
 }
 </style>

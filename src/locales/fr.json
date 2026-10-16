@@ -17,7 +17,8 @@
         "fresh": "{total} photos, un seul Alex",
         "resume": "Reprendre",
         "levels": "Niveaux",
-        "howTo": "Comment jouer ?"
+        "howTo": "Comment jouer ?",
+        "howToShort": "Comment jouer"
     },
     "quest": {
         "photoAlt": "Photo où Alex se cache",
@@ -45,6 +46,9 @@
     "end": {
         "done": "{level} · terminé",
         "found": "{found} / {count} trouvées",
+        "statTime": "Temps",
+        "statClues": "Indices",
+        "statNos": "Non",
         "missed": "raté",
         "unseen": "pas vue",
         "replay": "Rejouer la photo {index} ({status})",
