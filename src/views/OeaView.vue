@@ -61,25 +61,31 @@
                 >
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
                 </button>
+                <!-- The two tools share one look (icon + label), framed by the round arrows -->
                 <button
                     v-tooltip.top="tooltip($t('header.ask-clue'))"
                     type="button"
-                    class="oea-compass"
+                    class="oea-dock-tool"
                     :class="{ 'is-nudging': suggestClue }"
                     :disabled="displayClue"
                     :aria-label="$t('quest.askClue', { clues: $t('quest.clues', questStats.clueCount) })"
                     @click="showClue"
                 >
-                    <img src="@/assets/icons/compass-solid.svg" alt="" />
-                    <span v-if="questStats.clueCount" class="oea-compass-count oea-mono" aria-hidden="true">{{ questStats.clueCount }}</span>
+                    <span class="oea-dock-icon">
+                        <img src="@/assets/icons/compass-solid.svg" alt="" />
+                        <span v-if="questStats.clueCount" class="oea-compass-count oea-mono" aria-hidden="true">{{ questStats.clueCount }}</span>
+                    </span>
+                    {{ $t('quest.clue') }}
                 </button>
-                <button v-tooltip.top="tooltip($t('grid.title'))" type="button" class="oea-dock-grid" @click="gridVisible = true">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <rect x="4" y="4" width="6.5" height="6.5" rx="1.5" />
-                        <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5" />
-                        <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5" />
-                        <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5" />
-                    </svg>
+                <button v-tooltip.top="tooltip($t('grid.title'))" type="button" class="oea-dock-tool" @click="gridVisible = true">
+                    <span class="oea-dock-icon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="4" y="4" width="6.5" height="6.5" rx="1.5" />
+                            <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5" />
+                            <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5" />
+                            <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5" />
+                        </svg>
+                    </span>
                     {{ $t('quest.photos') }}
                 </button>
                 <button
@@ -647,11 +653,10 @@ onUnmounted(() => {
     width: min(calc(100% - 1.5rem), 20rem);
     height: 3.75rem;
     padding: 0 0.625rem;
-    display: grid;
-    grid-template-columns: 2.5rem 1fr 1fr 2.5rem;
+    // Equal gaps between the four buttons
+    display: flex;
     align-items: center;
-    justify-items: center;
-    gap: 0.25rem;
+    justify-content: space-between;
     border-radius: 1.5rem;
     background: var(--glass);
     color: var(--on-glass);
@@ -706,33 +711,33 @@ onUnmounted(() => {
     }
 }
 
-// Clue: available but not inviting (it costs, and the "noob" sound says so). Red stays for Alex.
-.oea-compass {
-    position: relative;
-    width: 2.75rem;
+// Clue and photo grid: same box, icon over label. The clue stays discreet on purpose
+// (it costs, and the "noob" sound says so); red is kept for Alex.
+.oea-dock-tool {
+    width: 4.5rem;
     height: 2.75rem;
-    display: grid;
-    place-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 0;
     border: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.12);
+    border-radius: 0.75rem;
+    background: none;
+    font-size: 0.6875rem;
+    line-height: 1;
     cursor: pointer;
     transition:
         background-color 150ms ease,
         transform 150ms var(--ease-out);
 
-    img {
-        width: 1.4rem;
-        height: 1.4rem;
-        filter: brightness(0) invert(1);
-    }
-
     &:not(:disabled):hover {
-        background: rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.12);
     }
 
     &:not(:disabled):active {
-        transform: scale(0.92);
+        transform: scale(0.94);
     }
 
     &:disabled {
@@ -745,15 +750,33 @@ onUnmounted(() => {
 
         // Without motion, the halo stays on instead of pulsing
         @media (prefers-reduced-motion: reduce) {
-            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.22);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.22);
         }
+    }
+}
+
+.oea-dock-icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 1.25rem;
+    height: 1.25rem;
+
+    img,
+    svg {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+
+    img {
+        filter: brightness(0) invert(1);
     }
 }
 
 .oea-compass-count {
     position: absolute;
-    top: -0.2rem;
-    right: -0.3rem;
+    top: -0.45rem;
+    right: -0.75rem;
     min-width: 1.1rem;
     height: 1.1rem;
     padding: 0 0.25rem;
@@ -773,26 +796,7 @@ onUnmounted(() => {
         box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
     }
     50% {
-        box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.22);
-    }
-}
-
-.oea-dock-grid {
-    justify-self: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    padding: 0.25rem 0.5rem;
-    border: 0;
-    border-radius: 0.75rem;
-    background: none;
-    font-size: 0.6875rem;
-    cursor: pointer;
-    transition: background-color 150ms ease;
-
-    &:hover {
-        background: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.2);
     }
 }
 </style>

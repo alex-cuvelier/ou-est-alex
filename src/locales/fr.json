@@ -26,6 +26,7 @@
         "previous": "Photo précédente",
         "next": "Photo suivante",
         "finish": "Voir le récap du niveau",
+        "clue": "Indice",
         "photos": "Photos",
         "askClue": "Demander un indice ({clues} jusqu'ici)",
         "timer": "Temps écoulé",

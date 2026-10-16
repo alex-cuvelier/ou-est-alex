@@ -85,7 +85,8 @@ const Noir = definePreset(Aura, {
     },
     // Tooltip is a directive: its tokens live under `directives`, not `components`
     directives: {
-        // Same dark glass as the in-game pills and dock, in both color schemes
+        // Inverted against the page: ink on light paper, light ink on dark paper.
+        // --ink / --on-ink already switch with prefers-color-scheme (theme.scss).
         tooltip: {
             root: {
                 maxWidth: '16rem',
@@ -97,14 +98,14 @@ const Noir = definePreset(Aura, {
             colorScheme: {
                 light: {
                     root: {
-                        background: 'rgba(16, 16, 20, 0.92)',
-                        color: '#ffffff',
+                        background: 'var(--ink)',
+                        color: 'var(--on-ink)',
                     },
                 },
                 dark: {
                     root: {
-                        background: 'rgba(16, 16, 20, 0.92)',
-                        color: '#ffffff',
+                        background: 'var(--ink)',
+                        color: 'var(--on-ink)',
                     },
                 },
             },

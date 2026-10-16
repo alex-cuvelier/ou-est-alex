@@ -26,6 +26,7 @@
         "previous": "Previous photo",
         "next": "Next photo",
         "finish": "See the level recap",
+        "clue": "Clue",
         "photos": "Photos",
         "askClue": "Ask for a clue ({clues} so far)",
         "timer": "Elapsed time",
