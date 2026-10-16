@@ -3,6 +3,7 @@
         <ol class="oea-grid">
             <li v-for="tile in tiles" :key="tile.quest.id">
                 <button
+                    v-tooltip.top="tooltip($t('grid.tile', { index: tile.index + 1, status: $t('grid.' + tile.status) }))"
                     type="button"
                     class="oea-grid-tile"
                     :class="['is-' + tile.status, { 'is-current': tile.index === currentQuestIndex }]"
@@ -26,6 +27,7 @@ import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useQuestsStore } from '@/stores/questsStore.js';
 import { thumbUrl } from '@/utils/utils.js';
+import { tooltip } from '@/utils/tooltip.js';
 
 const props = defineProps({
     visible: {

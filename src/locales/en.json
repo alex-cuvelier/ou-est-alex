@@ -25,9 +25,11 @@
         "controls": "Game controls",
         "previous": "Previous photo",
         "next": "Next photo",
+        "finish": "See the level recap",
         "photos": "Photos",
         "askClue": "Ask for a clue ({clues} so far)",
         "timer": "Elapsed time",
+        "timerHint": "Time spent on this photo",
         "position": "{level} · {index}/{count}",
         "clues": "0 clues | 1 clue | {n} clues",
         "nos": "0 misses | 1 miss | {n} misses"

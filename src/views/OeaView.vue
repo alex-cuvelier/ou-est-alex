@@ -29,20 +29,30 @@
             </main>
 
             <div class="oea-top">
-                <RouterLink class="oea-pill" :to="{ name: 'levelChooser' }" :title="$t('quest.back')">
-                    <svg class="oea-pill-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
-                    {{ $t('quest.position', { level: $t('difficulty.' + currentDifficultyLevel), index: currentQuestIndex + 1, count: photoCount }) }}
-                </RouterLink>
-                <div class="oea-top-right">
-                    <span class="oea-pill oea-mono" role="timer" :aria-label="$t('quest.timer')">{{ formatClock(timer) }}</span>
-                    <button type="button" class="oea-pill oea-pill--round" :aria-label="$t('header.showInstructions')" @click="instructionsVisible = true">
+                <div class="oea-top-group">
+                    <RouterLink v-tooltip.bottom="tooltip($t('quest.back'))" class="oea-pill" :to="{ name: 'levelChooser' }">
+                        <svg class="oea-pill-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+                        {{ $t('quest.position', { level: $t('difficulty.' + currentDifficultyLevel), index: currentQuestIndex + 1, count: photoCount }) }}
+                    </RouterLink>
+                    <button
+                        v-tooltip.bottom="tooltip($t('home.howTo'))"
+                        type="button"
+                        class="oea-pill oea-pill--round"
+                        :aria-label="$t('header.showInstructions')"
+                        @click="instructionsVisible = true"
+                    >
                         ?
                     </button>
                 </div>
+                <!-- Right edge of the screen: tooltip on the left, a centered one would be squeezed against the edge -->
+                <span v-tooltip.left="tooltip($t('quest.timerHint'))" class="oea-pill oea-mono" role="timer" :aria-label="$t('quest.timer')">
+                    {{ formatClock(timer) }}
+                </span>
             </div>
 
             <nav class="oea-dock" :aria-label="$t('quest.controls')">
                 <button
+                    v-tooltip.top="tooltip($t('quest.previous') + ' (←)')"
                     type="button"
                     class="oea-dock-btn"
                     :disabled="currentQuestIndex === 0"
@@ -52,18 +62,18 @@
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
                 </button>
                 <button
+                    v-tooltip.top="tooltip($t('header.ask-clue'))"
                     type="button"
                     class="oea-compass"
                     :class="{ 'is-nudging': suggestClue }"
                     :disabled="displayClue"
-                    :title="$t('header.ask-clue')"
                     :aria-label="$t('quest.askClue', { clues: $t('quest.clues', questStats.clueCount) })"
                     @click="showClue"
                 >
                     <img src="@/assets/icons/compass-solid.svg" alt="" />
                     <span v-if="questStats.clueCount" class="oea-compass-count oea-mono" aria-hidden="true">{{ questStats.clueCount }}</span>
                 </button>
-                <button type="button" class="oea-dock-grid" @click="gridVisible = true">
+                <button v-tooltip.top="tooltip($t('grid.title'))" type="button" class="oea-dock-grid" @click="gridVisible = true">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                         <rect x="4" y="4" width="6.5" height="6.5" rx="1.5" />
                         <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5" />
@@ -72,7 +82,13 @@
                     </svg>
                     {{ $t('quest.photos') }}
                 </button>
-                <button type="button" class="oea-dock-btn" :aria-label="$t('quest.next')" @click="questsStore.goToNextQuest">
+                <button
+                    v-tooltip.top="tooltip(nextLabel + ' (→)')"
+                    type="button"
+                    class="oea-dock-btn"
+                    :aria-label="nextLabel"
+                    @click="questsStore.goToNextQuest"
+                >
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
                 </button>
             </nav>
@@ -90,10 +106,12 @@ import OeaQuestGrid from '@/components/OeaQuestGrid.vue';
 import { ref, watch, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
+import { useI18n } from 'vue-i18n';
 
 import { useQuestsStore } from '@/stores/questsStore.js';
 import { useUiStore } from '@/stores/uiStore.js';
 import { pointInPolygon, toPolygon, getPolygonCenter, getRandomPointInCircle, alexPosition, formatClock, thumbUrl } from '@/utils/utils.js';
+import { tooltip } from '@/utils/tooltip.js';
 import confetti from '@/composables/useConfetti';
 import useImageZoom from '@/composables/useImageZoom.js';
 
@@ -112,6 +130,10 @@ const { currentDifficultyLevel, currentQuest, nextQuest, currentQuestIndex, phot
 const { instructionsVisible } = storeToRefs(useUiStore());
 
 const isQuest = computed(() => currentQuest.value?.type === 'quest');
+
+const { t } = useI18n();
+// On the last photo, "next" leads to the end-of-level recap
+const nextLabel = computed(() => (currentQuestIndex.value === photoCount.value - 1 ? t('quest.finish') : t('quest.next')));
 
 // --- Route → store (direct link, refresh, browser back) ---
 
@@ -591,7 +613,7 @@ onUnmounted(() => {
     }
 }
 
-.oea-top-right {
+.oea-top-group {
     display: flex;
     gap: 0.4rem;
 }

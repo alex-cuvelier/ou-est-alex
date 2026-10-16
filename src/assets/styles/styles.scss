@@ -16,6 +16,14 @@
     }
 }
 
+// PrimeVue tooltips (v-tooltip): colors come from the preset, size from here
+.p-tooltip .p-tooltip-text {
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.35;
+    text-align: center;
+}
+
 // Shared pill button style (glass on photos)
 .oea-pill {
     display: inline-flex;

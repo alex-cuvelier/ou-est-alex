@@ -11,6 +11,7 @@
         <ol class="oea-mosaic">
             <li v-for="tile in tiles" :key="tile.quest.id">
                 <button
+                    v-tooltip.top="tooltip(tile.ariaLabel)"
                     type="button"
                     class="oea-mosaic-tile"
                     :class="'is-' + tile.status"
@@ -48,6 +49,7 @@ import { storeToRefs } from 'pinia';
 import { useI18n } from 'vue-i18n';
 import { useQuestsStore } from '@/stores/questsStore.js';
 import { alexPosition, formatClock, thumbUrl } from '@/utils/utils.js';
+import { tooltip } from '@/utils/tooltip.js';
 import confetti from '@/composables/useConfetti';
 
 const { t } = useI18n();
