@@ -31,7 +31,7 @@
 
 ### Prerequisites
 
--   [Node.js](https://nodejs.org/) v16 or higher
+-   [Node.js](https://nodejs.org/) v20.19 or higher (the deployment builds with Node 24)
 -   npm or yarn
 
 ### Local Installation
@@ -66,6 +66,7 @@ npm run dev
 | `npm run test:coverage` | Generates code coverage report            |
 | `npm run lint`          | Checks and fixes ESLint errors            |
 | `npm run format`        | Formats code with Prettier                |
+| `npm run release`       | Publishes and deploys a version           |
 
 ---
 
@@ -217,16 +218,32 @@ npm run test:coverage
 
 ## 🌐 Deployment
 
-The project is configured with GitHub Actions for automatic deployment.
+Only released versions go online: `vX.Y.Z` tags on `main`. Work happens on `dev`; `main` only moves with `npm run release`.
+
+### Publishing a Version
+
+From `dev`, with everything committed:
+
+```bash
+npm run release -- minor            # patch, minor, major, or a number like 2.3.0
+npm run release -- minor --dry-run  # checks and tests only
+```
+
+The script checks the repository, lists the commits since the previous version and runs the tests. It then commits `chore: release x.y.z`, tags it `vx.y.z` (the commits as notes), moves `main` up to `dev` and pushes `dev`, `main` and the tag together.
 
 ### CI/CD Workflow
 
--   **Trigger:** Push to `main` or manual trigger
--   **Steps:**
-    1. Code checkout
-    2. Install dependencies
-    3. Production build
-    4. Deploy via SSH/rsync
+The tag starts the **Deploy** workflow ([deploy.yml](.github/workflows/deploy.yml)):
+
+1. Checks the tag is on `main`
+2. Installs dependencies (`npm ci`, Node 24) and runs the tests
+3. Production build
+4. Uploads `dist/` with rsync over SSH: unchanged files are left alone, the new ones are swapped in at the end
+5. Checks the site serves the `index.html` just built
+
+**Rolling back:** Actions → Deploy → *Run workflow* from `main`, with the version to put back online (e.g. `v2.1.0`).
+
+Repository settings it uses: secret `SSH_PRIVATE_KEY`, variables `SSH_HOST`, `SSH_USER`, `SSH_KNOWN_HOSTS` (the server's host key line), `DEPLOY_REPOSITORY` and `WEBSITE_URL`.
 
 ### Manual Build
 
