@@ -1,7 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import OeaView from '@/views/OeaView.vue';
 import OeaLevelChooser from '@/views/OeaLevelChooser.vue';
-import OeaAddImageView from '@/views/OeaAddImageView.vue';
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -19,7 +18,8 @@ const router = createRouter({
         {
             path: '/alex',
             name: 'addImage',
-            component: OeaAddImageView,
+            // Editor only: loaded on demand to keep it (and its HEIC converter) out of the game bundle
+            component: () => import('@/views/OeaAddImageView.vue'),
         },
     ],
 });

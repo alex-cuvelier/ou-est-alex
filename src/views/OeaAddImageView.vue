@@ -97,7 +97,6 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
-import { heicTo, isHeic } from 'heic-to';
 import InputText from 'primevue/inputtext';
 import { useToast } from 'primevue/usetoast';
 
@@ -176,7 +175,17 @@ const processFile = async (file) => {
     console.log('[processFile] Start - file:', file.name, 'type:', file.type, 'size:', file.size);
     loading.value = true;
 
-    const fileIsHeic = file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic') || await isHeic(file);
+    // heic-to weighs ~2.5 MB: only fetched once a file is actually being processed
+    let heicTo, isHeic;
+    try {
+        ({ heicTo, isHeic } = await import('heic-to'));
+    } catch (error) {
+        console.error('[processFile] heic-to loading error:', error);
+        toast.add({ severity: 'error', summary: 'Image converter unavailable', detail: 'Check the connection and drop the image again', life: 5000 });
+        loading.value = false;
+        return;
+    }
+    const fileIsHeic = file.type === 'image/heic' || file.name.toLowerCase().endsWith('.heic') || (await isHeic(file));
     if (fileIsHeic) {
         console.log('[processFile] HEIC detected, converting...');
         try {

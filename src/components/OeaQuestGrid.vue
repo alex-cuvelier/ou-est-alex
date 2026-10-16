@@ -1,18 +1,18 @@
 <template>
     <Drawer v-model:visible="isVisible" position="bottom" :header="$t('grid.title')" class="oea-grid-drawer" style="height: auto">
         <ol class="oea-grid">
-            <li v-for="(quest, index) in levelPhotos" :key="quest.id">
+            <li v-for="tile in tiles" :key="tile.quest.id">
                 <button
                     type="button"
                     class="oea-grid-tile"
-                    :class="['is-' + questsStore.questStatus(quest.id), { 'is-current': index === currentQuestIndex }]"
-                    :aria-current="index === currentQuestIndex ? 'true' : undefined"
-                    :aria-label="$t('grid.tile', { index: index + 1, status: $t('grid.' + questsStore.questStatus(quest.id)) })"
-                    @click="goToQuest(index)"
+                    :class="['is-' + tile.status, { 'is-current': tile.index === currentQuestIndex }]"
+                    :aria-current="tile.index === currentQuestIndex ? 'true' : undefined"
+                    :aria-label="$t('grid.tile', { index: tile.index + 1, status: $t('grid.' + tile.status) })"
+                    @click="goToQuest(tile.index)"
                 >
-                    <img :src="thumbUrl(quest)" alt="" loading="lazy" />
-                    <span class="oea-grid-num oea-mono">{{ index + 1 }}</span>
-                    <span v-if="questsStore.questStatus(quest.id) === 'found'" class="oea-grid-badge" aria-hidden="true">
+                    <img :src="thumbUrl(tile.quest)" alt="" loading="lazy" />
+                    <span class="oea-grid-num oea-mono">{{ tile.index + 1 }}</span>
+                    <span v-if="tile.status === 'found'" class="oea-grid-badge" aria-hidden="true">
                         <svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
                     </span>
                 </button>
@@ -43,6 +43,14 @@ const isVisible = computed({
     get: () => props.visible,
     set: (value) => emit('update:visible', value),
 });
+
+// A photo found in an earlier visit stays marked found; "missed" only concerns the current run
+const tiles = computed(() =>
+    levelPhotos.value.map((quest, index) => {
+        const runStatus = questsStore.questStatus(quest.id);
+        return { quest, index, status: questsStore.isEverFound(quest.id) ? 'found' : runStatus };
+    }),
+);
 
 function goToQuest(index) {
     isVisible.value = false;
@@ -77,7 +85,8 @@ function goToQuest(index) {
 .oea-grid {
     max-width: 60rem;
     margin: 0 auto;
-    padding: 0;
+    // Room for the current tile outline: the drawer content scrolls and would clip it
+    padding: 0.375rem 0 0;
     list-style: none;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(5.25rem, 1fr));
