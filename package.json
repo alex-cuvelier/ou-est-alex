@@ -1,11 +1,13 @@
 {
     "name": "ou-est-alex",
-    "version": "1.0.0-SNAPSHOT",
+    "version": "2.0.0",
     "private": true,
     "license": "MIT",
     "scripts": {
         "dev": "vite",
         "dev-host": "vite --host",
+        "thumbs": "node scripts/generate-thumbs.mjs",
+        "prebuild": "npm run thumbs",
         "build": "vite build",
         "preview": "vite preview",
         "test": "vitest",
@@ -15,6 +17,8 @@
         "format": "prettier --write src/"
     },
     "dependencies": {
+        "@fontsource-variable/geist": "^5.3.0",
+        "@fontsource-variable/geist-mono": "^5.3.0",
         "@primevue/themes": "^4.0.4",
         "heic-to": "^1.4.2",
         "pinia": "^2.1.4",
@@ -37,6 +41,7 @@
         "happy-dom": "^20.6.1",
         "prettier": "^3.0.0",
         "sass": "^1.64.2",
+        "sharp": "^0.34.5",
         "vite": "^7.3.1",
         "vitest": "^4.0.18"
     }

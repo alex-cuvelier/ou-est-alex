@@ -1,3 +1,5 @@
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
 import '@/assets/styles/styles.scss';
 
 import { createApp } from 'vue';

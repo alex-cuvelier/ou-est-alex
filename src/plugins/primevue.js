@@ -17,6 +17,7 @@ import Step from 'primevue/step';
 import StepPanel from 'primevue/steppanel';
 import InputText from 'primevue/inputtext';
 import Toast from 'primevue/toast';
+import Tooltip from 'primevue/tooltip';
 
 import ToastService from 'primevue/toastservice';
 
@@ -82,6 +83,34 @@ const Noir = definePreset(Aura, {
             },
         },
     },
+    // Tooltip is a directive: its tokens live under `directives`, not `components`
+    directives: {
+        // Inverted against the page: ink on light paper, light ink on dark paper.
+        // --ink / --on-ink already switch with prefers-color-scheme (theme.scss).
+        tooltip: {
+            root: {
+                maxWidth: '16rem',
+                gutter: '0.375rem',
+                padding: '0.375rem 0.625rem',
+                borderRadius: '8px',
+                shadow: '0 8px 24px -8px rgba(0, 0, 0, 0.5)',
+            },
+            colorScheme: {
+                light: {
+                    root: {
+                        background: 'var(--ink)',
+                        color: 'var(--on-ink)',
+                    },
+                },
+                dark: {
+                    root: {
+                        background: 'var(--ink)',
+                        color: 'var(--on-ink)',
+                    },
+                },
+            },
+        },
+    },
 });
 
 export default {
@@ -102,6 +131,7 @@ export default {
         app.component('Toast', Toast);
         /* eslint-enable vue/multi-word-component-names, vue/no-reserved-component-names */
 
+        app.directive('tooltip', Tooltip);
         app.use(ToastService);
 
         app.use(PrimeVue, {

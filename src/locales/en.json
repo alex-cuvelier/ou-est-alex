@@ -1,23 +1,7 @@
 {
     "header": {
         "ask-clue": "Ask for a clue",
-        "chooseQuest": "Choose a level",
         "showInstructions": "Help"
-    },
-    "footer": {
-        "difficultyLevel": "Difficulty",
-        "timer": "Timer",
-        "clue": "Clue",
-        "no": "No"
-    },
-    "end": {
-        "found": "Found",
-        "errors": "Errors",
-        "clues": "Clues",
-        "time": "Time",
-        "restart": "Restart",
-        "chooseLevel": "Choose difficulty",
-        "continue": "Continue"
     },
     "difficulty": {
         "0": "Easy",
@@ -27,8 +11,49 @@
         "4": "Impossible",
         "all": "All !"
     },
-    "level-chooser": {
-        "title": "Choose a difficulty level"
+    "home": {
+        "title": "Where is Alex?",
+        "progress": "{found} / {total} found · {time} played",
+        "fresh": "{total} photos, one Alex",
+        "resume": "Resume",
+        "levels": "Levels",
+        "howTo": "How to play?"
+    },
+    "quest": {
+        "photoAlt": "Photo where Alex is hiding",
+        "back": "Back to home",
+        "controls": "Game controls",
+        "previous": "Previous photo",
+        "next": "Next photo",
+        "finish": "See the level recap",
+        "clue": "Clue",
+        "photos": "Photos",
+        "askClue": "Ask for a clue ({clues} so far)",
+        "timer": "Elapsed time",
+        "timerHint": "Time spent on this photo",
+        "position": "{level} · {index}/{count}",
+        "clues": "0 clues | 1 clue | {n} clues",
+        "nos": "0 misses | 1 miss | {n} misses"
+    },
+    "grid": {
+        "title": "Pick a photo",
+        "tile": "Photo {index}, {status}",
+        "found": "found",
+        "missed": "missed",
+        "todo": "to search"
+    },
+    "end": {
+        "done": "{level} · done",
+        "found": "{found} / {count} found",
+        "missed": "missed",
+        "unseen": "not seen",
+        "replay": "Replay photo {index} ({status})",
+        "shareTitle": "Where is Alex? · {level}",
+        "copy": "Copy",
+        "copied": "Copied",
+        "next": "Next level",
+        "restart": "Play again",
+        "home": "Home"
     },
     "instructions": {
         "title": "How to Play?",

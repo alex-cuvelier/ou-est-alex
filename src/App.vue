@@ -1,27 +1,32 @@
 <template>
-    <OeaHeader @showInstructions="showInstructions = true" />
+    <OeaHeader v-if="route.name === 'addImage'" />
     <RouterView v-slot="{ Component }">
         <Transition name="page" mode="out-in">
             <component :is="Component" />
         </Transition>
     </RouterView>
     <Toast />
-    <OeaInstructionsDialog v-model:visible="showInstructions" @update:visible="onInstructionsClose" />
+    <OeaInstructionsDialog v-model:visible="instructionsVisible" @update:visible="onInstructionsClose" />
 </template>
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { watch, onMounted, onUnmounted } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useRoute } from 'vue-router';
 import OeaHeader from '@/components/OeaHeader.vue';
 import OeaInstructionsDialog from '@/components/OeaInstructionsDialog.vue';
 
 import { useQuestsStore } from '@/stores/questsStore.js';
-import { useRoute } from 'vue-router';
+import { useUiStore } from '@/stores/uiStore.js';
 
 const questsStore = useQuestsStore();
+const { instructionsVisible } = storeToRefs(useUiStore());
 const route = useRoute();
 
-const showInstructions = ref(false);
-
 function handleKeyboardNavigation(e) {
+    if (route.name !== 'quest' || instructionsVisible.value) {
+        return;
+    }
+
     if (e.key === 'ArrowRight') {
         questsStore.goToNextQuest();
     } else if (e.key === 'ArrowLeft') {
@@ -32,7 +37,19 @@ function handleKeyboardNavigation(e) {
 function onInstructionsClose(visible) {
     // When dialog closes, save to localStorage
     if (!visible) {
-        localStorage.setItem('instructionsShown', 'true');
+        try {
+            localStorage.setItem('instructionsShown', 'true');
+        } catch {
+            // Private browsing: the instructions will show again next visit
+        }
+    }
+}
+
+function instructionsAlreadyShown() {
+    try {
+        return Boolean(localStorage.getItem('instructionsShown'));
+    } catch {
+        return false;
     }
 }
 
@@ -40,9 +57,9 @@ function onInstructionsClose(visible) {
 watch(
     () => route.name,
     (name) => {
-        if (name === 'quest' && !localStorage.getItem('instructionsShown')) {
+        if (name === 'quest' && !instructionsAlreadyShown()) {
             setTimeout(() => {
-                showInstructions.value = true;
+                instructionsVisible.value = true;
             }, 300);
         }
     },
@@ -59,19 +76,14 @@ onUnmounted(() => {
 </script>
 
 <style>
-/* Transitions de page fluides */
+/* Transitions de page : fondu court */
 .page-enter-active,
 .page-leave-active {
-    transition: all var(--transition-base);
+    transition: opacity 180ms ease;
 }
 
-.page-enter-from {
-    opacity: 0;
-    transform: translateX(10px);
-}
-
+.page-enter-from,
 .page-leave-to {
     opacity: 0;
-    transform: translateX(-10px);
 }
 </style>

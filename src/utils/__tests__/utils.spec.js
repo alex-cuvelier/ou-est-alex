@@ -6,6 +6,10 @@ import {
     getRandomPointInCircle,
     formatMillisecondsToTime,
     formmatSecondsToTime,
+    formatClock,
+    formatDuration,
+    thumbUrl,
+    alexPosition,
 } from '../utils.js';
 
 describe('pointInPolygon', () => {
@@ -268,5 +272,55 @@ describe('formmatSecondsToTime', () => {
         expect(formmatSecondsToTime('abc')).toBe('Invalid input');
         expect(formmatSecondsToTime(NaN)).toBe('Invalid input');
         expect(formmatSecondsToTime(null)).toBe('Invalid input');
+    });
+});
+
+describe('formatClock', () => {
+    it('should format seconds as m:ss under one hour', () => {
+        expect(formatClock(0)).toBe('0:00');
+        expect(formatClock(42)).toBe('0:42');
+        expect(formatClock(724)).toBe('12:04');
+    });
+
+    it('should add hours when needed', () => {
+        expect(formatClock(3725)).toBe('1:02:05');
+    });
+
+    it('should treat invalid input as zero', () => {
+        expect(formatClock(undefined)).toBe('0:00');
+        expect(formatClock(-5)).toBe('0:00');
+    });
+});
+
+describe('formatDuration', () => {
+    it('should use seconds, minutes, then hours', () => {
+        expect(formatDuration(45)).toBe('45 s');
+        expect(formatDuration(720)).toBe('12 min');
+        expect(formatDuration(11520)).toBe('3 h 12');
+        expect(formatDuration(3660)).toBe('1 h 01');
+    });
+});
+
+describe('thumbUrl', () => {
+    it('should point to the webp thumbnail', () => {
+        expect(thumbUrl({ url: '/images/12.JPEG' })).toBe('/images/thumbs/12.webp');
+        expect(thumbUrl({ url: '/images/1.jpg' })).toBe('/images/thumbs/1.webp');
+    });
+
+    it('should return an empty string without url', () => {
+        expect(thumbUrl({ type: 'end' })).toBe('');
+        expect(thumbUrl(undefined)).toBe('');
+    });
+});
+
+describe('alexPosition', () => {
+    it('should return the polygon center as percentages', () => {
+        const quest = { coords: '100,100,300,100,300,300,100,300', width: 1000, height: 400 };
+
+        expect(alexPosition(quest)).toEqual({ x: 20, y: 50 });
+    });
+
+    it('should fall back to the center without coordinates', () => {
+        expect(alexPosition({ width: 100, height: 100 })).toEqual({ x: 50, y: 50 });
     });
 });

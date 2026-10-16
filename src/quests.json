@@ -239,7 +239,8 @@
         "coords": "1243.0000610351562,679,1252.0000610351562,686,1265.0000610351562,684,1268.0000610351562,676,1264.0000610351562,666,1254.0000610351562,662,1243.0000610351562,664",
         "width": 2048,
         "height": 1536,
-        "difficultyLevel": 2
+        "difficultyLevel": 2,
+        "group": "Bretagne"
     },
     {
         "id": 28,
@@ -293,7 +294,7 @@
         "width": 2048,
         "height": 1536,
         "difficultyLevel": 2,
-        "groupe": "La ferme"
+        "group": "La ferme de Viltain"
     },
     {
         "id": 34,
@@ -302,7 +303,7 @@
         "width": 2048,
         "height": 1536,
         "difficultyLevel": 2,
-        "groupe": "La ferme"
+        "group": "La ferme de Viltain"
     },
     {
         "id": 35,
@@ -311,7 +312,7 @@
         "width": 2043,
         "height": 1362,
         "difficultyLevel": 0,
-        "groupe": "Japon"
+        "group": "Japon"
     },
     {
         "id": 36,
@@ -320,7 +321,7 @@
         "width": 2043,
         "height": 1362,
         "difficultyLevel": 0,
-        "groupe": "Japon"
+        "group": "Japon"
     },
     {
         "id": 37,
@@ -329,7 +330,7 @@
         "width": 2043,
         "height": 1362,
         "difficultyLevel": 3,
-        "groupe": "Japon"
+        "group": "Japon"
     },
     {
         "id": 38,
@@ -338,7 +339,7 @@
         "width": 2016,
         "height": 1512,
         "difficultyLevel": 2,
-        "groupe": "Tahoe"
+        "group": "Tahoe"
     },
     {
         "id": 39,
@@ -347,7 +348,7 @@
         "width": 2016,
         "height": 1512,
         "difficultyLevel": 2,
-        "groupe": "Tahoe"
+        "group": "Tahoe"
     },
     {
         "id": 40,
@@ -356,7 +357,7 @@
         "width": 2016,
         "height": 1512,
         "difficultyLevel": 0,
-        "groupe": "Tahoe"
+        "group": "Tahoe"
     },
     {
         "id": 41,
@@ -365,7 +366,7 @@
         "width": 2016,
         "height": 1512,
         "difficultyLevel": 3,
-        "groupe": "Tahoe"
+        "group": "Tahoe"
     },
     {
         "id": 42,
@@ -374,7 +375,7 @@
         "width": 2016,
         "height": 1512,
         "difficultyLevel": 2,
-        "groupe": "Tahoe"
+        "group": "Tahoe"
     },
     {
         "id": 43,
@@ -383,7 +384,7 @@
         "width": 3024,
         "height": 2268,
         "difficultyLevel": 1,
-        "groupe": "Tahoe"
+        "group": "Tahoe"
     },
     {
         "id": "44",
@@ -391,7 +392,8 @@
         "coords": "1739,987,1731,997,1723,1004,1721,1016,1721,1029,1730,1037,1741,1035,1751,1031,1761,1030,1762,1019,1755,1004,1747,990",
         "width": 2016,
         "height": 1512,
-        "difficultyLevel": 1
+        "difficultyLevel": 1,
+        "group": "Pontis"
     },
     {
         "id": "45",
@@ -399,7 +401,26 @@
         "coords": "1049,1244,1036,1248,1034,1259,1039,1267,1050,1270,1062,1268,1062,1259,1062,1246",
         "width": 2856,
         "height": 2142,
-        "difficultyLevel": 3
+        "difficultyLevel": 3,
+        "group": "Pontis"
+    },
+    {
+        "id": "46",
+        "url": "/images/46.jpg",
+        "coords": "679,682,682,695,686,707,696,719,713,717,718,706,721,693,723,675,699,679",
+        "width": 2048,
+        "height": 1536,
+        "difficultyLevel": 1,
+        "group": "Japon"
+    },
+    {
+        "id": "47",
+        "url": "/images/47.jpg",
+        "coords": "863,625,875,638,884,636,884,624,873,616",
+        "width": 2048,
+        "height": 1536,
+        "difficultyLevel": 2,
+        "group": "Japon"
     },
     {
         "type": "end"

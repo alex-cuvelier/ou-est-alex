@@ -1,258 +1,359 @@
 <template>
-    <div class="oea-level-chooser">
-        <!-- Blobs flottants en arrière-plan -->
-        <div class="oea-blob oea-blob-1"></div>
-        <div class="oea-blob oea-blob-2"></div>
-        <div class="oea-blob oea-blob-3"></div>
+    <div class="oea-home">
+        <div class="oea-home-inner">
+            <header class="oea-home-head">
+                <h1>{{ $t('home.title') }}</h1>
+                <p class="oea-mono">{{ subtitle }}</p>
+            </header>
 
-        <h1>{{ $t('level-chooser.title') }}</h1>
-        <div class="oea-levels-container">
-            <Button v-for="level in [...difficultyLevels, 'all']" :key="level" outlined raised severity="contrast" @click="setLevel(level)">
-                {{ $t('difficulty.' + level) }}
-                <!-- {{ questsStore.getCompletedCount(level) }} / {{  questsStore.getTotalCount(level) }} -->
-            </Button>
+            <button v-if="resume" type="button" class="oea-resume" :style="{ backgroundImage: `url(${resume.thumb})` }" @click="resumeGame">
+                <span class="oea-resume-text">
+                    <span class="oea-mono">{{ $t('home.resume') }}</span>
+                    <b>{{ resume.label }}</b>
+                </span>
+                <span class="oea-resume-go" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </span>
+            </button>
+
+            <section class="oea-home-levels">
+                <h2 class="oea-home-label">
+                    {{ $t('home.levels') }} <span>{{ levels.length }}</span>
+                </h2>
+                <ul class="oea-levels">
+                    <li v-for="level in levels" :key="level.id">
+                        <button type="button" class="oea-level" :class="{ 'is-done': level.done }" @click="startLevel(level.id)">
+                            <img :src="level.thumb" alt="" loading="lazy" />
+                            <span class="oea-level-name">
+                                {{ level.name }}
+                                <span class="oea-mono">{{ level.found }}/{{ level.total }}</span>
+                            </span>
+                            <span class="oea-level-bar" :style="{ '--p': level.percent + '%' }"></span>
+                        </button>
+                    </li>
+                </ul>
+            </section>
+
+            <button type="button" class="oea-home-help" @click="instructionsVisible = true">{{ $t('home.howTo') }}</button>
         </div>
     </div>
 </template>
 
 <script setup>
+import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useQuestsStore } from '@/stores/questsStore.js';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import { useQuestsStore } from '@/stores/questsStore.js';
+import { useUiStore } from '@/stores/uiStore.js';
+import { formatDuration, thumbUrl } from '@/utils/utils.js';
 
+const { t } = useI18n();
 const router = useRouter();
 const questsStore = useQuestsStore();
+const { difficultyLevels, progress, currentDifficultyLevel } = storeToRefs(questsStore);
+const { instructionsVisible } = storeToRefs(useUiStore());
 
-const { currentDifficultyLevel, difficultyLevels } = storeToRefs(questsStore);
+const levels = computed(() =>
+    [...difficultyLevels.value, 'all'].map((id) => {
+        const photos = questsStore.getLevelPhotos(id);
+        const found = questsStore.getCompletedCount(id);
+        return {
+            id,
+            name: t('difficulty.' + id),
+            // "All" would repeat the first level's photo: take the most recent one instead
+            thumb: thumbUrl(id === 'all' ? photos.at(-1) : photos[0]),
+            found,
+            total: photos.length,
+            percent: photos.length ? (found / photos.length) * 100 : 0,
+            done: photos.length > 0 && found === photos.length,
+        };
+    }),
+);
 
-const setLevel = (difficultyLevel) => {
-    currentDifficultyLevel.value = difficultyLevel;
-    router.push({ name: 'quest', params: { difficultyLevel, imageIndex: 1 } });
-};
+const subtitle = computed(() => {
+    const total = questsStore.getTotalCount('all');
+    if (!progress.value.playTime) {
+        return t('home.fresh', { total });
+    }
+    return t('home.progress', { found: questsStore.getCompletedCount('all'), total, time: formatDuration(progress.value.playTime) });
+});
+
+const resume = computed(() => {
+    const last = progress.value.last;
+    const quest = last && questsStore.getLevelPhotos(last.level)[last.index];
+    if (!quest) {
+        return null;
+    }
+    return {
+        ...last,
+        thumb: thumbUrl(quest),
+        label: t('quest.position', { level: t('difficulty.' + last.level), index: last.index + 1, count: questsStore.getTotalCount(last.level) }),
+    };
+});
+
+function startLevel(level) {
+    questsStore.startLevel(level);
+    router.push({ name: 'quest', params: { difficultyLevel: level, imageIndex: 1 } });
+}
+
+// Keeps the current run when resuming the level being played
+function resumeGame() {
+    const { level, index } = resume.value;
+    if (level !== currentDifficultyLevel.value) {
+        questsStore.startLevel(level);
+    }
+    router.push({ name: 'quest', params: { difficultyLevel: level, imageIndex: index + 1 } });
+}
 </script>
 
-<style lang="scss" scoped>
-.oea-level-chooser {
-    padding: 2rem;
-    position: relative;
-    min-height: 100vh;
-    overflow: hidden;
-    background: var(--color-background);
+<style scoped lang="scss">
+.oea-home {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--paper);
+    color: var(--ink);
+}
 
-    // Pattern géométrique subtil en arrière-plan
+.oea-home-inner {
+    max-width: 60rem;
+    margin: 0 auto;
+    padding: calc(2.5rem + var(--safe-top)) max(1rem, env(safe-area-inset-right, 0px)) calc(2rem + var(--safe-bottom)) max(1rem, env(safe-area-inset-left, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    @media (min-width: 720px) {
+        padding-top: calc(4rem + var(--safe-top));
+        gap: 2rem;
+    }
+}
+
+.oea-home-head {
+    display: grid;
+    gap: 0.375rem;
+
+    h1 {
+        font-size: clamp(2rem, 7vw, 3.5rem);
+        letter-spacing: -0.04em;
+    }
+
+    p {
+        font-size: 0.8125rem;
+        color: var(--mid);
+    }
+}
+
+.oea-resume {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    height: 11rem;
+    padding: 1rem;
+    border: 0;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 200ms var(--ease-out);
+
+    @media (min-width: 720px) {
+        height: 15rem;
+        padding: 1.5rem;
+    }
+
     &::before {
         content: '';
         position: absolute;
         inset: 0;
-        background-image: linear-gradient(rgba(var(--color-purple-rgb), 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(var(--color-purple-rgb), 0.03) 1px, transparent 1px);
-        background-size: 50px 50px;
-        mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.3) 0%, transparent 70%);
-        -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.3) 0%, transparent 70%);
-        pointer-events: none;
-        z-index: 0;
+        background: linear-gradient(transparent 30%, rgba(0, 0, 0, 0.7));
     }
 
-    // Blobs SVG flottants
-    .oea-blob {
+    &:active {
+        transform: scale(0.99);
+    }
+
+    > * {
+        position: relative;
+    }
+}
+
+.oea-resume-text {
+    display: grid;
+    gap: 0.125rem;
+
+    .oea-mono {
+        font-size: 0.6875rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        opacity: 0.85;
+    }
+
+    b {
+        font-size: 1.125rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+    }
+}
+
+.oea-resume-go {
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #fff;
+    color: #0f0f12;
+    transition: transform 200ms var(--ease-out);
+
+    svg {
+        width: 1.1rem;
+        height: 1.1rem;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2.4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+}
+
+.oea-resume:hover .oea-resume-go {
+    transform: translateX(3px);
+}
+
+.oea-home-levels {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.oea-home-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0;
+
+    span {
+        font-weight: 400;
+        color: var(--mid);
+    }
+}
+
+// Every level visible at once: 3 columns, 2 rows
+.oea-levels {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem 0.625rem;
+
+    @media (min-width: 720px) {
+        gap: 1.25rem 1rem;
+    }
+}
+
+.oea-level {
+    width: 100%;
+    display: grid;
+    gap: 0.4rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+        border-radius: 14px;
+        background: var(--hair);
+        transition: transform 200ms var(--ease-out);
+
+        @media (min-width: 720px) {
+            aspect-ratio: 4 / 3;
+        }
+    }
+
+    &:hover img {
+        transform: scale(1.02);
+    }
+
+    &:active img {
+        transform: scale(0.98);
+    }
+}
+
+// Narrow cards: count under the name, so "Très difficile" never collides with it
+.oea-level-name {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.25;
+
+    .oea-mono {
+        font-size: 0.6875rem;
+        font-weight: 400;
+        color: var(--mid);
+    }
+
+    @media (min-width: 720px) {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+
+        .oea-mono {
+            font-size: 0.75rem;
+        }
+    }
+}
+
+.oea-level-bar {
+    position: relative;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--hair);
+    overflow: hidden;
+
+    &::after {
+        content: '';
         position: absolute;
-        opacity: 0.3;
-        filter: blur(40px);
-        pointer-events: none;
-        z-index: 0;
-
-        &.oea-blob-1 {
-            width: 400px;
-            height: 400px;
-            top: -100px;
-            left: -100px;
-            background: var(--gradient-vibrant);
-            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-            animation:
-                float 20s ease-in-out infinite,
-                morph 8s ease-in-out infinite;
-        }
-
-        &.oea-blob-2 {
-            width: 350px;
-            height: 350px;
-            top: 50%;
-            right: -80px;
-            background: var(--gradient-neon);
-            border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
-            animation:
-                floatReverse 25s ease-in-out infinite,
-                morph 10s ease-in-out infinite 2s;
-        }
-
-        &.oea-blob-3 {
-            width: 300px;
-            height: 300px;
-            bottom: -80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--gradient-fire);
-            border-radius: 40% 60% 60% 40% / 40% 50% 60% 50%;
-            animation:
-                float 30s ease-in-out infinite,
-                morph 12s ease-in-out infinite 4s;
-        }
-
-        // Mobile : animations plus lentes
-        @media (max-width: 768px) {
-            &.oea-blob-1 {
-                animation-duration: 30s, 12s;
-            }
-            &.oea-blob-2 {
-                animation-duration: 35s, 14s;
-            }
-            &.oea-blob-3 {
-                animation-duration: 40s, 16s;
-            }
-        }
+        inset: 0 auto 0 0;
+        width: var(--p);
+        background: var(--ink);
     }
+}
 
-    h1 {
-        position: relative;
-        z-index: 1;
-        text-align: center;
-        margin-bottom: 3rem;
-        font-size: clamp(2.5rem, 6vw, 4rem);
-        font-weight: 800;
-        background: var(--gradient-vibrant);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: fadeInUp 0.6s var(--transition-bounce);
+.oea-level.is-done .oea-level-bar::after {
+    background: var(--hot);
+}
 
-        // Glow line sous le titre
-        &::after {
-            content: '';
-            position: absolute;
-            bottom: -1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 4px;
-            background: var(--gradient-vibrant);
-            border-radius: 2px;
-            box-shadow:
-                0 0 20px var(--glow-pink),
-                0 0 40px var(--glow-pink);
-        }
-    }
+.oea-home-help {
+    align-self: flex-start;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--mid);
+    font-size: 0.875rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
 
-    .oea-levels-container {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 1.5rem;
-        align-items: center;
-
-        :deep(.p-button) {
-            position: relative;
-            font-size: 1.25rem !important;
-            padding: 1.5rem 3rem !important;
-            min-width: 20rem;
-            background: var(--gradient-primary) !important;
-            border: 1px solid rgba(var(--white-rgb), 0.1) !important;
-            color: white !important;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            overflow: hidden;
-            box-shadow:
-                0 10px 40px -10px var(--glow-purple),
-                0 0 0 1px rgba(var(--white-rgb), 0.1) inset !important;
-            transition: all var(--transition-base) !important;
-            animation: fadeInUp 0.6s var(--transition-bounce);
-
-            // Échelonnement de l'animation d'entrée
-            &:nth-child(1) {
-                animation-delay: 0.1s;
-                opacity: 0;
-                animation-fill-mode: forwards;
-            }
-            &:nth-child(2) {
-                animation-delay: 0.2s;
-                opacity: 0;
-                animation-fill-mode: forwards;
-            }
-            &:nth-child(3) {
-                animation-delay: 0.3s;
-                opacity: 0;
-                animation-fill-mode: forwards;
-            }
-            &:nth-child(4) {
-                animation-delay: 0.4s;
-                opacity: 0;
-                animation-fill-mode: forwards;
-            }
-            &:nth-child(5) {
-                animation-delay: 0.5s;
-                opacity: 0;
-                animation-fill-mode: forwards;
-            }
-
-            // Shimmer overlay
-            &::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
-                transition: left var(--transition-slow);
-            }
-
-            &:hover {
-                transform: translateY(-8px) scale(1.02) !important;
-                box-shadow:
-                    0 20px 60px -10px var(--glow-purple),
-                    0 0 40px var(--glow-pink),
-                    0 0 0 1px rgba(var(--white-rgb), 0.2) inset !important;
-
-                &::before {
-                    left: 100%;
-                }
-            }
-
-            &:active {
-                transform: translateY(-4px) scale(1) !important;
-            }
-
-            // Mobile : réduire les effets
-            @media (max-width: 768px) {
-                padding: 1.25rem 2.5rem !important;
-                min-width: 18rem;
-
-                &:hover {
-                    transform: translateY(-4px) scale(1.01) !important;
-                }
-            }
-        }
-    }
-
-    // Désactiver animations si préférence utilisateur
-    @media (prefers-reduced-motion: reduce) {
-        .oea-blob {
-            animation: none !important;
-        }
-
-        h1 {
-            animation: fadeIn 0.3s ease-in-out !important;
-        }
-
-        :deep(.p-button) {
-            animation: fadeIn 0.3s ease-in-out !important;
-
-            &::before {
-                display: none;
-            }
-        }
+    &:hover {
+        color: var(--ink);
     }
 }
 </style>
