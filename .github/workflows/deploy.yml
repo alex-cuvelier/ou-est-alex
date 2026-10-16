@@ -1,40 +1,91 @@
 name: Deploy
 
+# Ships a released version: `npm run release` pushes a vX.Y.Z tag, which starts this workflow.
+# To roll back, run it by hand from main ("Run workflow") with the tag to put back online.
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version to deploy, e.g. v2.1.0'
+        required: true
+
+# One deployment at a time; a second one waits instead of interrupting an upload.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout the version
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+          fetch-depth: 0
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
+      - name: Check it is a released version on main
+        run: |
+          if ! git rev-parse -q --verify "refs/tags/$TAG" > /dev/null; then
+            echo "::error::$TAG is not a tag"; exit 1
+          fi
+          if ! git merge-base --is-ancestor "$TAG" origin/main; then
+            echo "::error::$TAG is not on main"; exit 1
+          fi
 
-    - name: Install dependencies
-      run: npm install
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
 
-    - name: Build the Vue app
-      run: npm run build
-      
-    - name: Set up SSH key
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Add server to known_hosts
-      run: |
-        mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ vars.SSH_HOST }} >> ~/.ssh/known_hosts
+      - name: Run the tests
+        run: npx vitest run
 
-    - name: Deploy to Server
-      run: |
-        rsync -avz --delete dist/ ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}:${{ vars.DEPLOY_REPOSITORY }}
+      - name: Build the Vue app
+        run: npm run build
+
+      - name: Set up SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ vars.SSH_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      # --checksum skips unchanged files and keeps their date, so browsers keep their cached copy.
+      # --delay-updates and --delete-after swap everything in at the end: no visitor gets a half-updated site.
+      - name: Deploy to the server
+        env:
+          TARGET: ${{ vars.SSH_USER }}@${{ vars.SSH_HOST }}:${{ vars.DEPLOY_REPOSITORY }}
+        run: |
+          rsync -rlz --checksum --delay-updates --delete-after --itemize-changes \
+            -e "ssh -i ~/.ssh/deploy_key -o BatchMode=yes" \
+            dist/ "$TARGET"
+
+      - name: Check the site serves this version
+        env:
+          WEBSITE_URL: ${{ vars.WEBSITE_URL }}
+        run: |
+          curl -fsS "$WEBSITE_URL" -o served.html
+          if ! cmp -s served.html dist/index.html; then
+            echo "::error::$WEBSITE_URL does not serve the index.html just built"; exit 1
+          fi
+          while read -r asset; do
+            curl -fsS -o /dev/null "${WEBSITE_URL%/}$asset"
+          done < <(grep -oE '/assets/[^"]+\.(js|css)' served.html)
+          echo "### $TAG is online at $WEBSITE_URL" >> "$GITHUB_STEP_SUMMARY"
