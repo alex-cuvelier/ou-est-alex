@@ -134,18 +134,15 @@ function goToNextDifficultyLevel() {
     questsStore.openLevel(currentDifficultyLevel.value + 1);
 }
 
-// Everything found: one last round of confetti
-let confettiTimeout = null;
+// Everything found: heads shot from both bottom corners
 onMounted(() => {
     if (isRunComplete.value) {
-        confetti.start();
-        confettiTimeout = setTimeout(() => confetti.stop(), 2500);
+        confetti.celebrate();
     }
 });
 
 onUnmounted(() => {
-    clearTimeout(confettiTimeout);
-    confetti.stop();
+    confetti.clear();
 });
 </script>
 

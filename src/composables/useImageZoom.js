@@ -60,12 +60,17 @@ export default function useImageZoom(clickCallback, wrapperRef) {
         pointY = ref(0),
         isDragging = ref(false),
         isSnapping = ref(false), // True during snap-back animation (triggers CSS transition)
-        isZooming = ref(false); // True during animated zoom-to-point (triggers longer CSS transition)
+        isZooming = ref(false); // True during animated zoom-to-point (keeps the 1x auto-reset off)
 
     // --- Internal state ---
 
     const DAMPING = 0.3; // Rubber-band resistance factor (0 = hard stop, 1 = no resistance)
 
+    const zoomTransition = ref(null); // CSS transition of the zoom-to-point, while it runs
+
+    let zoomFrame = 0, // requestAnimationFrame id that starts the zoom-to-point
+        zoomTimeout = null, // End of the zoom-to-point transition
+        endZoom = null; // Resolves the running zoom-to-point promise
     let panning = false,
         start = { x: 0, y: 0 },
         mouseDownPos = { x: 0, y: 0 }, // Mouse position at mousedown to distinguish click vs drag
@@ -79,6 +84,7 @@ export default function useImageZoom(clickCallback, wrapperRef) {
     const transformStyle = computed(() => {
         return {
             transform: `translate(${pointX.value}px, ${pointY.value}px) scale(${scale.value})`,
+            transition: zoomTransition.value, // null removes it: the snap-back class transition applies
         };
     });
 
@@ -154,7 +160,27 @@ export default function useImageZoom(clickCallback, wrapperRef) {
 
     // --- Actions ---
 
+    // Stops the zoom-to-point animation where it is (next photo, or the player takes over)
+    function stopZoom() {
+        cancelAnimationFrame(zoomFrame);
+        clearTimeout(zoomTimeout);
+        if (zoomTransition.value) {
+            // The values already hold the end of the transition: take the one on screen instead
+            if (wrapperRef.value) {
+                const matrix = new DOMMatrix(getComputedStyle(wrapperRef.value).transform);
+                pointX.value = matrix.e;
+                pointY.value = matrix.f;
+                scale.value = matrix.a;
+            }
+            zoomTransition.value = null;
+        }
+        isZooming.value = false;
+        endZoom?.();
+        endZoom = null;
+    }
+
     function resetTransform() {
+        stopZoom();
         scale.value = MINSCALE;
         pointX.value = 0;
         pointY.value = 0;
@@ -162,36 +188,39 @@ export default function useImageZoom(clickCallback, wrapperRef) {
 
     /**
      * Animates zoom to center on a specific point (e.g. polygon center on correct answer).
+     *
+     * A CSS transition, run by the GPU: smooth on every device, nothing to do per frame.
+     * The GPU stretches a bitmap of the photo drawn at the starting scale, so the photo is
+     * soft during the zoom, and redrawn sharp at its final scale once the transition ends.
+     *
      * @param {number} centerX - Target X in displayed image coordinates
      * @param {number} centerY - Target Y in displayed image coordinates
-     * @param {number} targetScale - Zoom level to animate to (default 3)
-     * @param {number} duration - Animation duration in ms (default 800)
-     * @returns {Promise} Resolves when animation completes
+     * @param {number} targetScale - Zoom level to animate to (default 10)
+     * @param {number} duration - Animation duration in ms (default 1600)
+     * @returns {Promise} Resolves when the animation completes or is stopped
      */
     function animateZoomTo(centerX, centerY, targetScale = 10, duration = 1600) {
+        stopZoom();
+        isSnapping.value = false;
+
+        // On mobile, reset to clean state first to avoid weird intermediate states
+        if (isTouchDevice.value) {
+            resetTransform();
+        }
+
         return new Promise((resolve) => {
-            isSnapping.value = false;
-            isZooming.value = false;
-
-            // On mobile, reset to clean state first to avoid weird intermediate states
-            if (isTouchDevice.value) {
-                resetTransform();
-            }
-
-            requestAnimationFrame(() => {
-                isZooming.value = true;
+            endZoom = resolve;
+            isZooming.value = true;
+            zoomTransition.value = `transform ${duration}ms cubic-bezier(0.25, 1, 0.5, 1)`;
+            // A frame later, so that the transition starts from the state on screen
+            zoomFrame = requestAnimationFrame(() => {
                 const wrapper = wrapperRef.value;
-                const wrapperW = wrapper.offsetWidth;
-                const wrapperH = wrapper.offsetHeight;
                 // With transform-origin: center, to center point (cx,cy) in viewport:
                 // tx = (w/2 - cx) * scale,  ty = (h/2 - cy) * scale
-                pointX.value = (wrapperW / 2 - centerX) * targetScale;
-                pointY.value = (wrapperH / 2 - centerY) * targetScale;
+                pointX.value = (wrapper.offsetWidth / 2 - centerX) * targetScale;
+                pointY.value = (wrapper.offsetHeight / 2 - centerY) * targetScale;
                 scale.value = targetScale;
-                setTimeout(() => {
-                    isZooming.value = false;
-                    resolve();
-                }, duration);
+                zoomTimeout = setTimeout(stopZoom, duration);
             });
         });
     }
@@ -200,6 +229,7 @@ export default function useImageZoom(clickCallback, wrapperRef) {
 
     function onMouseDown(e) {
         e.preventDefault();
+        stopZoom(); // The player takes over
         start = { x: e.clientX - pointX.value, y: e.clientY - pointY.value };
         panning = true;
         isDragging.value = true;
@@ -253,6 +283,7 @@ export default function useImageZoom(clickCallback, wrapperRef) {
         if (event.ctrlKey) {
             return;
         }
+        stopZoom(); // The player takes over
 
         const img = event.target;
         const rec = img.getBoundingClientRect();
@@ -290,6 +321,7 @@ export default function useImageZoom(clickCallback, wrapperRef) {
     // --- Touch event handlers ---
 
     function onTouchStart(e) {
+        stopZoom(); // The player takes over
         if (e.touches.length === 1) {
             start = { x: e.touches[0].clientX - pointX.value, y: e.touches[0].clientY - pointY.value };
             panning = true;
@@ -359,7 +391,6 @@ export default function useImageZoom(clickCallback, wrapperRef) {
         scale,
         isDragging,
         isSnapping,
-        isZooming,
         transformStyle,
         resetTransform,
         animateZoomTo,

@@ -12,7 +12,6 @@
                         'oea-display-clue': displayClue,
                         'oea-dragging': isDragging,
                         'oea-snapping': isSnapping,
-                        'oea-zooming': isZooming,
                         'oea-shaking': isShaking,
                     }"
                     :style="{ ...wrapperStyle, ...transformStyle }"
@@ -144,7 +143,7 @@ import { useI18n } from 'vue-i18n';
 
 import { useQuestsStore } from '@/stores/questsStore.js';
 import { useUiStore } from '@/stores/uiStore.js';
-import { pointInPolygon, toPolygon, getPolygonCenter, getRandomPointInCircle, alexPosition, alexRing, formatClock, thumbUrl } from '@/utils/utils.js';
+import { pointInPolygon, toPolygon, getRandomPointInCircle, alexPosition, alexRing, formatClock, thumbUrl } from '@/utils/utils.js';
 import { tooltip } from '@/utils/tooltip.js';
 import confetti from '@/composables/useConfetti';
 import useImageZoom from '@/composables/useImageZoom.js';
@@ -352,7 +351,6 @@ const {
     scale,
     isDragging,
     isSnapping,
-    isZooming,
     transformStyle,
     resetTransform,
     animateZoomTo,
@@ -434,7 +432,7 @@ function checkAlexFound(event) {
     const polygon = toPolygon(currentQuest.value.coords, xRatio, yRatio);
 
     if (pointInPolygon(polygon, event.offsetX, event.offsetY)) {
-        onAlexFound(polygon);
+        onAlexFound();
     } else {
         playKo();
         visit.value.noCount++;
@@ -448,7 +446,7 @@ function checkAlexFound(event) {
 
 let advanceTimeout = null;
 
-async function onAlexFound(polygon) {
+function onAlexFound() {
     previousBest.value = questsStore.bestTime(currentQuest.value.id);
     // Saved at once: the find is kept even if the tab is closed during the animation
     commitVisit(true);
@@ -456,12 +454,14 @@ async function onAlexFound(polygon) {
     misses.value = [];
     hideClue();
     playOk();
-    confetti.start();
     advanceTimeout = setTimeout(autoAdvance, ADVANCE_DELAY);
 
-    const center = getPolygonCenter(polygon);
-    await animateZoomTo(center.x, center.y, 15, FOUND_ZOOM_DURATION);
-    confetti.stop();
+    // The zoom brings the ring to the middle of the photo, and the heads spring from there
+    const { width, height } = wrapperSize.value;
+    animateZoomTo((ring.value.x / 100) * width, (ring.value.y / 100) * height, 15, FOUND_ZOOM_DURATION);
+    const area = photoArea.value.getBoundingClientRect();
+    const wrapper = imageWrapper.value; // Its layout box, the zoom aside
+    confetti.burst(area.left + wrapper.offsetLeft + wrapper.offsetWidth / 2, area.top + wrapper.offsetTop + wrapper.offsetHeight / 2);
 }
 
 // --- Once found: the card, then the next photo still to search ---
@@ -565,7 +565,7 @@ onUnmounted(() => {
     clearTimeout(clueTimeout);
     clearTimeout(advanceTimeout);
     resizeObserver.disconnect();
-    confetti.stop();
+    confetti.clear();
     document.removeEventListener('mouseup', onMouseUp);
     document.removeEventListener('visibilitychange', onVisibilityChange);
 });
@@ -634,10 +634,6 @@ onUnmounted(() => {
 
     &.oea-snapping {
         transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    &.oea-zooming {
-        transition: transform 1.6s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
     // Clue: red ring, white inner line, and the rest of the photo dimmed
