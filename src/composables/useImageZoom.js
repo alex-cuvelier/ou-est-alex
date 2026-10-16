@@ -1,8 +1,6 @@
 import { ref, computed, watch } from 'vue';
 import useDeviceDetection from './useDeviceDetection';
 
-const { isTouchDevice } = useDeviceDetection();
-
 const MINSCALE = 1;
 const MAXSCALE = 10;
 
@@ -53,6 +51,8 @@ const MAXSCALE = 10;
  * @param {import('vue').Ref<HTMLElement>} wrapperRef - Template ref of the image wrapper element
  */
 export default function useImageZoom(clickCallback, wrapperRef) {
+    const { isTouchDevice } = useDeviceDetection();
+
     // --- Reactive state ---
 
     const scale = ref(MINSCALE),
@@ -356,6 +356,7 @@ export default function useImageZoom(clickCallback, wrapperRef) {
     // --- Public API ---
 
     return {
+        scale,
         isDragging,
         isSnapping,
         isZooming,

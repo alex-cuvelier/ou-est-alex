@@ -9,7 +9,7 @@
 
         <div class="oea-instructions-content">
             <!-- Desktop Controls -->
-            <div v-if="!isMobile" class="oea-controls-section animate-fadeInUp">
+            <div v-if="!isMobile" class="oea-controls-section">
                 <h2 class="oea-section-title">
                     <i class="pi pi-desktop"></i>
                     {{ $t('instructions.desktop.title') }}
@@ -57,7 +57,7 @@
             </div>
 
             <!-- Mobile Controls -->
-            <div v-else class="oea-controls-section animate-fadeInUp">
+            <div v-else class="oea-controls-section">
                 <h2 class="oea-section-title">
                     <i class="pi pi-mobile"></i>
                     {{ $t('instructions.mobile.title') }}
@@ -95,7 +95,7 @@
             </div>
 
             <!-- Tips Section -->
-            <div class="oea-tips-section animate-fadeInUp">
+            <div class="oea-tips-section">
                 <h3 class="oea-tips-title">
                     {{ $t('instructions.tips.title') }}
                 </h3>
@@ -113,7 +113,7 @@
         </div>
 
         <template #footer>
-            <Button class="oea-got-it-button" :label="$t('instructions.gotIt')" @click="closeDialog" outlined raised severity="contrast"></Button>
+            <button type="button" class="oea-button oea-got-it-button" @click="closeDialog">{{ $t('instructions.gotIt') }}</button>
         </template>
     </Dialog>
 </template>
@@ -148,164 +148,109 @@ function closeDialog() {
 </script>
 
 <style lang="scss">
-.oea-instructions-dialog {
-    &.p-dialog {
-        background: rgba(26, 31, 58, 0.95) !important;
-        backdrop-filter: var(--glass-blur);
-        border: 2px solid transparent;
-        border-radius: var(--radius-lg);
-        background-clip: padding-box;
-        position: relative;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+.oea-instructions-dialog.p-dialog {
+    max-height: 90svh;
+    border: 0;
+    border-radius: 1.5rem;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.55);
 
-        &::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: var(--radius-lg);
-            padding: 2px;
-            background: linear-gradient(135deg, var(--color-purple), var(--color-pink), var(--color-cyan));
-            -webkit-mask:
-                linear-gradient(#fff 0 0) content-box,
-                linear-gradient(#fff 0 0);
-            -webkit-mask-composite: exclude;
-            mask:
-                linear-gradient(#fff 0 0) content-box,
-                linear-gradient(#fff 0 0);
-            mask-composite: exclude;
-            pointer-events: none;
-            z-index: -1;
-        }
+    .p-dialog-header {
+        align-items: flex-start;
+        padding: 1.5rem 1.5rem 0.75rem;
+        background: transparent;
+        color: var(--ink);
     }
 
-    :deep(.p-dialog-header) {
-        padding: 2rem 2rem 1rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    .p-dialog-content {
+        padding: 0 1.5rem;
+        background: transparent;
+        color: var(--ink);
+    }
+
+    .p-dialog-footer {
+        padding: 1rem 1.5rem 1.5rem;
         background: transparent;
     }
 
-    :deep(.p-dialog-content) {
-        padding: 2rem;
-        color: var(--color-text-primary);
-        background: transparent;
-    }
-
-    :deep(.p-dialog-footer) {
-        padding: 1rem 2rem 2rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        background: transparent;
+    .p-dialog-close-button {
+        color: var(--mid);
     }
 
     @media (max-width: 768px) {
-        :deep(.p-dialog-header),
-        :deep(.p-dialog-content),
-        :deep(.p-dialog-footer) {
-            padding: 1.5rem;
+        .p-dialog-header,
+        .p-dialog-content,
+        .p-dialog-footer {
+            padding-inline: 1.25rem;
         }
     }
 }
 
 .oea-instructions-title {
-    font-size: clamp(1.75rem, 4vw, 2.5rem);
-    font-weight: 700;
-    background: var(--gradient-vibrant);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.25rem;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    letter-spacing: -0.035em;
 }
 
 .oea-instructions-subtitle {
-    font-size: clamp(0.95rem, 2vw, 1.1rem);
-    color: var(--color-text-primary);
-    font-weight: bold;
     margin: 0;
+    font-size: 0.9375rem;
+    color: var(--mid);
 }
 
 .oea-instructions-content {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
 .oea-controls-section {
-    animation: fadeInUp 0.6s ease-out;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.25rem;
 }
 
 .oea-section-title {
-    font-size: clamp(1.25rem, 3vw, 1.5rem);
-    font-weight: 600;
-    color: var(--color-text-primary);
-    margin: 0 0 0.5rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
+    margin: 0 0 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mid);
 
     i {
-        color: var(--color-purple);
-        font-size: 1.5rem;
+        font-size: 0.875rem;
     }
 }
 
 .oea-instruction-item {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
-    padding: 1.25rem;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all var(--transition-base);
-    animation: fadeInUp 0.6s ease-out;
-    animation-fill-mode: both;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--hair);
 
-    @for $i from 1 through 4 {
-        &:nth-child(#{$i + 1}) {
-            animation-delay: #{$i * 0.1}s;
-        }
-    }
-
-    &:hover {
-        background: rgba(255, 255, 255, 0.06);
-        border-color: rgba(139, 92, 246, 0.3);
-        transform: translateX(4px);
-    }
-
-    @media (max-width: 768px) {
-        padding: 1rem;
-        gap: 1rem;
+    &:last-child {
+        border-bottom: 0;
     }
 }
 
 .oea-instruction-icon {
     flex-shrink: 0;
-    width: 3rem;
-    height: 3rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--color-purple), var(--color-pink));
-    border-radius: var(--radius-sm);
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    width: 2.5rem;
+    height: 2.5rem;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: var(--ink);
+    color: var(--on-ink);
 
     i {
-        font-size: 1.5rem;
-        color: white;
-    }
-
-    @media (max-width: 768px) {
-        width: 2.5rem;
-        height: 2.5rem;
-
-        i {
-            font-size: 1.25rem;
-        }
+        font-size: 1.1rem;
     }
 }
 
@@ -314,144 +259,61 @@ function closeDialog() {
 
     strong {
         display: block;
-        font-size: clamp(1rem, 2vw, 1.125rem);
-        color: var(--color-text-primary);
-        margin-bottom: 0.25rem;
+        font-size: 0.9375rem;
+        font-weight: 600;
     }
 
     p {
-        font-size: clamp(0.875rem, 2vw, 0.95rem);
-        color: var(--color-text-secondary);
         margin: 0;
-        line-height: 1.5;
+        font-size: 0.875rem;
+        line-height: 1.45;
+        color: var(--mid);
     }
 }
 
 .oea-tips-section {
-    padding: 1.5rem;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1));
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(139, 92, 246, 0.2);
-    animation: fadeInUp 0.6s ease-out;
-    animation-fill-mode: both;
-    animation-delay: 0.5s;
+    padding: 1rem 1.125rem;
+    border-radius: 14px;
+    background: var(--surface-1);
+    box-shadow: inset 0 0 0 1px var(--hair);
 }
 
 .oea-tips-title {
-    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    margin: 0 0 0.5rem;
+    font-size: 0.9375rem;
     font-weight: 600;
-    color: var(--color-text-primary);
-    margin: 0 0 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-
-    i {
-        color: var(--color-cyan);
-        font-size: 1.25rem;
-    }
+    letter-spacing: -0.01em;
 }
 
 .oea-tips-list {
     margin: 0;
-    padding-left: 1.5rem;
-    color: var(--color-text-secondary);
+    padding-left: 1.25rem;
+    color: var(--mid);
 
     li {
-        font-size: clamp(0.875rem, 2vw, 0.95rem);
-        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
         line-height: 1.6;
-
-        &:last-child {
-            margin-bottom: 0;
-        }
     }
 }
 
 .oea-clue-button-demo {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    display: inline-grid;
+    place-items: center;
     width: 1.5rem;
     height: 1.5rem;
+    margin: 0 0.2rem;
     vertical-align: middle;
-    background: var(--gradient-vibrant);
-    backdrop-filter: blur(12px);
-    border: 1.5px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
-    position: relative;
-    margin: 0 0.25rem;
-
-    // Radial glow
-    &::before {
-        content: '';
-        position: absolute;
-        inset: -4px;
-        border-radius: 50%;
-        background: radial-gradient(circle, var(--glow-pink) 0%, transparent 70%);
-        opacity: 0.6;
-        z-index: -1;
-    }
+    background: var(--hot);
 
     img {
-        width: 1.25rem;
-        height: 1.25rem;
+        width: 1rem;
+        height: 1rem;
         filter: brightness(0) invert(1);
     }
 }
 
 .oea-got-it-button {
-    position: relative;
-    font-size: 1.25rem !important;
-    padding: 0.5rem !important;
     width: 100%;
-    background: var(--gradient-primary) !important;
-    border: 1px solid rgba(var(--white-rgb), 0.1) !important;
-    color: white !important;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    overflow: hidden;
-    box-shadow:
-        0 10px 40px -10px var(--glow-purple),
-        0 0 0 1px rgba(var(--white-rgb), 0.1) inset !important;
-    transition: all var(--transition-base) !important;
-    animation: fadeInUp 0.6s var(--transition-bounce);
-
-    // Shimmer overlay
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
-        transition: left var(--transition-slow);
-    }
-
-    &:hover {
-        transform: translateY(-8px) scale(1.02) !important;
-        box-shadow:
-            0 20px 60px -10px var(--glow-purple),
-            0 0 40px var(--glow-pink),
-            0 0 0 1px rgba(var(--white-rgb), 0.2) inset !important;
-
-        &::before {
-            left: 100%;
-        }
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .oea-instruction-item,
-    .oea-controls-section,
-    .oea-tips-section {
-        animation: none;
-    }
-
-    .oea-instruction-item:hover,
-    .oea-got-it-button:hover {
-        transform: none;
-    }
 }
 </style>

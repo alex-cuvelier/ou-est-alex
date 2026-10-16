@@ -17,6 +17,7 @@ const messages = {
 const userLocale = getUserLocale();
 
 const i18n = createI18n({
+    legacy: false, // Composition API (useI18n), $t stays available in templates
     locale: messages[userLocale] ? userLocale : 'fr', // Use user preferred language if available, else fallback to 'en'
     fallbackLocale: 'fr', // Set fallback locale
     messages, // Set locale messages

@@ -18,7 +18,8 @@
 -   🔍 **Zoom/pan system** - Smooth navigation on mobile and desktop
 -   💡 **Hint system** - Help circle that shrinks with each use
 -   🌍 **Multilingual** - Interface in French and English
--   📊 **Statistics** - Track your performance (time, hints, errors)
+-   📊 **Progress** - Found photos, best times and play time saved in the browser, with a "Resume" card
+-   🖼️ **End-of-level recap** - Mosaic of the photos with Alex circled, and a result to copy and share
 -   🛠️ **Quest editor** - Interface for adding new images
 -   🎉 **Visual effects** - Confetti and victory sounds
 -   📱 **Responsive** - Playable on mobile, tablet and desktop
@@ -57,6 +58,7 @@ npm run dev
 | ----------------------- | ----------------------------------------- |
 | `npm run dev`           | Starts development server on port 8080    |
 | `npm run dev-host`      | Starts server accessible on local network |
+| `npm run thumbs`        | Generates the WebP thumbnails             |
 | `npm run build`         | Creates production build in `/dist`       |
 | `npm run preview`       | Previews production build                 |
 | `npm test`              | Runs unit tests with Vitest               |
@@ -92,9 +94,9 @@ ou-est-alex/
 │   │   ├── styles/          # Global SCSS styles
 │   │   └── icons/           # SVG icons
 │   ├── components/           # Reusable Vue components
-│   │   ├── OeaHeader.vue
-│   │   ├── OeaCurrentQuestStats.vue
-│   │   └── OeaEndStats.vue
+│   │   ├── OeaHeader.vue          # Editor header
+│   │   ├── OeaQuestGrid.vue       # Photo picker (bottom sheet)
+│   │   └── OeaEndStats.vue        # End-of-level recap
 │   ├── composables/          # Reusable logic (Composition API)
 │   │   ├── useConfetti.js
 │   │   ├── useImageZoom.js
@@ -108,7 +110,8 @@ ou-est-alex/
 │   ├── router/               # Vue Router configuration
 │   │   └── index.js
 │   ├── stores/               # Pinia stores
-│   │   └── questsStore.js
+│   │   ├── questsStore.js
+│   │   └── uiStore.js
 │   ├── utils/                # Utility functions
 │   │   └── utils.js
 │   ├── views/                # Main pages/views
@@ -131,12 +134,12 @@ ou-est-alex/
 
 1. **Choose a level** - 6 difficulty levels available
 2. **Find Alex** - Click on the image where you think Alex is hiding
-3. **Use hints** - Click the `?` button to display a help circle (shrinks with each use)
+3. **Use hints** - Click the compass button to display a help circle (shrinks with each use)
 4. **Zoom and pan** - Use mouse or touch to navigate:
     - **Mouse:** Click+drag to move, scroll wheel to zoom
     - **Touch:** Pinch to zoom, swipe with one finger to move
 5. **Navigate** - Arrow keys ← → to go to next/previous quests
-6. **Check your stats** - Time, hints used and errors displayed at the bottom
+6. **Check your stats** - Time, hints used and misses are shown in the bottom bar, then recapped at the end of the level
 
 ---
 
@@ -175,10 +178,11 @@ ou-est-alex/
     - Click to add points
     - Drag points to move them
 5. **Step 4:** Copy the generated JSON and add it to `src/quests.json`
+6. Run `npm run thumbs` to generate the thumbnail (also done automatically before `npm run build`)
 
 ### Method 2: Manually
 
-1. Add the image to `/public/images/`
+1. Add the image to `/public/images/` and run `npm run thumbs`
 2. Create a new object in `src/quests.json`
 3. Define polygon coordinates
 4. Test in the game

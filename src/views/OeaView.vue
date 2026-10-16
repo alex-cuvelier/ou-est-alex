@@ -1,82 +1,232 @@
 <template>
-    <div class="oea-view-wrapper">
-        <main :class="{ 'oea-quest': currentQuest?.type == 'quest' }">
-            <div
-                v-if="currentQuest?.type == 'quest'"
-                ref="imageWrapper"
-                class="oea-image-wrapper"
-                :class="{
-                    'oea-display-clue': displayClue,
-                    'oea-dragging': isDragging,
-                    'oea-snapping': isSnapping,
-                    'oea-zooming': isZooming,
-                    'oea-shaking': isShaking,
-                }"
-                :style="{ ...wrapperStyle, ...transformStyle }"
-                @mousedown.left="onMouseDown"
-                @mousemove="onMouseMove"
-                @wheel="onWheel"
-                @touchstart="onTouchStart"
-                @touchmove="onTouchMove"
-                @touchend="onTouchEnd"
-            >
-                <img ref="image" class="oea-img" :src="currentQuest.url" />
-            </div>
-            <oea-end-stats v-else></oea-end-stats>
+    <div class="oea-stage" :class="{ 'oea-stage--end': !isQuest }">
+        <template v-if="isQuest">
+            <!-- Blurred thumbnail behind the photo: no black bars, and a placeholder while the photo loads -->
+            <div class="oea-backdrop" :style="{ backgroundImage: `url(${thumbUrl(currentQuest)})` }" aria-hidden="true"></div>
 
-            <button v-if="currentQuest?.type == 'quest'" class="oea-ask-clue" :title="$t('header.ask-clue')" :disabled="displayClue" @click="showClue">
-                <img src="@/assets/icons/compass-solid.svg" />
-            </button>
-        </main>
-        <oea-current-quest-stats
-            v-if="currentQuest?.type == 'quest'"
-            :difficultyLevel="currentQuest.difficultyLevel"
-            :timer="timer"
-            :clueCount="questStats.clueCount"
-            :noCount="questStats.noCount"
-        >
-        </oea-current-quest-stats>
+            <main ref="photoArea" class="oea-photo-area">
+                <div
+                    ref="imageWrapper"
+                    class="oea-image-wrapper"
+                    :class="{
+                        'oea-display-clue': displayClue,
+                        'oea-dragging': isDragging,
+                        'oea-snapping': isSnapping,
+                        'oea-zooming': isZooming,
+                        'oea-shaking': isShaking,
+                    }"
+                    :style="{ ...wrapperStyle, ...transformStyle }"
+                    @mousedown.left="onMouseDown"
+                    @mousemove="onMouseMove"
+                    @wheel="onWheel"
+                    @touchstart="onTouchStart"
+                    @touchmove="onTouchMove"
+                    @touchend="onTouchEnd"
+                >
+                    <img class="oea-img" :src="currentQuest.url" :alt="$t('quest.photoAlt')" draggable="false" />
+                    <span v-for="miss in misses" :key="miss.id" class="oea-miss" :style="{ left: miss.x + '%', top: miss.y + '%' }" aria-hidden="true"></span>
+                </div>
+            </main>
+
+            <div class="oea-top">
+                <RouterLink class="oea-pill" :to="{ name: 'levelChooser' }" :title="$t('quest.back')">
+                    <svg class="oea-pill-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+                    {{ $t('quest.position', { level: $t('difficulty.' + currentDifficultyLevel), index: currentQuestIndex + 1, count: photoCount }) }}
+                </RouterLink>
+                <div class="oea-top-right">
+                    <span class="oea-pill oea-mono" role="timer" :aria-label="$t('quest.timer')">{{ formatClock(timer) }}</span>
+                    <button type="button" class="oea-pill oea-pill--round" :aria-label="$t('header.showInstructions')" @click="instructionsVisible = true">
+                        ?
+                    </button>
+                </div>
+            </div>
+
+            <nav class="oea-dock" :aria-label="$t('quest.controls')">
+                <button
+                    type="button"
+                    class="oea-dock-btn"
+                    :disabled="currentQuestIndex === 0"
+                    :aria-label="$t('quest.previous')"
+                    @click="questsStore.goToPreviousQuest"
+                >
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+                </button>
+                <p class="oea-dock-count oea-mono" aria-live="polite">
+                    {{ $t('quest.clues', questStats.clueCount) }}<br />{{ $t('quest.nos', questStats.noCount) }}
+                </p>
+                <button
+                    type="button"
+                    class="oea-compass"
+                    :disabled="displayClue"
+                    :title="$t('header.ask-clue')"
+                    :aria-label="$t('header.ask-clue')"
+                    @click="showClue"
+                >
+                    <img src="@/assets/icons/compass-solid.svg" alt="" />
+                </button>
+                <button type="button" class="oea-dock-grid" @click="gridVisible = true">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="4" y="4" width="6.5" height="6.5" rx="1.5" />
+                        <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5" />
+                        <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5" />
+                        <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5" />
+                    </svg>
+                    {{ $t('quest.photos') }}
+                </button>
+                <button type="button" class="oea-dock-btn" :aria-label="$t('quest.next')" @click="questsStore.goToNextQuest">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+                </button>
+            </nav>
+
+            <OeaQuestGrid v-model:visible="gridVisible" />
+        </template>
+        <OeaEndStats v-else />
     </div>
 </template>
 
 <script setup>
-import OeaCurrentQuestStats from '@/components/OeaCurrentQuestStats.vue';
 import OeaEndStats from '@/components/OeaEndStats.vue';
+import OeaQuestGrid from '@/components/OeaQuestGrid.vue';
 
-import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
+import { ref, watch, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
 import { useQuestsStore } from '@/stores/questsStore.js';
-import { pointInPolygon, toPolygon, getPolygonCenter, getRandomPointInCircle } from '@/utils/utils.js';
+import { useUiStore } from '@/stores/uiStore.js';
+import { pointInPolygon, toPolygon, getPolygonCenter, getRandomPointInCircle, alexPosition, formatClock, thumbUrl } from '@/utils/utils.js';
 import confetti from '@/composables/useConfetti';
 import useImageZoom from '@/composables/useImageZoom.js';
 
 import { playOk, playKo, playNoob } from '@/composables/useSounds.js';
 
+const CLUE_SHRINK = 0.8;
+const CLUE_MIN_SIZE = 50;
+const MISS_LIFETIME = 2500;
+
 const route = useRoute();
 const router = useRouter();
 
 const questsStore = useQuestsStore();
-const { currentDifficultyLevel, currentQuest, nextQuest, currentQuestIndex, questsStats } = storeToRefs(questsStore);
+const { currentDifficultyLevel, currentQuest, nextQuest, currentQuestIndex, photoCount } = storeToRefs(questsStore);
+const { instructionsVisible } = storeToRefs(useUiStore());
 
-const questStats = ref({});
+const isQuest = computed(() => currentQuest.value?.type === 'quest');
+
+// --- Route → store (direct link, refresh, browser back) ---
+
+function parseLevel(param) {
+    if (param === 'all') {
+        return 'all';
+    }
+    const level = parseInt(param);
+    return Number.isNaN(level) ? 0 : level;
+}
+
+function applyRoute(params) {
+    const level = parseLevel(params?.difficultyLevel);
+    if (level !== currentDifficultyLevel.value) {
+        questsStore.startLevel(level);
+    }
+    questsStore.setCurrentQuestIndex((parseInt(params?.imageIndex) || 1) - 1);
+}
+
+applyRoute(route.params);
+
+// --- Current attempt on the displayed photo ---
+
+const questStats = ref({ questId: null, clueCount: 0, noCount: 0, found: false });
 const timer = ref(0);
+const isFound = ref(false);
+const gridVisible = ref(false);
+const pageVisible = ref(!document.hidden);
+
+// The timer only counts while the player is actually searching
+const timerRunning = computed(() => isQuest.value && !isFound.value && !instructionsVisible.value && !gridVisible.value && pageVisible.value);
+
 let timerInterval = null;
 
-timerInterval = setInterval(() => {
-    timer.value++;
-}, 1000);
-questsStore.currentDifficultyLevel = route?.params?.difficultyLevel != 'all' ? parseInt(route?.params?.difficultyLevel || 0) : 'all';
-questsStore.setCurrentQuestIndex(parseInt(route?.params?.imageIndex || 1) - 1);
+// Restarted on each photo so that the first second really is one second on it
+function restartTimer() {
+    clearInterval(timerInterval);
+    timer.value = 0;
+    timerInterval = setInterval(() => {
+        if (timerRunning.value) {
+            timer.value++;
+        }
+    }, 1000);
+}
 
+function onVisibilityChange() {
+    pageVisible.value = !document.hidden;
+}
+
+function resetQuestStats() {
+    questStats.value = { questId: currentQuest.value?.id ?? null, clueCount: 0, noCount: 0, found: false };
+    restartTimer();
+    isFound.value = false;
+    misses.value = [];
+    clueFactor.value = 1;
+}
+
+// Leaving a photo saves what happened on it (skipped if the player only passed through)
+function recordCurrentAttempt() {
+    const { questId, clueCount, noCount, found } = questStats.value;
+    if (!found && timer.value === 0 && clueCount === 0 && noCount === 0) {
+        return;
+    }
+    questsStore.recordAttempt(questId, { time: timer.value, clueCount, noCount, found });
+}
+
+// --- Layout: fit the photo in the area between the top pills and the dock ---
+
+const photoArea = ref(null);
 const imageWrapper = ref(null);
-const clueSize = ref(0);
-const clueSizeWithUnit = computed(() => clueSize.value + 'px');
-const displayClue = ref(false);
+const wrapperSize = ref({ width: 0, height: 0 });
+const clueBase = ref(0);
 
-const isShaking = ref(false);
+function updateLayout() {
+    const area = photoArea.value;
+    if (!area || !isQuest.value) {
+        return;
+    }
+
+    const style = getComputedStyle(area);
+    const availableWidth = area.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+    const availableHeight = area.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+    const ratio = currentQuest.value.width / currentQuest.value.height;
+
+    let width = availableWidth;
+    let height = availableWidth / ratio;
+    if (height > availableHeight) {
+        height = availableHeight;
+        width = availableHeight * ratio;
+    }
+
+    wrapperSize.value = { width, height };
+    clueBase.value = Math.min(availableWidth, availableHeight);
+}
+
+const resizeObserver = new ResizeObserver(() => updateLayout());
+
+watch(photoArea, (element, previous) => {
+    if (previous) {
+        resizeObserver.unobserve(previous);
+    }
+    if (element) {
+        resizeObserver.observe(element);
+    }
+});
+
+// --- Clue: a circle around Alex, smaller at each use ---
+
+const displayClue = ref(false);
+const clueFactor = ref(1);
+const clueCenter = ref({ x: 0.5, y: 0.5 }); // fraction of the photo
+const clueSize = computed(() => Math.max(CLUE_MIN_SIZE, clueBase.value * clueFactor.value));
+
 const {
+    scale,
     isDragging,
     isSnapping,
     isZooming,
@@ -92,17 +242,71 @@ const {
     onTouchEnd,
 } = useImageZoom(checkAlexFound, imageWrapper);
 
+const wrapperStyle = computed(() => {
+    const { width, height } = wrapperSize.value;
+    return {
+        width: width + 'px',
+        height: height + 'px',
+        '--clue-size': clueSize.value + 'px',
+        '--clue-x': clueCenter.value.x * width - clueSize.value / 2 + 'px',
+        '--clue-y': clueCenter.value.y * height - clueSize.value / 2 + 'px',
+        '--zoom': scale.value,
+    };
+});
+
+function randomizeClueCenter() {
+    const { width, height } = wrapperSize.value;
+    if (!width || !height) {
+        return;
+    }
+    const alex = alexPosition(currentQuest.value);
+    const point = getRandomPointInCircle((alex.x / 100) * width, (alex.y / 100) * height, Math.max(0, clueSize.value / 2 - 20));
+    clueCenter.value = { x: point.x / width, y: point.y / height };
+}
+
+function showClue() {
+    playNoob();
+    questStats.value.clueCount++;
+    randomizeClueCenter();
+    displayClue.value = true;
+    setTimeout(() => {
+        displayClue.value = false;
+        if (clueSize.value > CLUE_MIN_SIZE) {
+            clueFactor.value *= CLUE_SHRINK;
+        }
+    }, 100);
+}
+
+// --- Clicks on the photo ---
+
+const isShaking = ref(false);
+const misses = ref([]);
+let missId = 0;
+
+function addMiss(event) {
+    const image = event.target;
+    const id = ++missId;
+    misses.value = [...misses.value.slice(-4), { id, x: (event.offsetX / image.width) * 100, y: (event.offsetY / image.height) * 100 }];
+    setTimeout(() => {
+        misses.value = misses.value.filter((miss) => miss.id !== id);
+    }, MISS_LIFETIME);
+}
+
 function checkAlexFound(event) {
+    if (isFound.value) {
+        return;
+    }
+
     const xRatio = event.target.naturalWidth / event.target.width;
     const yRatio = event.target.naturalHeight / event.target.height;
     const polygon = toPolygon(currentQuest.value.coords, xRatio, yRatio);
-    const isInside = pointInPolygon(polygon, event.offsetX, event.offsetY);
 
-    if (isInside) {
-        onAlexFound(event);
+    if (pointInPolygon(polygon, event.offsetX, event.offsetY)) {
+        onAlexFound(polygon);
     } else {
         playKo();
         questStats.value.noCount++;
+        addMiss(event);
         isShaking.value = true;
         setTimeout(() => {
             isShaking.value = false;
@@ -110,81 +314,26 @@ function checkAlexFound(event) {
     }
 }
 
-async function onAlexFound(event) {
+async function onAlexFound(polygon) {
+    const foundQuest = currentQuest.value;
+    isFound.value = true;
+    questStats.value.found = true;
+    misses.value = [];
     playOk();
     confetti.start();
-    questStats.value.found = true;
 
-    const xRatio = event.target.naturalWidth / event.target.width;
-    const yRatio = event.target.naturalHeight / event.target.height;
-    const polygon = toPolygon(currentQuest.value.coords, xRatio, yRatio);
     const center = getPolygonCenter(polygon);
-
     await animateZoomTo(center.x, center.y, 15, 1600);
     confetti.stop();
-    questsStore.goToNextQuest();
-}
 
-function resetQuestStats() {
-    questStats.value = {
-        questId: currentQuest.id,
-        start: new Date(),
-        end: null,
-        clueCount: 0,
-        noCount: 0,
-        found: false,
-    };
-    timer.value = 0;
-}
-
-//IMAGE WRAPPER DIMENSIONS
-const wrapperStyle = ref({ height: '100%', width: '100%' });
-
-function updateWrapperStyle() {
-    /* Compute wrapper dimmensions */
-    const mainDimensions = document.querySelector('main').getBoundingClientRect();
-    const aspectRatio = currentQuest.value.width / currentQuest.value.height;
-    const containerAspectRatio = mainDimensions.width / mainDimensions.height;
-
-    let newWidth, newHeight;
-    if (aspectRatio > containerAspectRatio) {
-        newWidth = mainDimensions.width;
-        newHeight = mainDimensions.width / aspectRatio;
-    } else {
-        newHeight = mainDimensions.height;
-        newWidth = mainDimensions.height * aspectRatio;
+    // The player may already have moved on during the animation
+    if (currentQuest.value === foundQuest) {
+        questsStore.goToNextQuest();
     }
-
-    /* Compute clue circle position*/
-    const xRatio = currentQuest.value.width / newWidth;
-    const yRatio = currentQuest.value.height / newHeight;
-    const polygon = toPolygon(currentQuest.value.coords, xRatio, yRatio);
-    const polygonCenter = getPolygonCenter(polygon);
-    const clueCenter = getRandomPointInCircle(polygonCenter.x, polygonCenter.y, clueSize.value / 2 - 20);
-
-    wrapperStyle.value = {
-        height: newHeight + 'px',
-        width: newWidth + 'px',
-        '--clueCenterY': clueCenter.y - clueSize.value / 2 + 'px',
-        '--clueCenterX': clueCenter.x - clueSize.value / 2 + 'px',
-    };
-}
-
-function showClue() {
-    playNoob();
-    displayClue.value = true;
-    questStats.value.clueCount++;
-    setTimeout(() => {
-        displayClue.value = false;
-        if (clueSize.value > 50) {
-            clueSize.value = clueSize.value * 0.8;
-        }
-        updateWrapperStyle();
-    }, 100);
 }
 
 function preloadNextImage() {
-    if (nextQuest?.value?.type != 'quest') {
+    if (nextQuest.value?.type !== 'quest') {
         return;
     }
 
@@ -192,117 +341,208 @@ function preloadNextImage() {
     nextImage.src = nextQuest.value.url;
 }
 
-//ZOOM
-function resetClueSize() {
-    const mainDimensions = document.querySelector('main').getBoundingClientRect();
-    clueSize.value = Math.min(mainDimensions.width, mainDimensions.height);
-}
+// --- Quest changes (navigation, found, level change) ---
 
-onMounted(() => {
-    if (currentQuest.value.type == 'end' && questsStats.value.length == 0) {
-        // location.href = '/';
-    }
+watch(currentQuest, async () => {
+    recordCurrentAttempt();
+    gridVisible.value = false;
 
-    resetClueSize();
-    resetQuestStats();
-    updateWrapperStyle();
-
-    document.addEventListener('mouseup', onMouseUp);
-});
-
-onUnmounted(() => {
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-    }
-    document.removeEventListener('mouseup', onMouseUp);
-});
-
-//change url on quest change
-watch(currentQuestIndex, (value, oldValue) => {
     router.push({
         name: 'quest',
         params: {
             difficultyLevel: currentDifficultyLevel.value,
-            imageIndex: value + 1,
+            imageIndex: currentQuestIndex.value + 1,
         },
     });
+
     resetTransform();
-    resetClueSize();
-
-    if (value === oldValue + 1 || value == oldValue - 1) {
-        questStats.value.end = new Date();
-        questsStore.pushQuestStats({
-            ...questStats.value,
-        });
-        resetQuestStats();
-    }
-
-    if (currentQuest.value.type == 'quest') {
-        updateWrapperStyle();
-    }
-});
-
-// Reset stats when difficulty level changes
-watch(currentDifficultyLevel, () => {
-    questsStore.resetQuests();
     resetQuestStats();
+
+    if (isQuest.value) {
+        questsStore.rememberPosition();
+        await nextTick();
+        updateLayout();
+    } else {
+        questsStore.clearPosition();
+    }
 });
 
-watch(currentQuestIndex, preloadNextImage, { immediate: true });
+watch(
+    () => route.params,
+    (params) => {
+        if (route.name === 'quest') {
+            applyRoute(params);
+        }
+    },
+);
+
+watch(currentQuest, preloadNextImage, { immediate: true });
+
+onMounted(() => {
+    resetQuestStats();
+    if (isQuest.value) {
+        questsStore.rememberPosition();
+    }
+
+    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+});
+
+onUnmounted(() => {
+    recordCurrentAttempt();
+    clearInterval(timerInterval);
+    resizeObserver.disconnect();
+    confetti.stop();
+    document.removeEventListener('mouseup', onMouseUp);
+    document.removeEventListener('visibilitychange', onVisibilityChange);
+});
 </script>
 
 <style lang="scss">
-/* Wrapper pour éviter le warning Vue Transition */
-.oea-view-wrapper {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+.oea-stage {
+    position: relative;
     flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--stage);
+    color: var(--on-glass);
+
+    &--end {
+        overflow-y: auto;
+        background: var(--paper);
+        color: var(--ink);
+    }
 }
 
-/* Clue circles */
+.oea-backdrop {
+    position: absolute;
+    inset: -48px;
+    background-size: cover;
+    background-position: center;
+    filter: blur(32px) saturate(1.2) brightness(0.5);
+    pointer-events: none;
+}
+
+// The photo is fitted between the top pills and the dock, but can be zoomed beneath them
+.oea-photo-area {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: calc(4.25rem + var(--safe-top)) 0.75rem calc(6.25rem + var(--safe-bottom));
+    overflow: hidden;
+
+    @media (min-width: 900px) {
+        padding-inline: 1.5rem;
+    }
+}
+
 .oea-image-wrapper {
-    &.oea-display-clue {
-        &::after,
-        &::before {
-            display: block;
-            animation: clueGlow 2s ease-in-out infinite;
-        }
+    position: relative;
+    flex: 0 0 auto;
+    overflow: hidden;
+    touch-action: none;
+    border-radius: 6px;
+    box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.7);
+
+    .oea-img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        cursor: crosshair;
+        user-select: none;
+        -webkit-user-drag: none;
     }
 
+    &.oea-dragging .oea-img {
+        cursor: grabbing;
+    }
+
+    &.oea-snapping {
+        transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    &.oea-zooming {
+        transition: transform 1.6s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    // Clue: red ring, white inner line, and the rest of the photo dimmed
     &::after,
     &::before {
         content: '';
         display: none;
         position: absolute;
         border-radius: 50%;
+        pointer-events: none;
     }
 
-    // Cercle extérieur avec glow rose
+    &.oea-display-clue::after,
+    &.oea-display-clue::before {
+        display: block;
+    }
+
     &::after {
-        top: var(--clueCenterY);
-        left: var(--clueCenterX);
-        width: v-bind(clueSizeWithUnit);
-        height: v-bind(clueSizeWithUnit);
-        border: 3px solid rgba(var(--color-pink-rgb), 0.8);
-        box-shadow:
-            0 0 20px var(--glow-pink),
-            0 0 40px var(--glow-pink),
-            0 0 60px rgba(var(--color-pink-rgb), 0.4),
-            inset 0 0 20px rgba(var(--color-pink-rgb), 0.1);
+        top: var(--clue-y);
+        left: var(--clue-x);
+        width: var(--clue-size);
+        height: var(--clue-size);
+        border: 3px solid var(--hot);
+        box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.35);
     }
 
-    // Cercle intérieur avec bordure blanche subtile
     &::before {
-        top: calc(var(--clueCenterY) + 4px);
-        left: calc(var(--clueCenterX) + 4px);
-        width: calc(v-bind(clueSizeWithUnit) - 8px);
-        height: calc(v-bind(clueSizeWithUnit) - 8px);
-        border: 2px solid rgba(var(--white-rgb), 0.6);
-        box-shadow:
-            0 0 10px rgba(var(--white-rgb), 0.3),
-            inset 0 0 10px rgba(var(--color-pink-rgb), 0.2);
+        z-index: 1;
+        top: calc(var(--clue-y) + 5px);
+        left: calc(var(--clue-x) + 5px);
+        width: calc(var(--clue-size) - 10px);
+        height: calc(var(--clue-size) - 10px);
+        border: 1.5px solid rgba(255, 255, 255, 0.85);
+    }
+}
+
+// Wrong click marker: a cross that fades away, same size whatever the zoom
+.oea-miss {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(calc(1 / var(--zoom, 1)));
+    animation: missFade 2.5s ease-out;
+
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 0;
+        width: 2.5px;
+        height: 100%;
+        margin-left: -1.25px;
+        border-radius: 2px;
+        background: #fff;
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
+    }
+
+    &::before {
+        transform: rotate(45deg);
+    }
+
+    &::after {
+        transform: rotate(-45deg);
+    }
+}
+
+@keyframes missFade {
+    0% {
+        opacity: 0;
+    }
+    8%,
+    70% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
     }
 }
 
@@ -330,14 +570,176 @@ watch(currentQuestIndex, preloadNextImage, { immediate: true });
     }
 }
 
-// Animation de pulse pour le glow de l'indice
-@keyframes clueGlow {
-    0%,
-    100% {
-        opacity: 0.8;
+// --- Top pills ---
+
+.oea-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    padding: calc(0.875rem + var(--safe-top)) max(0.75rem, env(safe-area-inset-right, 0px)) 0 max(0.75rem, env(safe-area-inset-left, 0px));
+    pointer-events: none;
+
+    > * {
+        pointer-events: auto;
     }
-    50% {
-        opacity: 1;
+}
+
+.oea-top-right {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.oea-pill-icon {
+    width: 0.9rem;
+    height: 0.9rem;
+    margin-left: -0.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.oea-pill--round {
+    width: 2.25rem;
+    padding: 0;
+    justify-content: center;
+    font-weight: 600;
+}
+
+// --- Dock ---
+
+.oea-dock {
+    position: absolute;
+    left: 50%;
+    bottom: calc(0.875rem + var(--safe-bottom));
+    z-index: 2;
+    transform: translateX(-50%);
+    width: min(calc(100% - 1.5rem), 26rem);
+    height: 4rem;
+    padding: 0 0.75rem;
+    display: grid;
+    grid-template-columns: 2.5rem 1fr 3.75rem 1fr 2.5rem;
+    align-items: center;
+    gap: 0.25rem;
+    border-radius: 1.5rem;
+    background: var(--glass);
+    color: var(--on-glass);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    box-shadow:
+        inset 0 0 0 1px var(--glass-line),
+        0 12px 32px -12px rgba(0, 0, 0, 0.55);
+
+    svg {
+        width: 1.15rem;
+        height: 1.15rem;
+    }
+
+    path {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2.4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    rect {
+        fill: currentColor;
+    }
+}
+
+.oea-dock-btn {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    cursor: pointer;
+    transition:
+        background-color 150ms ease,
+        transform 150ms var(--ease-out);
+
+    &:not(:disabled):hover {
+        background: rgba(255, 255, 255, 0.22);
+    }
+
+    &:not(:disabled):active {
+        transform: scale(0.92);
+    }
+
+    &:disabled {
+        opacity: 0.3;
+        cursor: default;
+    }
+}
+
+.oea-dock-count {
+    margin: 0;
+    font-size: 0.6875rem;
+    line-height: 1.45;
+    text-align: center;
+    opacity: 0.9;
+}
+
+.oea-compass {
+    width: 3.75rem;
+    height: 3.75rem;
+    margin-top: -1.25rem;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: var(--hot);
+    cursor: pointer;
+    box-shadow:
+        0 10px 20px -8px rgba(255, 77, 46, 0.75),
+        0 0 0 4px rgba(255, 255, 255, 0.16);
+    transition: transform 160ms var(--ease-out);
+
+    img {
+        width: 2rem;
+        height: 2rem;
+        filter: brightness(0) invert(1);
+    }
+
+    &:hover {
+        transform: scale(1.05);
+    }
+
+    &:active {
+        transform: scale(0.94);
+    }
+
+    &:disabled {
+        cursor: default;
+    }
+}
+
+.oea-dock-grid {
+    justify-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 0.25rem 0.5rem;
+    border: 0;
+    border-radius: 0.75rem;
+    background: none;
+    font-size: 0.6875rem;
+    cursor: pointer;
+    transition: background-color 150ms ease;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.1);
     }
 }
 </style>

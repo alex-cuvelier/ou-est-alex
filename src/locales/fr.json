@@ -1,23 +1,7 @@
 {
     "header": {
         "ask-clue": "Demander un indice",
-        "chooseQuest": "Choisir un niveau",
         "showInstructions": "Aide"
-    },
-    "footer": {
-        "difficultyLevel": "Difficulté",
-        "timer": "Timer",
-        "clue": "Indice",
-        "no": "Non"
-    },
-    "end": {
-        "found": "Trouvés",
-        "errors": "Erreurs",
-        "clues": "Indices",
-        "time": "Temps",
-        "restart": "Recommencer",
-        "chooseLevel": "Choisir la difficulté",
-        "continue": "Continuer"
     },
     "difficulty": {
         "0": "Facile",
@@ -27,8 +11,45 @@
         "4": "Impossible",
         "all": "Tout !"
     },
-    "level-chooser": {
-        "title": "Choisir une difficulté"
+    "home": {
+        "title": "Où est Alex ?",
+        "progress": "{found} / {total} trouvées · {time} de jeu",
+        "fresh": "{total} photos, un seul Alex",
+        "resume": "Reprendre",
+        "levels": "Niveaux",
+        "howTo": "Comment jouer ?"
+    },
+    "quest": {
+        "photoAlt": "Photo où Alex se cache",
+        "back": "Retour à l'accueil",
+        "controls": "Commandes de la partie",
+        "previous": "Photo précédente",
+        "next": "Photo suivante",
+        "photos": "Photos",
+        "timer": "Temps écoulé",
+        "position": "{level} · {index}/{count}",
+        "clues": "0 indice | 1 indice | {n} indices",
+        "nos": "0 non | 1 non | {n} non"
+    },
+    "grid": {
+        "title": "Choisir une photo",
+        "tile": "Photo {index}, {status}",
+        "found": "trouvée",
+        "missed": "ratée",
+        "todo": "à chercher"
+    },
+    "end": {
+        "done": "{level} · terminé",
+        "found": "{found} / {count} trouvées",
+        "missed": "raté",
+        "unseen": "pas vue",
+        "replay": "Rejouer la photo {index} ({status})",
+        "shareTitle": "Où est Alex ? · {level}",
+        "copy": "Copier",
+        "copied": "Copié",
+        "next": "Niveau suivant",
+        "restart": "Rejouer",
+        "home": "Accueil"
     },
     "instructions": {
         "title": "Comment jouer ?",
