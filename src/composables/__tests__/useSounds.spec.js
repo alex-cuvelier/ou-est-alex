@@ -3,12 +3,14 @@ import { playOk, playKo, playNoob } from '../useSounds.js';
 
 describe('useSounds', () => {
     beforeEach(() => {
-        // Mock Audio constructor
-        global.Audio = vi.fn().mockImplementation(() => ({
-            play: vi.fn().mockResolvedValue(undefined),
-            pause: vi.fn(),
-            currentTime: 0,
-        }));
+        // Mock Audio constructor (a regular function: since Vitest 4, arrow implementations can't be called with `new`)
+        global.Audio = vi.fn().mockImplementation(function () {
+            return {
+                play: vi.fn().mockResolvedValue(undefined),
+                pause: vi.fn(),
+                currentTime: 0,
+            };
+        });
     });
 
     describe('playOk', () => {
@@ -76,9 +78,9 @@ describe('useSounds', () => {
 
     describe('Error handling', () => {
         it('should not throw when Audio.play fails', () => {
-            global.Audio = vi.fn().mockImplementation(() => ({
-                play: vi.fn().mockRejectedValue(new Error('Play failed')),
-            }));
+            global.Audio = vi.fn().mockImplementation(function () {
+                return { play: vi.fn().mockRejectedValue(new Error('Play failed')) };
+            });
 
             expect(() => playOk()).not.toThrow();
             expect(() => playKo()).not.toThrow();

@@ -73,10 +73,21 @@
                                     <InputText v-model="imageId" placeholder="Enter image ID" />
                                 </label>
                                 <label>
+                                    Location:
+                                    <InputText v-model="group" list="oea-known-groups" placeholder="e.g. Bretagne" />
+                                    <datalist id="oea-known-groups">
+                                        <option v-for="name in knownGroups" :key="name" :value="name"></option>
+                                    </datalist>
+                                </label>
+                                <label>
                                     Difficulty Level:
                                     <SelectButton :options="difficultyOptions" v-model="difficultyLevel" optionLabel="label" optionValue="value" />
                                 </label>
                             </div>
+                            <p v-if="idTaken" class="id-warning">
+                                <i class="pi pi-exclamation-triangle"></i>
+                                ID {{ imageId }} is already used by an existing quest.
+                            </p>
                             <div class="json-output">
                                 <div class="json-container">
                                     <Button v-if="imageId != null && difficultyLevel != null" icon="pi pi-copy" class="copy-button" @click="copyJsonOutput" />
@@ -99,6 +110,7 @@
 import { ref, computed, watch } from 'vue';
 import InputText from 'primevue/inputtext';
 import { useToast } from 'primevue/usetoast';
+import quests from '@/quests.json';
 
 const toast = useToast();
 
@@ -121,7 +133,20 @@ const percentageOptions = [
     { label: '75%', value: 75 },
     { label: '100%', value: 100 },
 ];
-const imageId = ref();
+// Next free id after the existing quests (the latest ones are stored as strings)
+const existingIds = quests.filter((quest) => quest.id != null).map((quest) => String(quest.id));
+const nextId = String(Math.max(0, ...existingIds.map(Number).filter(Number.isFinite)) + 1);
+
+// Places already used, most frequent first
+const groupCounts = quests.reduce((counts, quest) => {
+    if (quest.group) counts[quest.group] = (counts[quest.group] || 0) + 1;
+    return counts;
+}, {});
+const knownGroups = Object.keys(groupCounts).sort((a, b) => groupCounts[b] - groupCounts[a]);
+
+const imageId = ref(nextId);
+const idTaken = computed(() => existingIds.includes(String(imageId.value ?? '').trim()));
+const group = ref('');
 const difficultyLevel = ref(0);
 const difficultyOptions = [
     { label: '0', value: 0 },
@@ -141,6 +166,7 @@ const jsonOutput = computed(() => {
             width: displayWidth.value,
             height: displayHeight.value,
             difficultyLevel: difficultyLevel.value,
+            group: group.value.trim() || undefined,
         },
         null,
         2,
@@ -724,7 +750,9 @@ const copyJsonOutput = () => {
 
         .input-fields {
             display: flex;
-            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem 2rem;
             align-items: center;
             margin-bottom: 1.5rem;
             padding: 1rem 1.5rem;
@@ -752,6 +780,15 @@ const copyJsonOutput = () => {
                     min-width: 3rem;
                 }
             }
+        }
+
+        .id-warning {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: -0.5rem 0 1rem;
+            color: var(--color-warning);
+            font-weight: 600;
         }
 
         .json-output {

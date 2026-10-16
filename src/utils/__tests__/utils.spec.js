@@ -10,6 +10,7 @@ import {
     formatDuration,
     thumbUrl,
     alexPosition,
+    alexRing,
 } from '../utils.js';
 
 describe('pointInPolygon', () => {
@@ -322,5 +323,27 @@ describe('alexPosition', () => {
 
     it('should fall back to the center without coordinates', () => {
         expect(alexPosition({ width: 100, height: 100 })).toEqual({ x: 50, y: 50 });
+    });
+});
+
+describe('alexRing', () => {
+    it('should circle the outline with some room, as percentages', () => {
+        const ring = alexRing({ coords: '100,100,300,100,300,300,100,300', width: 1000, height: 400 });
+
+        expect(ring.x).toBeCloseTo(20);
+        expect(ring.y).toBeCloseTo(50);
+        expect(ring.width).toBeCloseTo(28);
+        expect(ring.height).toBeCloseTo(70);
+    });
+
+    it('should never be too small to be seen', () => {
+        const ring = alexRing({ coords: '500,200,510,200,510,210', width: 1000, height: 400 });
+
+        expect(ring.width).toBeCloseTo(3.2);
+        expect(ring.height).toBeCloseTo(8);
+    });
+
+    it('should be absent without coordinates', () => {
+        expect(alexRing({ width: 100, height: 100 })).toBeNull();
     });
 });

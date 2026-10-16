@@ -3,6 +3,11 @@
         <div class="oea-home-inner">
             <header class="oea-home-head">
                 <h1>{{ $t('home.title') }}</h1>
+                <!-- Same "?" as in the game, on the title line where it is seen on arrival -->
+                <button type="button" class="oea-home-help" @click="instructionsVisible = true">
+                    <span class="oea-home-help-icon" aria-hidden="true">?</span>
+                    <span class="oea-home-help-label">{{ $t('home.howToShort') }}</span>
+                </button>
                 <p class="oea-mono">{{ subtitle }}</p>
             </header>
 
@@ -22,7 +27,7 @@
                 </h2>
                 <ul class="oea-levels">
                     <li v-for="level in levels" :key="level.id">
-                        <button type="button" class="oea-level" :class="{ 'is-done': level.done }" @click="startLevel(level.id)">
+                        <button type="button" class="oea-level" :class="{ 'is-done': level.done }" @click="openLevel(level.id)">
                             <img :src="level.thumb" alt="" loading="lazy" />
                             <span class="oea-level-name">
                                 {{ level.name }}
@@ -33,8 +38,6 @@
                     </li>
                 </ul>
             </section>
-
-            <button type="button" class="oea-home-help" @click="instructionsVisible = true">{{ $t('home.howTo') }}</button>
         </div>
     </div>
 </template>
@@ -51,22 +54,23 @@ import { formatDuration, thumbUrl } from '@/utils/utils.js';
 const { t } = useI18n();
 const router = useRouter();
 const questsStore = useQuestsStore();
-const { difficultyLevels, progress, currentDifficultyLevel } = storeToRefs(questsStore);
+const { difficultyLevels, progress, currentQuestIndex } = storeToRefs(questsStore);
 const { instructionsVisible } = storeToRefs(useUiStore());
 
+// Each card shows its level's run, the one a tap resumes
 const levels = computed(() =>
     [...difficultyLevels.value, 'all'].map((id) => {
         const photos = questsStore.getLevelPhotos(id);
-        const found = questsStore.getCompletedCount(id);
+        const { found, total } = questsStore.runProgress(id);
         return {
             id,
             name: t('difficulty.' + id),
             // "All" would repeat the first level's photo: take the most recent one instead
             thumb: thumbUrl(id === 'all' ? photos.at(-1) : photos[0]),
             found,
-            total: photos.length,
-            percent: photos.length ? (found / photos.length) * 100 : 0,
-            done: photos.length > 0 && found === photos.length,
+            total,
+            percent: total ? (found / total) * 100 : 0,
+            done: total > 0 && found === total,
         };
     }),
 );
@@ -79,31 +83,32 @@ const subtitle = computed(() => {
     return t('home.progress', { found: questsStore.getCompletedCount('all'), total, time: formatDuration(progress.value.playTime) });
 });
 
+// The last level played, on the photo it will open: the next one still to search
 const resume = computed(() => {
     const last = progress.value.last;
-    const quest = last && questsStore.getLevelPhotos(last.level)[last.index];
+    if (!last) {
+        return null;
+    }
+    const index = questsStore.resumeIndex(last.level);
+    const quest = questsStore.getLevelPhotos(last.level)[index];
     if (!quest) {
         return null;
     }
     return {
-        ...last,
+        level: last.level,
         thumb: thumbUrl(quest),
-        label: t('quest.position', { level: t('difficulty.' + last.level), index: last.index + 1, count: questsStore.getTotalCount(last.level) }),
+        label: t('quest.position', { level: t('difficulty.' + last.level), index: index + 1, count: questsStore.getTotalCount(last.level) }),
     };
 });
 
-function startLevel(level) {
-    questsStore.startLevel(level);
-    router.push({ name: 'quest', params: { difficultyLevel: level, imageIndex: 1 } });
+// Resumes the level's run (its recap if it is complete, its first photo if never played)
+function openLevel(level) {
+    questsStore.openLevel(level);
+    router.push({ name: 'quest', params: { difficultyLevel: level, imageIndex: currentQuestIndex.value + 1 } });
 }
 
-// Keeps the current run when resuming the level being played
 function resumeGame() {
-    const { level, index } = resume.value;
-    if (level !== currentDifficultyLevel.value) {
-        questsStore.startLevel(level);
-    }
-    router.push({ name: 'quest', params: { difficultyLevel: level, imageIndex: index + 1 } });
+    openLevel(resume.value.level);
 }
 </script>
 
@@ -129,16 +134,24 @@ function resumeGame() {
     }
 }
 
+// Title and help on the same line, the subtitle under both
 .oea-home-head {
     display: grid;
-    gap: 0.375rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+        'title help'
+        'sub sub';
+    align-items: center;
+    gap: 0.375rem 0.75rem;
 
     h1 {
+        grid-area: title;
         font-size: clamp(2rem, 7vw, 3.5rem);
         letter-spacing: -0.04em;
     }
 
     p {
+        grid-area: sub;
         font-size: 0.8125rem;
         color: var(--mid);
     }
@@ -342,18 +355,54 @@ function resumeGame() {
 }
 
 .oea-home-help {
-    align-self: flex-start;
-    padding: 0;
+    grid-area: help;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3125rem 0.875rem 0.3125rem 0.3125rem;
     border: 0;
-    background: none;
-    color: var(--mid);
-    font-size: 0.875rem;
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-1);
+    box-shadow: inset 0 0 0 1px var(--hair);
+    color: var(--ink);
+    font-size: 0.8125rem;
+    font-weight: 600;
     cursor: pointer;
+    transition:
+        box-shadow 150ms ease,
+        transform 150ms var(--ease-out);
 
     &:hover {
-        color: var(--ink);
+        box-shadow: inset 0 0 0 1.5px var(--mid);
     }
+
+    &:active {
+        transform: scale(0.97);
+    }
+
+    // Very narrow phones: the "?" alone, the label stays for screen readers
+    @media (max-width: 379px) {
+        padding: 0.3125rem;
+
+        .oea-home-help-label {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip-path: inset(50%);
+            white-space: nowrap;
+        }
+    }
+}
+
+.oea-home-help-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--on-ink);
+    font-weight: 700;
 }
 </style>

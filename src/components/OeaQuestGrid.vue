@@ -46,13 +46,8 @@ const isVisible = computed({
     set: (value) => emit('update:visible', value),
 });
 
-// A photo found in an earlier visit stays marked found; "missed" only concerns the current run
-const tiles = computed(() =>
-    levelPhotos.value.map((quest, index) => {
-        const runStatus = questsStore.questStatus(quest.id);
-        return { quest, index, status: questsStore.isEverFound(quest.id) ? 'found' : runStatus };
-    }),
-);
+// The state of the current run, the one the game follows to pick the next photo
+const tiles = computed(() => levelPhotos.value.map((quest, index) => ({ quest, index, status: questsStore.questStatus(quest.id) })));
 
 function goToQuest(index) {
     isVisible.value = false;
