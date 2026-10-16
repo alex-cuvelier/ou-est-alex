@@ -26,6 +26,7 @@
         "previous": "Photo précédente",
         "next": "Photo suivante",
         "photos": "Photos",
+        "askClue": "Demander un indice ({clues} jusqu'ici)",
         "timer": "Temps écoulé",
         "position": "{level} · {index}/{count}",
         "clues": "0 indice | 1 indice | {n} indices",

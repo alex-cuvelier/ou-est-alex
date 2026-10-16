@@ -304,7 +304,8 @@ function closeDialog() {
     margin: 0 0.2rem;
     vertical-align: middle;
     border-radius: 50%;
-    background: var(--hot);
+    // Same look as the in-game button, which always sits on the dark photo stage
+    background: var(--stage);
 
     img {
         width: 1rem;

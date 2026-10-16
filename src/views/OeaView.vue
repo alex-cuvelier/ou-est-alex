@@ -51,18 +51,17 @@
                 >
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
                 </button>
-                <p class="oea-dock-count oea-mono" aria-live="polite">
-                    {{ $t('quest.clues', questStats.clueCount) }}<br />{{ $t('quest.nos', questStats.noCount) }}
-                </p>
                 <button
                     type="button"
                     class="oea-compass"
+                    :class="{ 'is-nudging': suggestClue }"
                     :disabled="displayClue"
                     :title="$t('header.ask-clue')"
-                    :aria-label="$t('header.ask-clue')"
+                    :aria-label="$t('quest.askClue', { clues: $t('quest.clues', questStats.clueCount) })"
                     @click="showClue"
                 >
                     <img src="@/assets/icons/compass-solid.svg" alt="" />
+                    <span v-if="questStats.clueCount" class="oea-compass-count oea-mono" aria-hidden="true">{{ questStats.clueCount }}</span>
                 </button>
                 <button type="button" class="oea-dock-grid" @click="gridVisible = true">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -102,6 +101,7 @@ import { playOk, playKo, playNoob } from '@/composables/useSounds.js';
 
 const CLUE_SHRINK = 0.8;
 const CLUE_MIN_SIZE = 50;
+const CLUE_NUDGE_DELAY = 90; // seconds searching without a clue before the compass pulses
 const MISS_LIFETIME = 2500;
 
 const route = useRoute();
@@ -224,6 +224,7 @@ const displayClue = ref(false);
 const clueFactor = ref(1);
 const clueCenter = ref({ x: 0.5, y: 0.5 }); // fraction of the photo
 const clueSize = computed(() => Math.max(CLUE_MIN_SIZE, clueBase.value * clueFactor.value));
+const suggestClue = computed(() => timer.value >= CLUE_NUDGE_DELAY && questStats.value.clueCount === 0 && !isFound.value);
 
 const {
     scale,
@@ -430,7 +431,7 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: calc(4.25rem + var(--safe-top)) 0.75rem calc(6.25rem + var(--safe-bottom));
+    padding: calc(4.25rem + var(--safe-top)) 0.75rem calc(5.5rem + var(--safe-bottom));
     overflow: hidden;
 
     @media (min-width: 900px) {
@@ -621,12 +622,13 @@ onUnmounted(() => {
     bottom: calc(0.875rem + var(--safe-bottom));
     z-index: 2;
     transform: translateX(-50%);
-    width: min(calc(100% - 1.5rem), 26rem);
-    height: 4rem;
-    padding: 0 0.75rem;
+    width: min(calc(100% - 1.5rem), 20rem);
+    height: 3.75rem;
+    padding: 0 0.625rem;
     display: grid;
-    grid-template-columns: 2.5rem 1fr 3.75rem 1fr 2.5rem;
+    grid-template-columns: 2.5rem 1fr 1fr 2.5rem;
     align-items: center;
+    justify-items: center;
     gap: 0.25rem;
     border-radius: 1.5rem;
     background: var(--glass);
@@ -682,45 +684,74 @@ onUnmounted(() => {
     }
 }
 
-.oea-dock-count {
-    margin: 0;
-    font-size: 0.6875rem;
-    line-height: 1.45;
-    text-align: center;
-    opacity: 0.9;
-}
-
+// Clue: available but not inviting (it costs, and the "noob" sound says so). Red stays for Alex.
 .oea-compass {
-    width: 3.75rem;
-    height: 3.75rem;
-    margin-top: -1.25rem;
+    position: relative;
+    width: 2.75rem;
+    height: 2.75rem;
     display: grid;
     place-items: center;
     border: 0;
     border-radius: 50%;
-    background: var(--hot);
+    background: rgba(255, 255, 255, 0.12);
     cursor: pointer;
-    box-shadow:
-        0 10px 20px -8px rgba(255, 77, 46, 0.75),
-        0 0 0 4px rgba(255, 255, 255, 0.16);
-    transition: transform 160ms var(--ease-out);
+    transition:
+        background-color 150ms ease,
+        transform 150ms var(--ease-out);
 
     img {
-        width: 2rem;
-        height: 2rem;
+        width: 1.4rem;
+        height: 1.4rem;
         filter: brightness(0) invert(1);
     }
 
-    &:hover {
-        transform: scale(1.05);
+    &:not(:disabled):hover {
+        background: rgba(255, 255, 255, 0.22);
     }
 
-    &:active {
-        transform: scale(0.94);
+    &:not(:disabled):active {
+        transform: scale(0.92);
     }
 
     &:disabled {
         cursor: default;
+    }
+
+    // Stuck for a while without any clue: a slow, discreet halo
+    &.is-nudging {
+        animation: compassNudge 2.4s ease-in-out infinite;
+
+        // Without motion, the halo stays on instead of pulsing
+        @media (prefers-reduced-motion: reduce) {
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.22);
+        }
+    }
+}
+
+.oea-compass-count {
+    position: absolute;
+    top: -0.2rem;
+    right: -0.3rem;
+    min-width: 1.1rem;
+    height: 1.1rem;
+    padding: 0 0.25rem;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-pill);
+    background: var(--on-glass);
+    color: var(--stage);
+    font-size: 0.625rem;
+    font-weight: 500;
+    line-height: 1;
+}
+
+@keyframes compassNudge {
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.22);
     }
 }
 

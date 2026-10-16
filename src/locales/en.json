@@ -26,6 +26,7 @@
         "previous": "Previous photo",
         "next": "Next photo",
         "photos": "Photos",
+        "askClue": "Ask for a clue ({clues} so far)",
         "timer": "Elapsed time",
         "position": "{level} · {index}/{count}",
         "clues": "0 clues | 1 clue | {n} clues",

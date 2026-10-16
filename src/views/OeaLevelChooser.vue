@@ -245,30 +245,17 @@ function resumeGame() {
     }
 }
 
-// Mobile: one scrollable row. Wider screens: a grid.
+// Every level visible at once: 3 columns, 2 rows
 .oea-levels {
-    margin: 0 calc(-1 * max(1rem, env(safe-area-inset-right, 0px))) 0 0;
-    padding: 0 1rem 0.25rem 0;
+    margin: 0;
+    padding: 0;
     list-style: none;
     display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: 7.5rem;
-    gap: 0.625rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-
-    li {
-        scroll-snap-align: start;
-    }
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem 0.625rem;
 
     @media (min-width: 720px) {
-        margin: 0;
-        padding: 0;
-        grid-auto-flow: row;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 1rem;
-        overflow: visible;
+        gap: 1.25rem 1rem;
     }
 }
 
@@ -306,18 +293,31 @@ function resumeGame() {
     }
 }
 
+// Narrow cards: count under the name, so "Très difficile" never collides with it
 .oea-level-name {
     display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 0.5rem;
-    font-size: 0.875rem;
+    flex-direction: column;
+    gap: 0.125rem;
+    font-size: 0.8125rem;
     font-weight: 600;
+    line-height: 1.25;
 
     .oea-mono {
-        font-size: 0.75rem;
+        font-size: 0.6875rem;
         font-weight: 400;
         color: var(--mid);
+    }
+
+    @media (min-width: 720px) {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+
+        .oea-mono {
+            font-size: 0.75rem;
+        }
     }
 }
 
