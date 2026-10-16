@@ -402,6 +402,22 @@
         "difficultyLevel": 3
     },
     {
+        "id": "46",
+        "url": "/images/46.jpg",
+        "coords": "679,682,682,695,686,707,696,719,713,717,718,706,721,693,723,675,699,679",
+        "width": 2048,
+        "height": 1536,
+        "difficultyLevel": 1
+    },
+    {
+        "id": "47",
+        "url": "/images/47.jpg",
+        "coords": "863,625,875,638,884,636,884,624,873,616",
+        "width": 2048,
+        "height": 1536,
+        "difficultyLevel": 2
+    },
+    {
         "type": "end"
     }
 ]
