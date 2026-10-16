@@ -245,6 +245,10 @@ The tag starts the **Deploy** workflow ([deploy.yml](.github/workflows/deploy.ym
 
 Repository settings it uses: secret `SSH_PRIVATE_KEY`, variables `SSH_HOST`, `SSH_USER`, `SSH_KNOWN_HOSTS` (the server's host key line), `DEPLOY_REPOSITORY` and `WEBSITE_URL`.
 
+### Monitoring
+
+The **health-check** workflow ([health-check.yml](.github/workflows/health-check.yml)) checks every 30 minutes that the site serves the game and that its certificate has more than 14 days left; a failed run sends GitHub's failure e-mail. GitHub turns the schedule off after 60 days without a push: re-enable it in Actions → health-check.
+
 ### Manual Build
 
 ```bash
