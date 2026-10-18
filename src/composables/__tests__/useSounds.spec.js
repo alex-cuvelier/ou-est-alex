@@ -87,4 +87,72 @@ describe('useSounds', () => {
             expect(() => playNoob()).not.toThrow();
         });
     });
+
+    describe('With Web Audio', () => {
+        let listeners, context, sounds;
+
+        beforeEach(async () => {
+            listeners = {};
+            context = {
+                state: 'suspended',
+                destination: {},
+                resume: vi.fn(function () {
+                    this.state = 'running';
+                    return Promise.resolve();
+                }),
+                decodeAudioData: vi.fn((data) => Promise.resolve({ decoded: data })),
+                createBufferSource: vi.fn(() => ({ connect: vi.fn(), start: vi.fn() })),
+            };
+            vi.stubGlobal('window', {
+                AudioContext: vi.fn(function () {
+                    return context;
+                }),
+                addEventListener: vi.fn((type, listener) => {
+                    listeners[type] = listener;
+                }),
+            });
+            vi.stubGlobal(
+                'fetch',
+                vi.fn((url) => Promise.resolve({ arrayBuffer: () => Promise.resolve(url) })),
+            );
+            // A fresh module, which sees the stubbed window when it is loaded
+            vi.resetModules();
+            sounds = await import('../useSounds.js');
+        });
+
+        afterEach(() => {
+            vi.unstubAllGlobals();
+        });
+
+        it('should play from memory once a gesture has decoded the sounds', async () => {
+            listeners.pointerup();
+            await new Promise((resolve) => setTimeout(resolve));
+
+            sounds.playOk();
+
+            const source = context.createBufferSource.mock.results[0].value;
+            expect(source.buffer).toEqual({ decoded: '/src/assets/sounds/oui.mp3' });
+            expect(source.connect).toHaveBeenCalledWith(context.destination);
+            expect(source.start).toHaveBeenCalled();
+            expect(global.Audio).not.toHaveBeenCalled();
+        });
+
+        it('should fall back to an audio element before any gesture', () => {
+            sounds.playOk();
+
+            expect(global.Audio).toHaveBeenCalledWith('/src/assets/sounds/oui.mp3');
+            expect(context.createBufferSource).not.toHaveBeenCalled();
+        });
+
+        it('should fall back to an audio element while the system keeps audio suspended', async () => {
+            listeners.pointerup();
+            await new Promise((resolve) => setTimeout(resolve));
+            context.state = 'interrupted';
+
+            sounds.playKo();
+
+            expect(global.Audio).toHaveBeenCalledWith('/src/assets/sounds/non.mp3');
+            expect(context.createBufferSource).not.toHaveBeenCalled();
+        });
+    });
 });
