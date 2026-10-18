@@ -169,7 +169,7 @@ function burst(x, y) {
     }
     const height = getLayer().clientHeight;
     const shots = [];
-    for (let i = 0; i < 22; i++) {
+    for (let i = 0; i < 32; i++) {
         // A V, 30° to 75° off the vertical: the heads land aside, not on Alex while the photo zooms in on him
         const side = i % 2 ? 1 : -1;
         shots.push({ x, y, angle: -Math.PI / 2 + side * random(0.55, 1.3), speed: height * random(0.9, 1.6), delay: random(0, 0.08) });
