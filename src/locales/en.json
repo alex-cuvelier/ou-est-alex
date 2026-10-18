@@ -18,7 +18,6 @@
         "resume": "Resume",
         "levels": "Levels",
         "howTo": "How to play?",
-        "howToShort": "How to play",
         "reset": "Reset everything",
         "resetConfirm": "Erase all progress? Best times and play time will be lost.",
         "resetCancel": "Cancel",
@@ -76,9 +75,8 @@
     "instructions": {
         "title": "How to Play?",
         "subtitle": "Find Alex hidden in the image!",
-        "gotIt": "Got it!",
+        "gotIt": "Got it",
         "desktop": {
-            "title": "Desktop Controls",
             "zoom": {
                 "label": "Zoom",
                 "description": "Use mouse wheel to zoom in/out"
@@ -97,7 +95,6 @@
             }
         },
         "mobile": {
-            "title": "Touch Controls",
             "pinch": {
                 "label": "Zoom",
                 "description": "Pinch with two fingers to zoom in/out"
@@ -112,10 +109,14 @@
             }
         },
         "tips": {
-            "title": "Tips",
-            "cluePrefix": "Use the",
-            "clueSuffix": "button to get a hint",
-            "difficulty": "Higher the level, harder it gets!"
+            "clue": {
+                "label": "Clue",
+                "description": "The button at the bottom, to get a clue"
+            },
+            "levels": {
+                "label": "Levels",
+                "description": "Higher the level, harder it gets!"
+            }
         }
     }
 }

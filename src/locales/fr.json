@@ -18,7 +18,6 @@
         "resume": "Reprendre",
         "levels": "Niveaux",
         "howTo": "Comment jouer ?",
-        "howToShort": "Comment jouer",
         "reset": "Tout réinitialiser",
         "resetConfirm": "Effacer toute la progression ? Les records et le temps de jeu seront perdus.",
         "resetCancel": "Annuler",
@@ -75,47 +74,49 @@
     },
     "instructions": {
         "title": "Comment jouer ?",
-        "subtitle": "Trouvez Alex caché dans l'image !",
-        "gotIt": "J'ai compris !",
+        "subtitle": "Trouve Alex caché dans l'image !",
+        "gotIt": "J'ai compris",
         "desktop": {
-            "title": "Contrôles Bureau",
             "zoom": {
                 "label": "Zoom",
-                "description": "Utilisez la molette de la souris pour zoomer/dézoomer"
+                "description": "Utilise la molette de la souris pour zoomer/dézoomer"
             },
             "pan": {
                 "label": "Déplacer",
-                "description": "Cliquez et glissez pour déplacer l'image"
+                "description": "Clique et glisse pour déplacer l'image"
             },
             "click": {
                 "label": "Trouver Alex",
-                "description": "Cliquez sur Alex quand vous le voyez"
+                "description": "Clique sur Alex quand tu le vois"
             },
             "keyboard": {
                 "label": "Navigation",
-                "description": "Utilisez les flèches ← → pour changer d'image"
+                "description": "Utilise les flèches ← → pour changer d'image"
             }
         },
         "mobile": {
-            "title": "Contrôles Tactiles",
             "pinch": {
                 "label": "Zoom",
-                "description": "Pincez avec deux doigts pour zoomer/dézoomer"
+                "description": "Pince avec deux doigts pour zoomer/dézoomer"
             },
             "pan": {
                 "label": "Déplacer",
-                "description": "Glissez avec un doigt pour déplacer l'image"
+                "description": "Glisse avec un doigt pour déplacer l'image"
             },
             "tap": {
                 "label": "Trouver Alex",
-                "description": "Tapez sur Alex quand vous le voyez"
+                "description": "Touche Alex quand tu le vois"
             }
         },
         "tips": {
-            "title": "Astuces",
-            "cluePrefix": "Utilisez le bouton",
-            "clueSuffix": "pour obtenir un indice",
-            "difficulty": "Plus le niveau est élevé, plus c'est difficile !"
+            "clue": {
+                "label": "Indice",
+                "description": "Le bouton en bas, pour obtenir un indice"
+            },
+            "levels": {
+                "label": "Niveaux",
+                "description": "Plus le niveau est élevé, plus c'est difficile !"
+            }
         }
     }
 }

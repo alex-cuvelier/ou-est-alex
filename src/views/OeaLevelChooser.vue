@@ -4,9 +4,14 @@
             <header class="oea-home-head">
                 <h1>{{ $t('home.title') }}</h1>
                 <!-- Same "?" as in the game, on the title line where it is seen on arrival -->
-                <button type="button" class="oea-home-help" @click="instructionsVisible = true">
-                    <span class="oea-home-help-icon" aria-hidden="true">?</span>
-                    <span class="oea-home-help-label">{{ $t('home.howToShort') }}</span>
+                <button
+                    v-tooltip.bottom="tooltip($t('home.howTo'))"
+                    type="button"
+                    class="oea-home-help"
+                    :aria-label="$t('home.howTo')"
+                    @click="instructionsVisible = true"
+                >
+                    ?
                 </button>
                 <p class="oea-mono">{{ subtitle }}</p>
             </header>
@@ -60,6 +65,7 @@ import { useI18n } from 'vue-i18n';
 import { useQuestsStore } from '@/stores/questsStore.js';
 import { useUiStore } from '@/stores/uiStore.js';
 import { formatDuration, thumbUrl } from '@/utils/utils.js';
+import { tooltip } from '@/utils/tooltip.js';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -376,44 +382,31 @@ function resetGame() {
     background: var(--hot);
 }
 
+// The game's round "?" in ink, as the page is paper
 .oea-home-help {
     grid-area: help;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.3125rem 0.875rem 0.3125rem 0.3125rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: grid;
+    place-items: center;
+    padding: 0;
     border: 0;
-    border-radius: var(--radius-pill);
-    background: var(--surface-1);
-    box-shadow: inset 0 0 0 1px var(--hair);
-    color: var(--ink);
-    font-size: 0.8125rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--on-ink);
+    font-size: 1.0625rem;
     font-weight: 600;
     cursor: pointer;
     transition:
-        box-shadow 150ms ease,
+        opacity 150ms ease,
         transform 150ms var(--ease-out);
 
     &:hover {
-        box-shadow: inset 0 0 0 1.5px var(--mid);
+        opacity: 0.85;
     }
 
     &:active {
-        transform: scale(0.97);
-    }
-
-    // Very narrow phones: the "?" alone, the label stays for screen readers
-    @media (max-width: 379px) {
-        padding: 0.3125rem;
-
-        .oea-home-help-label {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
-            clip-path: inset(50%);
-            white-space: nowrap;
-        }
+        transform: scale(0.92);
     }
 }
 
@@ -430,16 +423,5 @@ function resetGame() {
         font-size: 0.8125rem;
         color: var(--mid);
     }
-}
-
-.oea-home-help-icon {
-    width: 1.5rem;
-    height: 1.5rem;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    background: var(--ink);
-    color: var(--on-ink);
-    font-weight: 700;
 }
 </style>
