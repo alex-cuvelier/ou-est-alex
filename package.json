@@ -4,8 +4,7 @@
     "private": true,
     "license": "MIT",
     "scripts": {
-        "dev": "vite",
-        "dev-host": "vite --host",
+        "dev": "vite --host",
         "thumbs": "node scripts/generate-thumbs.mjs",
         "prebuild": "npm run thumbs",
         "build": "vite build",
