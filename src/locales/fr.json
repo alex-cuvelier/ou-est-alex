@@ -18,7 +18,11 @@
         "resume": "Reprendre",
         "levels": "Niveaux",
         "howTo": "Comment jouer ?",
-        "howToShort": "Comment jouer"
+        "howToShort": "Comment jouer",
+        "reset": "Tout réinitialiser",
+        "resetConfirm": "Effacer toute la progression ? Les records et le temps de jeu seront perdus.",
+        "resetCancel": "Annuler",
+        "resetYes": "Tout effacer"
     },
     "quest": {
         "photoAlt": "Photo où Alex se cache",

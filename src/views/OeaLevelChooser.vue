@@ -38,12 +38,22 @@
                     </li>
                 </ul>
             </section>
+
+            <!-- Records and play time go too: asked twice so a stray tap never wipes them -->
+            <footer v-if="allFound" class="oea-home-reset">
+                <template v-if="confirmingReset">
+                    <p>{{ $t('home.resetConfirm') }}</p>
+                    <button type="button" class="oea-button oea-button--ghost" @click="confirmingReset = false">{{ $t('home.resetCancel') }}</button>
+                    <button type="button" class="oea-button" @click="resetGame">{{ $t('home.resetYes') }}</button>
+                </template>
+                <button v-else type="button" class="oea-button oea-button--ghost" @click="confirmingReset = true">{{ $t('home.reset') }}</button>
+            </footer>
         </div>
     </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -109,6 +119,18 @@ function openLevel(level) {
 
 function resumeGame() {
     openLevel(resume.value.level);
+}
+
+const allFound = computed(() => {
+    const total = questsStore.getTotalCount('all');
+    return total > 0 && questsStore.getCompletedCount('all') === total;
+});
+
+const confirmingReset = ref(false);
+
+function resetGame() {
+    questsStore.resetProgress();
+    confirmingReset.value = false;
 }
 </script>
 
@@ -392,6 +414,21 @@ function resumeGame() {
             clip-path: inset(50%);
             white-space: nowrap;
         }
+    }
+}
+
+.oea-home-reset {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem 0.5rem;
+
+    p {
+        flex-basis: 100%;
+        text-align: center;
+        font-size: 0.8125rem;
+        color: var(--mid);
     }
 }
 

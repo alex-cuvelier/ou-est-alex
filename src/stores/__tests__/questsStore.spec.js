@@ -333,6 +333,19 @@ describe('QuestsStore', () => {
             expect(store.bestTime(id)).toBe(25);
         });
 
+        it('should wipe everything on a reset', () => {
+            const store = useQuestsStore();
+            findAll(store);
+            store.rememberPosition();
+
+            store.resetProgress();
+
+            expect(store.getCompletedCount('all')).toBe(0);
+            expect(store.progress.playTime).toBe(0);
+            expect(store.runProgress(0).found).toBe(0);
+            expect(JSON.parse(storage.data['oea-progress'])).toEqual({ found: {}, playTime: 0, last: null, runs: {} });
+        });
+
         it('should remember the resume position until the level is complete', () => {
             const store = useQuestsStore();
             store.currentQuestIndex = 3;

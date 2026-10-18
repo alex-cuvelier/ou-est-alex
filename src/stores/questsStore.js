@@ -2,7 +2,7 @@ import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 
 import quests from '@/quests.json';
-import { loadProgress, saveProgress } from '@/utils/progress.js';
+import { emptyProgress, loadProgress, saveProgress } from '@/utils/progress.js';
 
 // Under this, a visit without any click or clue is a glance, not a search: the photo stays "to find"
 export const SEARCH_THRESHOLD = 5; // seconds
@@ -232,6 +232,13 @@ export const useQuestsStore = defineStore('quests', () => {
         save();
     }
 
+    /** A brand new game: every run, best time and play time goes */
+    function resetProgress() {
+        progress.value = emptyProgress();
+        currentQuestIndex.value = 0;
+        save();
+    }
+
     // --- Position, for "Resume" on the home screen ---
 
     function rememberPosition() {
@@ -288,6 +295,7 @@ export const useQuestsStore = defineStore('quests', () => {
         resumeIndex,
         openLevel,
         restartLevel,
+        resetProgress,
         runStats,
         recordAttempt,
         questStatus,

@@ -18,7 +18,11 @@
         "resume": "Resume",
         "levels": "Levels",
         "howTo": "How to play?",
-        "howToShort": "How to play"
+        "howToShort": "How to play",
+        "reset": "Reset everything",
+        "resetConfirm": "Erase all progress? Best times and play time will be lost.",
+        "resetCancel": "Cancel",
+        "resetYes": "Erase everything"
     },
     "quest": {
         "photoAlt": "Photo where Alex is hiding",
