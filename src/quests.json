@@ -338,7 +338,7 @@
         "coords": "1453,558,1469,565,1480,555,1473,541,1459,542",
         "width": 2016,
         "height": 1512,
-        "difficultyLevel": 2,
+        "difficultyLevel": 3,
         "group": "Tahoe"
     },
     {
@@ -347,7 +347,7 @@
         "coords": "1617,955,1644,967,1658,955,1658,931,1638,923,1622,931",
         "width": 2016,
         "height": 1512,
-        "difficultyLevel": 2,
+        "difficultyLevel": 3,
         "group": "Tahoe"
     },
     {
@@ -365,7 +365,7 @@
         "coords": "618,853,645,872,659,853,656,830,629,828",
         "width": 2016,
         "height": 1512,
-        "difficultyLevel": 3,
+        "difficultyLevel": 2,
         "group": "Tahoe"
     },
     {
