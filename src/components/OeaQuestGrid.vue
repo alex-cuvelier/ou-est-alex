@@ -106,6 +106,11 @@ function goToQuest(index) {
     overflow: hidden;
     background: var(--hair);
     cursor: pointer;
+    transition: transform 150ms var(--ease-out);
+
+    &:active {
+        transform: scale(0.97);
+    }
 
     img {
         display: block;
