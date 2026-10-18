@@ -1,61 +1,65 @@
 <template>
-    <!-- The game's glass, like the dock and the found card; PrimeVue keeps the mask, focus trap and Escape -->
-    <Dialog
+    <!-- A bottom sheet like the photo grid: each gesture shown on a photo rather than described -->
+    <Drawer
         v-model:visible="isVisible"
-        modal
-        :dismissableMask="true"
         position="bottom"
-        :draggable="false"
+        :header="$t('instructions.title')"
         class="oea-instructions-dialog"
-        :class="{ 'oea-instructions-dialog--game': inGame }"
-        aria-labelledby="oea-instructions-title"
+        :class="{ 'oea-instructions-dialog--desktop': !isMobile }"
+        style="height: auto"
     >
-        <template #container>
-            <header class="oea-instructions-dialog__head">
-                <h2 id="oea-instructions-title" class="oea-instructions-dialog__title">{{ $t('instructions.title') }}</h2>
-                <p class="oea-instructions-dialog__subtitle">{{ $t('instructions.subtitle') }}</p>
-            </header>
+        <p class="oea-instructions-dialog__subtitle">{{ $t('instructions.subtitle') }}</p>
 
-            <ul class="oea-instructions-dialog__list">
-                <li v-for="row in rows" :key="row.key" class="oea-instructions-dialog__item">
-                    <span class="oea-instructions-dialog__icon" aria-hidden="true">
-                        <img v-if="row.icon === 'clue'" src="@/assets/icons/compass-solid.svg" alt="" />
-                        <svg v-else viewBox="0 0 24 24">
-                            <template v-if="row.icon === 'zoom'">
-                                <circle cx="11" cy="11" r="6.5" />
-                                <path d="M16 16l4 4M11 8.5v5M8.5 11h5" />
-                            </template>
-                            <path
-                                v-else-if="row.icon === 'pan'"
-                                d="M12 4v16M4 12h16M9.5 6.5L12 4l2.5 2.5M9.5 17.5L12 20l2.5-2.5M6.5 9.5L4 12l2.5 2.5M17.5 9.5L20 12l-2.5 2.5"
-                            />
-                            <!-- The ring drawn around Alex once found -->
-                            <template v-else-if="row.icon === 'find'">
-                                <circle class="oea-instructions-dialog__halo" cx="12" cy="12" r="7.5" />
-                                <circle class="oea-instructions-dialog__ring" cx="12" cy="12" r="7.5" />
-                            </template>
-                            <path v-else-if="row.icon === 'keys'" d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4" />
-                            <path v-else d="M6 18v-3M12 18v-7M18 18V6" stroke-width="2.6" />
+        <ul class="oea-instructions-dialog__demos">
+            <li v-for="demo in demos" :key="demo.key" class="oea-instructions-dialog__demo">
+                <span class="oea-instructions-dialog__stage" :class="'is-' + demo.kind" aria-hidden="true">
+                    <img class="oea-instructions-dialog__photo" :src="demo.photo" alt="" />
+                    <img v-if="demo.next" class="oea-instructions-dialog__photo oea-instructions-dialog__photo--next" :src="demo.next" alt="" />
+
+                    <span v-if="demo.kind === 'find'" class="oea-instructions-dialog__ring" :style="demo.spot"></span>
+
+                    <template v-if="demo.kind === 'clue'">
+                        <span class="oea-instructions-dialog__clue" :style="demo.spot"></span>
+                        <span class="oea-instructions-dialog__tool">
+                            <img src="@/assets/icons/compass-solid.svg" alt="" />
+                            {{ $t('quest.clue') }}
+                        </span>
+                    </template>
+
+                    <span v-if="demo.kind === 'keys'" class="oea-instructions-dialog__keys">
+                        <kbd class="oea-instructions-dialog__key">←</kbd>
+                        <kbd class="oea-instructions-dialog__key oea-instructions-dialog__key--next">→</kbd>
+                    </span>
+
+                    <!-- A finger on touch screens, the mouse pointer on desktop (a second finger to pinch) -->
+                    <template v-if="demo.pointer">
+                        <span class="oea-instructions-dialog__pointer" :style="demo.spot">
+                            <svg v-if="!isMobile" viewBox="0 0 24 24"><path d="M5 2.5v16l4.2-3.8 2.9 6.3 2.6-1.2-2.9-6.2 5.7-.4z" /></svg>
+                        </span>
+                        <span v-if="isMobile && demo.kind === 'zoom'" class="oea-instructions-dialog__pointer oea-instructions-dialog__pointer--second"></span>
+                    </template>
+
+                    <!-- Desktop zoom: the mouse, its wheel rolling while the photo zooms -->
+                    <span v-if="demo.wheel" class="oea-instructions-dialog__mouse">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="6" y="2.5" width="12" height="19" rx="6" />
+                            <path class="oea-instructions-dialog__wheel" d="M12 6.5v3" />
                         </svg>
                     </span>
-                    <span class="oea-instructions-dialog__text">
-                        <b>{{ $t(`instructions.${row.key}.label`) }}</b>
-                        <span>{{ $t(`instructions.${row.key}.description`) }}</span>
-                    </span>
-                </li>
-            </ul>
+                </span>
+                <b class="oea-instructions-dialog__label">{{ $t(`instructions.${demo.key}.label`) }}</b>
+                <span class="oea-instructions-dialog__description">{{ $t(`instructions.${demo.key}.description`) }}</span>
+            </li>
+        </ul>
 
-            <button type="button" class="oea-instructions-dialog__button" autofocus @click="closeDialog">
-                {{ $t('instructions.gotIt') }}
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-            </button>
-        </template>
-    </Dialog>
+        <p class="oea-instructions-dialog__levels">{{ $t('instructions.tips.levels.description') }}</p>
+
+        <button type="button" class="oea-button oea-instructions-dialog__button" autofocus @click="closeDialog">{{ $t('instructions.gotIt') }}</button>
+    </Drawer>
 </template>
 
 <script setup>
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
 import useDeviceDetection from '@/composables/useDeviceDetection.js';
 
 const props = defineProps({
@@ -68,7 +72,6 @@ const props = defineProps({
 const emit = defineEmits(['update:visible']);
 
 const { isMobile } = useDeviceDetection();
-const route = useRoute();
 
 const isVisible = computed({
     get() {
@@ -79,24 +82,27 @@ const isVisible = computed({
     },
 });
 
-// In the game the panel sits above the dock, elsewhere at the bottom of the screen
-const inGame = computed(() => route.name === 'quest');
+// Thumbnails the home cards already show; the ring and the clue circle sit away from Alex, so the help gives nothing away
+const thumb = (name) => `/images/thumbs/${name}.webp`;
+const CENTER = { left: '50%', top: '50%' };
 
-// The controls of the device in use, then the tips
-const rows = computed(() => {
-    const controls = isMobile.value
-        ? [
-              { icon: 'zoom', key: 'mobile.pinch' },
-              { icon: 'pan', key: 'mobile.pan' },
-              { icon: 'find', key: 'mobile.tap' },
-          ]
-        : [
-              { icon: 'zoom', key: 'desktop.zoom' },
-              { icon: 'pan', key: 'desktop.pan' },
-              { icon: 'find', key: 'desktop.click' },
-              { icon: 'keys', key: 'desktop.keyboard' },
-          ];
-    return [...controls, { icon: 'clue', key: 'tips.clue' }, { icon: 'levels', key: 'tips.levels' }];
+// The controls of the device in use, each with its photo and where the gesture lands
+const demos = computed(() => {
+    const zoom = { kind: 'zoom', photo: thumb(2), spot: CENTER, pointer: true };
+    const pan = { kind: 'pan', photo: thumb(12), spot: CENTER, pointer: true };
+    const find = { kind: 'find', photo: thumb(3), spot: { left: '28%', top: '62%' }, pointer: true };
+    const clue = { kind: 'clue', key: 'tips.clue', photo: thumb(1), spot: { left: '72%', top: '40%' } };
+
+    if (isMobile.value) {
+        return [{ ...zoom, key: 'mobile.pinch' }, { ...pan, key: 'mobile.pan' }, { ...find, key: 'mobile.tap' }, clue];
+    }
+    return [
+        { ...zoom, key: 'desktop.zoom', pointer: false, wheel: true },
+        { ...pan, key: 'desktop.pan' },
+        { ...find, key: 'desktop.click' },
+        { kind: 'keys', key: 'desktop.keyboard', photo: thumb(47), next: thumb(19) },
+        clue,
+    ];
 });
 
 function closeDialog() {
@@ -105,175 +111,558 @@ function closeDialog() {
 </script>
 
 <style lang="scss">
-// Qualified by the mask: PrimeVue's position rules (.p-dialog-bottom .p-dialog) are injected after this sheet
-.p-dialog-mask .oea-instructions-dialog.p-dialog {
-    width: min(calc(100% - 1.5rem), 24rem);
-    max-height: calc(100% - 1.5rem - var(--safe-top) - var(--safe-bottom));
-    margin: 0 0 calc(0.75rem + var(--safe-bottom));
-    padding: 1.125rem 1rem 1rem;
+.oea-instructions-dialog.p-drawer {
+    max-height: 90svh;
     border: 0;
-    border-radius: 1.25rem;
-    background: var(--glass-strong);
-    color: var(--on-glass);
-    backdrop-filter: blur(16px) saturate(140%);
-    -webkit-backdrop-filter: blur(16px) saturate(140%);
-    box-shadow:
-        inset 0 0 0 1px var(--glass-line),
-        0 12px 32px -12px rgba(0, 0, 0, 0.55);
+    border-radius: 1.5rem 1.5rem 0 0;
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 -20px 60px -20px rgba(0, 0, 0, 0.5);
 
-    // Same entrance as the found card, instead of a slide from the bottom edge
-    &.p-dialog-enter-active {
-        transition:
-            opacity 200ms ease,
-            transform 200ms var(--ease-out);
+    .p-drawer-header {
+        padding: 1.25rem 1rem 0;
     }
 
-    &.p-dialog-leave-active {
-        transition: opacity 120ms ease;
+    .p-drawer-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
     }
 
-    &.p-dialog-enter-from {
-        opacity: 0;
-        transform: translate3d(0, 0.5rem, 0);
+    .p-drawer-content {
+        padding: 0 1rem calc(1.25rem + var(--safe-bottom));
     }
-
-    &.p-dialog-leave-to {
-        opacity: 0;
-        transform: none;
-    }
-}
-
-// Where the found card shows: the dock stays in sight under the mask
-.p-dialog-mask .oea-instructions-dialog--game.p-dialog {
-    max-height: calc(100% - 6.125rem - var(--safe-top) - var(--safe-bottom));
-    margin-bottom: calc(0.875rem + 3.75rem + 0.5rem + var(--safe-bottom));
-}
-
-.oea-instructions-dialog__head {
-    flex-shrink: 0;
-    display: grid;
-    gap: 0.125rem;
-    padding: 0 0.125rem 0.5rem;
-}
-
-.oea-instructions-dialog__title {
-    margin: 0;
-    font-size: 1.25rem;
-    line-height: 1.2;
 }
 
 .oea-instructions-dialog__subtitle {
-    margin: 0;
-    font-size: 0.8125rem;
-    color: rgba(255, 255, 255, 0.72);
+    max-width: 60rem;
+    margin: 0 auto 0.875rem;
+    font-size: 0.875rem;
+    color: var(--mid);
 }
 
-// Scrolls on its own on short screens: the title and the button stay in sight
-.oea-instructions-dialog__list {
-    min-height: 0;
-    margin: 0;
+.oea-instructions-dialog__demos {
+    max-width: 60rem;
+    margin: 0 auto;
     padding: 0;
-    overflow-y: auto;
     list-style: none;
-}
-
-.oea-instructions-dialog__item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem 0.125rem;
-
-    & + & {
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-}
-
-// Round like the dock's arrows
-.oea-instructions-dialog__icon {
-    flex-shrink: 0;
-    width: 2.25rem;
-    height: 2.25rem;
     display: grid;
-    place-items: center;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.12);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 0.625rem;
+}
 
-    svg {
-        width: 1.1rem;
-        height: 1.1rem;
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 2.2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
+.oea-instructions-dialog__demo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+// The photo stage of the game, at thumbnail size
+.oea-instructions-dialog__stage {
+    --pan: 16px;
+
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 3;
+    margin-bottom: 0.375rem;
+    border-radius: 14px;
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--stage);
+}
+
+.oea-instructions-dialog__photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+    &--next {
+        opacity: 0;
     }
+}
+
+.oea-instructions-dialog__label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+}
+
+.oea-instructions-dialog__description {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--mid);
+}
+
+// Same look as the game's ring around Alex, the rest of the photo dimmed
+.oea-instructions-dialog__ring {
+    position: absolute;
+    width: 2.125rem;
+    height: 2.125rem;
+    margin: -1.0625rem 0 0 -1.0625rem;
+    border: 3px solid var(--hot);
+    border-radius: 50%;
+    box-shadow:
+        0 0 0 1.5px rgba(255, 255, 255, 0.85),
+        0 0 0 100vmax rgba(0, 0, 0, 0.35);
+}
+
+// Same look as the game's clue: red ring, white inner line
+.oea-instructions-dialog__clue {
+    position: absolute;
+    width: 4rem;
+    height: 4rem;
+    margin: -2rem 0 0 -2rem;
+    border: 3px solid var(--hot);
+    border-radius: 50%;
+    box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.35);
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 2px;
+        border: 1.5px solid rgba(255, 255, 255, 0.85);
+        border-radius: 50%;
+    }
+}
+
+// The dock's clue button, in miniature
+.oea-instructions-dialog__tool {
+    position: absolute;
+    left: 50%;
+    bottom: 0.5rem;
+    width: 3.75rem;
+    height: 2.375rem;
+    margin-left: -1.875rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    border-radius: 0.625rem;
+    background: var(--glass);
+    box-shadow: inset 0 0 0 1px var(--glass-line);
+    color: var(--on-glass);
+    font-size: 0.625rem;
+    line-height: 1;
 
     img {
-        width: 1.2rem;
-        height: 1.2rem;
+        width: 0.95rem;
+        height: 0.95rem;
         filter: brightness(0) invert(1);
     }
 }
 
-.oea-instructions-dialog__halo {
-    stroke: rgba(255, 255, 255, 0.85);
-    stroke-width: 4.5;
+.oea-instructions-dialog__keys {
+    position: absolute;
+    left: 50%;
+    bottom: 0.5rem;
+    display: flex;
+    gap: 0.25rem;
+    transform: translateX(-50%);
 }
 
-.oea-instructions-dialog__ring {
-    stroke: var(--hot);
-    stroke-width: 2.6;
-}
-
-.oea-instructions-dialog__text {
-    flex: 1;
-    min-width: 0;
+.oea-instructions-dialog__key {
+    min-width: 1.75rem;
+    height: 1.75rem;
     display: grid;
-
-    b {
-        font-size: 0.875rem;
-        font-weight: 600;
-        line-height: 1.3;
-    }
-
-    span {
-        font-size: 0.8125rem;
-        line-height: 1.35;
-        color: rgba(255, 255, 255, 0.7);
-    }
+    place-items: center;
+    border-radius: 0.5rem;
+    background: var(--glass);
+    box-shadow:
+        inset 0 0 0 1px var(--glass-line),
+        0 2px 0 rgba(0, 0, 0, 0.4);
+    color: var(--on-glass);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
 }
 
-// White on glass, like the found card's "Next"
-.oea-instructions-dialog__button {
-    flex-shrink: 0;
-    margin-top: 0.625rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.375rem;
-    height: 2.75rem;
-    padding: 0 1rem;
-    border: 0;
-    border-radius: var(--radius-pill);
-    background: #fff;
-    color: #0f0f12;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 150ms var(--ease-out);
+// A fingertip; on desktop only its arrow shows, the tip on the spot
+.oea-instructions-dialog__pointer {
+    position: absolute;
+    width: 1.375rem;
+    height: 1.375rem;
+    margin: -0.6875rem 0 0 -0.6875rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    box-shadow:
+        0 0 0 2px #fff,
+        0 4px 10px rgba(0, 0, 0, 0.35);
 
-    &:active {
-        transform: scale(0.97);
+    &--second {
+        left: 50%;
+        top: 50%;
+    }
+
+    .oea-instructions-dialog--desktop & {
+        margin: 0;
+        background: none;
+        box-shadow: none;
     }
 
     svg {
-        width: 1rem;
-        height: 1rem;
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 2.4;
-        stroke-linecap: round;
+        display: block;
+        width: 1.25rem;
+        height: 1.25rem;
+        fill: #fff;
+        stroke: #0f0f12;
+        stroke-width: 1.4;
         stroke-linejoin: round;
+        filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4));
+    }
+}
+
+// Glass like the keys, white line like the pointer
+.oea-instructions-dialog__mouse {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    svg {
+        display: block;
+        width: 2.75rem;
+        height: 2.75rem;
+        fill: var(--glass);
+        stroke: #fff;
+        stroke-width: 1.6;
+        stroke-linecap: round;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+    }
+}
+
+.oea-instructions-dialog__wheel {
+    stroke-width: 2.2;
+}
+
+.oea-instructions-dialog__levels {
+    max-width: 60rem;
+    margin: 1rem auto 0;
+    font-size: 0.8125rem;
+    text-align: center;
+    color: var(--mid);
+}
+
+.oea-instructions-dialog__button {
+    display: flex;
+    width: 100%;
+    max-width: 22rem;
+    margin: 0.875rem auto 0;
+}
+
+// Desktop: five controls on one row, a size up, the title lined up with the photos
+.oea-instructions-dialog--desktop {
+    --sheet-width: 80rem;
+
+    &.p-drawer {
+        .p-drawer-header {
+            padding: 2rem max(2rem, calc((100% - var(--sheet-width)) / 2)) 0;
+        }
+
+        .p-drawer-title {
+            font-size: 1.5rem;
+        }
+
+        .p-drawer-content {
+            padding: 0 2rem calc(2rem + var(--safe-bottom));
+        }
+    }
+
+    .oea-instructions-dialog__subtitle,
+    .oea-instructions-dialog__demos,
+    .oea-instructions-dialog__levels {
+        max-width: var(--sheet-width);
+    }
+
+    .oea-instructions-dialog__subtitle {
+        margin-bottom: 1.25rem;
+        font-size: 1rem;
+    }
+
+    .oea-instructions-dialog__demos {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 1.5rem;
+    }
+
+    .oea-instructions-dialog__stage {
+        --pan: 1.5rem;
+
+        margin-bottom: 0.625rem;
+        border-radius: var(--radius-card);
+    }
+
+    .oea-instructions-dialog__label {
+        font-size: 1rem;
+    }
+
+    .oea-instructions-dialog__description {
+        font-size: 0.9375rem;
+    }
+
+    .oea-instructions-dialog__ring {
+        width: 2.75rem;
+        height: 2.75rem;
+        margin: -1.375rem 0 0 -1.375rem;
+    }
+
+    .oea-instructions-dialog__clue {
+        width: 5.5rem;
+        height: 5.5rem;
+        margin: -2.75rem 0 0 -2.75rem;
+    }
+
+    .oea-instructions-dialog__tool {
+        bottom: 0.75rem;
+        width: 4.5rem;
+        height: 2.875rem;
+        margin-left: -2.25rem;
+        font-size: 0.75rem;
+
+        img {
+            width: 1.15rem;
+            height: 1.15rem;
+        }
+    }
+
+    .oea-instructions-dialog__keys {
+        bottom: 0.75rem;
+        gap: 0.375rem;
+    }
+
+    .oea-instructions-dialog__key {
+        min-width: 2.25rem;
+        height: 2.25rem;
+        font-size: 0.9375rem;
+    }
+
+    .oea-instructions-dialog__pointer svg {
+        width: 1.625rem;
+        height: 1.625rem;
+    }
+
+    .oea-instructions-dialog__levels {
+        margin-top: 1.5rem;
+        font-size: 0.9375rem;
+    }
+
+    .oea-instructions-dialog__button {
+        max-width: 24rem;
+        min-height: 3rem;
+        margin-top: 1.25rem;
+        font-size: 1rem;
+    }
+}
+
+// --- The gestures, looped. With reduced motion (base.scss) each stage shows its still state ---
+
+.oea-instructions-dialog__stage {
+    --loop: 3.2s;
+
+    &.is-zoom .oea-instructions-dialog__photo {
+        animation: helpZoom var(--loop) ease-in-out infinite;
+    }
+
+    &.is-zoom .oea-instructions-dialog__wheel {
+        animation: helpWheel var(--loop) ease-in-out infinite;
+    }
+
+    &.is-pan .oea-instructions-dialog__photo {
+        animation: helpPanPhoto var(--loop) ease-in-out infinite;
+    }
+
+    &.is-pan .oea-instructions-dialog__pointer {
+        animation: helpPanPointer var(--loop) ease-in-out infinite;
+    }
+
+    &.is-find .oea-instructions-dialog__pointer {
+        animation: helpTap var(--loop) ease-out infinite;
+    }
+
+    &.is-find .oea-instructions-dialog__ring {
+        animation: helpRing var(--loop) var(--ease-out) infinite;
+    }
+
+    &.is-clue .oea-instructions-dialog__tool {
+        animation: helpPress var(--loop) ease-out infinite;
+    }
+
+    &.is-clue .oea-instructions-dialog__clue {
+        animation: helpClue var(--loop) ease-out infinite;
+    }
+
+    &.is-keys .oea-instructions-dialog__photo--next {
+        animation: helpNextPhoto var(--loop) ease-in-out infinite;
+    }
+
+    &.is-keys .oea-instructions-dialog__key--next {
+        animation: helpPress var(--loop) ease-out infinite;
+    }
+}
+
+// Two fingers on touch screens: they spread while the photo zooms
+.oea-instructions-dialog:not(.oea-instructions-dialog--desktop) .is-zoom .oea-instructions-dialog__pointer {
+    animation: helpPinchA var(--loop) ease-in-out infinite;
+
+    &--second {
+        animation-name: helpPinchB;
+    }
+}
+
+@keyframes helpZoom {
+    0%,
+    15%,
+    100% {
+        transform: scale(1);
+    }
+    50%,
+    65% {
+        transform: scale(1.35);
+    }
+}
+
+// Two notches up while the photo zooms in, two down while it zooms out
+@keyframes helpWheel {
+    0%,
+    15%,
+    32%,
+    50%,
+    65%,
+    82%,
+    100% {
+        transform: translateY(0);
+    }
+    24%,
+    41% {
+        transform: translateY(-2px);
+    }
+    74%,
+    91% {
+        transform: translateY(2px);
+    }
+}
+
+@keyframes helpPinchA {
+    0%,
+    15%,
+    100% {
+        transform: translate(0, 0);
+    }
+    50%,
+    65% {
+        transform: translate(-22px, -14px);
+    }
+}
+
+@keyframes helpPinchB {
+    0%,
+    15%,
+    100% {
+        transform: translate(0, 0);
+    }
+    50%,
+    65% {
+        transform: translate(22px, 14px);
+    }
+}
+
+@keyframes helpPanPhoto {
+    0%,
+    12%,
+    100% {
+        transform: translateX(var(--pan)) scale(1.4);
+    }
+    50%,
+    62% {
+        transform: translateX(calc(-1 * var(--pan))) scale(1.4);
+    }
+}
+
+@keyframes helpPanPointer {
+    0%,
+    12%,
+    100% {
+        transform: translateX(var(--pan));
+    }
+    50%,
+    62% {
+        transform: translateX(calc(-1 * var(--pan)));
+    }
+}
+
+@keyframes helpTap {
+    0%,
+    10% {
+        opacity: 0;
+        transform: scale(1.4);
+    }
+    22% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    34%,
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes helpRing {
+    0%,
+    28% {
+        opacity: 0;
+        transform: scale(1.3);
+    }
+    40%,
+    85% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes helpPress {
+    0%,
+    40%,
+    50%,
+    100% {
+        transform: scale(1);
+    }
+    45% {
+        transform: scale(0.88);
+    }
+}
+
+@keyframes helpClue {
+    0%,
+    48% {
+        opacity: 0;
+        transform: scale(1.08);
+    }
+    55%,
+    85% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    95%,
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes helpNextPhoto {
+    0%,
+    45% {
+        opacity: 0;
+    }
+    55%,
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
     }
 }
 </style>

@@ -3,17 +3,9 @@
         <div class="oea-home-inner">
             <header class="oea-home-head">
                 <h1>{{ $t('home.title') }}</h1>
-                <!-- Same "?" as in the game, on the title line where it is seen on arrival -->
-                <button
-                    v-tooltip.bottom="tooltip($t('home.howTo'))"
-                    type="button"
-                    class="oea-home-help"
-                    :aria-label="$t('home.howTo')"
-                    @click="instructionsVisible = true"
-                >
-                    ?
-                </button>
                 <p class="oea-mono">{{ subtitle }}</p>
+                <!-- A discreet link: the help also opens by itself on the first photo -->
+                <button type="button" class="oea-home-help" @click="instructionsVisible = true">{{ $t('home.howTo') }}</button>
             </header>
 
             <button v-if="resume" type="button" class="oea-resume" :style="{ backgroundImage: `url(${resume.thumb})` }" @click="resumeGame">
@@ -65,7 +57,6 @@ import { useI18n } from 'vue-i18n';
 import { useQuestsStore } from '@/stores/questsStore.js';
 import { useUiStore } from '@/stores/uiStore.js';
 import { formatDuration, thumbUrl } from '@/utils/utils.js';
-import { tooltip } from '@/utils/tooltip.js';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -162,14 +153,14 @@ function resetGame() {
     }
 }
 
-// Title and help on the same line, the subtitle under both
+// The title alone, then the progress and the help link on one line
 .oea-home-head {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
-        'title help'
-        'sub sub';
-    align-items: center;
+        'title title'
+        'sub help';
+    align-items: baseline;
     gap: 0.375rem 0.75rem;
 
     h1 {
@@ -382,31 +373,26 @@ function resetGame() {
     background: var(--hot);
 }
 
-// The game's round "?" in ink, as the page is paper
+// Padded to a finger's height without moving the line
 .oea-home-help {
     grid-area: help;
-    width: 2.5rem;
-    height: 2.5rem;
-    display: grid;
-    place-items: center;
-    padding: 0;
+    margin: -0.75rem 0;
+    padding: 0.75rem 0;
     border: 0;
-    border-radius: 50%;
-    background: var(--ink);
-    color: var(--on-ink);
-    font-size: 1.0625rem;
+    background: none;
+    color: var(--ink);
+    font-size: 0.8125rem;
     font-weight: 600;
+    white-space: nowrap;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: var(--mid);
+    text-underline-offset: 4px;
     cursor: pointer;
-    transition:
-        opacity 150ms ease,
-        transform 150ms var(--ease-out);
+    transition: text-decoration-color 150ms ease;
 
     &:hover {
-        opacity: 0.85;
-    }
-
-    &:active {
-        transform: scale(0.92);
+        text-decoration-color: var(--ink);
     }
 }
 
