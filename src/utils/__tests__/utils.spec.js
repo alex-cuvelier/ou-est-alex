@@ -343,6 +343,13 @@ describe('alexRing', () => {
         expect(ring.height).toBeCloseTo(8);
     });
 
+    it('should hug the outline when asked, however small', () => {
+        const ring = alexRing({ coords: '500,200,510,200,510,210', width: 1000, height: 400 }, { hug: true });
+
+        expect(ring.width).toBeCloseTo(1.4);
+        expect(ring.height).toBeCloseTo(3.5);
+    });
+
     it('should be absent without coordinates', () => {
         expect(alexRing({ width: 100, height: 100 })).toBeNull();
     });

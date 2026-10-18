@@ -27,6 +27,7 @@
                     <span
                         v-if="isFound && ring"
                         class="oea-alex-ring"
+                        :class="{ 'oea-alex-ring--spotlight': justFound }"
                         :style="{ left: ring.x + '%', top: ring.y + '%', width: ring.width + '%', height: ring.height + '%' }"
                         aria-hidden="true"
                     ></span>
@@ -155,6 +156,7 @@ const CLUE_MIN_SIZE = 50;
 const CLUE_DURATION = 200; // ms on screen: a glimpse, with a quick fade in and out
 const CLUE_NUDGE_DELAY = 90; // seconds searching without a clue before the compass pulses
 const MISS_LIFETIME = 2500;
+const FOUND_ZOOM = 15; // Zoom on Alex once found, lower when his ring would not fit on screen
 const FOUND_ZOOM_DURATION = 1600;
 const ADVANCE_DELAY = 2800; // ms from the find to the next photo: the zoom on Alex, then time to read the card
 const CLOCK_REFRESH = 250; // ms between two refreshes of the displayed time
@@ -458,15 +460,18 @@ function onAlexFound() {
 
     // The zoom brings the ring to the middle of the photo, and the heads spring from there
     const { width, height } = wrapperSize.value;
-    animateZoomTo((ring.value.x / 100) * width, (ring.value.y / 100) * height, 15, FOUND_ZOOM_DURATION);
     const area = photoArea.value.getBoundingClientRect();
+    // The ring kept within 70% of the screen's short side
+    const zoom = Math.max(1, Math.min(FOUND_ZOOM, (0.7 * Math.min(area.width, area.height)) / ((ring.value.width / 100) * width)));
+    animateZoomTo((ring.value.x / 100) * width, (ring.value.y / 100) * height, zoom, FOUND_ZOOM_DURATION);
     const wrapper = imageWrapper.value; // Its layout box, the zoom aside
     confetti.burst(area.left + wrapper.offsetLeft + wrapper.offsetWidth / 2, area.top + wrapper.offsetTop + wrapper.offsetHeight / 2);
 }
 
 // --- Once found: the card, then the next photo still to search ---
 
-const ring = computed(() => alexRing(currentQuest.value));
+// Found just now, the photo zooms in: the ring hugs Alex. Seen again later, unzoomed, it stays big enough to be seen
+const ring = computed(() => alexRing(currentQuest.value, { hug: justFound.value }));
 
 // Compared as displayed (whole seconds), so that a record never reads "0:12, before 0:12"
 const shownSeconds = (seconds) => Math.floor(seconds);
@@ -721,6 +726,13 @@ onUnmounted(() => {
 
     @media (prefers-reduced-motion: reduce) {
         animation: none;
+    }
+
+    // Found just now: the rest of the photo dimmed, as under a clue
+    &--spotlight {
+        box-shadow:
+            0 0 0 calc(1.5px / var(--zoom, 1)) rgba(255, 255, 255, 0.85),
+            0 0 0 100vmax rgba(0, 0, 0, 0.35);
     }
 }
 
